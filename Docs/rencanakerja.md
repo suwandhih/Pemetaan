@@ -103,15 +103,47 @@ nanti diperlukan citra yang tidak berubah-ubah.
 
 ## Penghambat (menunggu dari pemilik proyek)
 
+### 🔴 PERLU DIPUTUSKAN BESOK — perubahan belum tersimpan
+
+Ditemukan 2026-10-12 22:25 saat pemeriksaan akhir sebelum berhenti.
+
+| Hal | Keadaan |
+|---|---|
+| `Docs/aturan.md` | **Sudah tidak ada** di lokal (dihapus) |
+| `Docs/agents.md` | **Ada** di lokal — 5.252 byte |
+| Isi `agents.md` vs `aturan.md` | **Identik** — 120 baris, **0 perbedaan** (baru ganti nama, isi belum diubah) |
+| Di GitHub | masih `Docs/aturan.md` — **31 commit? tidak**, masih 13 commit lama |
+| Status git | `D Docs/aturan.md` + `?? Docs/agents.md` — **belum di-commit** |
+
+**Sebab:** penggantian nama ini dilakukan dari luar sesi (oleh pemilik proyek),
+bukan oleh asisten. Sesuai aturan 1 (backup) dan aturan 2 (jangan menambah
+tanpa perintah), asisten **belum menyimpan perubahan ini**.
+
+**Tiga pilihan untuk besok:**
+
+| Pilihan | Cara | Akibat |
+|---|---|---|
+| A — Pakai `agents.md` | `git mv Docs/aturan.md Docs/agents.md` lalu commit | Riwayat terjaga (git mengenali sebagai *rename*, bukan hapus+buat) |
+| B — Kembalikan ke `aturan.md` | `git checkout -- Docs/aturan.md` | Repo kembali seperti semula |
+| C — Pakai `agents.md` + tambah isi | Opsi A, lalu tambahkan bagian "catatan AI" seperti di orderan 9 | Sesuai rencana orderan 9 dan 11 |
+
+Catatan: opsi **C** sesuai dengan maksud orderan 9 yang sudah tercatat —
+`agents.md` bukan sekadar ganti nama, tetapi juga memuat catatan agar asisten
+diingatkan setiap mulai proyek.
+
+---
+
+### Penghambat lain
+
 | No | Yang dibutuhkan | Untuk orderan | Status |
 |----|-----------------|---------------|--------|
-| 1 | **Kredensial Neon** — connection string, atau URL Data API + JWT | 1 dan 6 | ⛔ Belum ada |
-| 2 | **Tujuan push GitHub** — repo baru atau repo yang sudah ada? | 1 | ⛔ Belum diputuskan |
-| 3 | **Pemisahan penyimpanan** — kode ke GitHub (repo publik), data ke Neon (database). Perlu dipastikan karena repo publik = kode terlihat semua orang | 1 | ⛔ Belum diputuskan |
-| 4 | **Password/kunci database** — kalau kredensial diberikan lewat obrolan, tercatat di riwayat sesi. Perlu kesepakatan cara penyerahan | 1 dan 6 | ⛔ Belum diputuskan |
-| 5 | **Aktifkan Data API Neon** atau putuskan memakai driver langsung | 1 dan 6 | ⛔ Belum diputuskan |
-| 6 | **Buat tabel di Neon** — saat ini 0 tabel, belum ada skema | 1 dan 6 | ⛔ Belum diputuskan |
-| 7 | **Aturan RLS** — wajib dibuat sebelum data masuk | 1 dan 6 | ⛔ Belum diputuskan |
+| 1 | **Kredensial Neon** — connection string, atau URL Data API + JWT | 1, 6, 7 | ⛔ Belum ada |
+| 2 | **Tujuan push GitHub** — repo baru atau repo yang sudah ada? | 1 | ✅ Terjawab: repo `Pemetaan` |
+| 3 | **Pemisahan penyimpanan** — kode ke GitHub (repo publik), data ke Neon (database) | 1, 6, 7 | ⛔ Belum diputuskan |
+| 4 | **Password/kunci database** — cara penyerahan | 1, 6, 7 | ⛔ Belum diputuskan |
+| 5 | **Aktifkan Data API Neon** atau putuskan memakai driver langsung | 1, 6, 7 | ⛔ Belum diputuskan |
+| 6 | **Buat tabel di Neon** — saat ini 0 tabel, belum ada skema | 1, 6, 7 | ⛔ Belum diputuskan |
+| 7 | **Aturan RLS** — wajib dibuat sebelum data masuk | 1, 6, 7 | ⛔ Belum diputuskan |
 
 Catatan penting soal Neon: **Neon Data API tidak punya lapisan izin sendiri.**
 Setiap permintaan diotorisasi sepenuhnya oleh `GRANT` dan kebijakan
