@@ -353,6 +353,7 @@ Catatan arah proyek yang sudah disetujui pemilik proyek.
 | 2026-10-12 | **Aturan 9 ditetapkan:** tanda kehidupan saat bekerja. Asisten tidak boleh diam di layar; wajib melaporkan langkah ke berapa, nama pekerjaan, waktu mulai/selesai, hasil perintah, posisi keseluruhan, langkah lama, jalan buntu, dan ringkasan akhir. |
 | 2026-10-12 | **Setelan database & GitHub dijadikan orderan tersendiri** — orderan 7 (database Neon) dan orderan 8 (GitHub), karena keduanya perlu dikerjakan, bukan sekadar syarat. |
 | 2026-10-12 | **Seluruh berkas `.md` dipindahkan ke folder `Docs/`.** Akar proyek bersih dari dokumen. Dicatat sebagai bagian aturan 3b di `Docs/aturan.md`. |
+| 2026-10-12 | **Nama repo GitHub ditetapkan: `Pemetaan`, publik** (`https://github.com/suwandhih/Pemetaan`). Alasan publik: supaya dapat memakai **GitHub Pages gratis**. Struktur dokumen proyek: `agents.md` (aturan + catatan untuk AI), `rencanakerja.md` (orderan), `prompt.md` (konsep agar bisa dibangun ulang persis sama), `CHANGELOG.md` (semua perkembangan). |
 
 ---
 
