@@ -13,11 +13,76 @@ Aturan pengelolaan:
 
 ## Daftar Orderan
 
-Belum ada orderan teknis yang tercatat.
+Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 
-| No | Orderan | Status | Tanggal Selesai |
-|----|---------|--------|-----------------|
-| —  | —       | —      | —               |
+| No | Orderan | Status | Estimasi | Tanggal Selesai |
+|----|---------|--------|----------|-----------------|
+| 1 | Konsep aplikasi: berjalan di Chrome Android; kode di-push ke GitHub; data memakai database Neon; berjalan juga di Chrome PC dengan lebar 50% (simulasi ukuran HP) | BARU | 30–45 mnt | — |
+| 2 | UI HP berdiri (portrait); penampakan peta bisa di-scroll kiri-kanan; peta Sumatera–Jawa muat dari atas ke bawah | BARU | 30–45 mnt | — |
+| 3 | Peta menjadi utama sehingga harus tetap/freeze; input data tambahan dan panel lain memakai hide/unhide | BARU | 40–60 mnt | — |
+| 4 | UI peta memakai citra satelit; harus terlihat gunung, danau, sungai, rumah, jalan, dan nama jalan | BARU | 45–60 mnt | — |
+| 5 | Detail peta setara `suwandhih.github.io/petadunia/app/index.html`; citra satelit memakai versi terbaru (data lama sudah banyak berubah, hampir tidak bisa dipakai) | **SUDAH TERPENUHI** — perlu verifikasi ulang | 10 mnt | — |
+| 6 | Tahap awal: peta dan tampilan sudah bisa diakses di PC maupun HP; konsep dasar UI, penempatan data, dan isian data | BARU | 90–150 mnt | — |
+
+Catatan hubungan antar-orderan:
+
+* Orderan 1–5 berisi **syarat** dari aplikasi yang akan dibangun.
+* Orderan 6 adalah **wujud nyata** tahap awal — peta + UI + form isian.
+* Orderan 4 dan 5 hampir seluruhnya berupa konfigurasi, bukan kode baru.
+
+Total perkiraan waktu orderan 1–6: **±4,5–6,5 jam**, dikerjakan bertahap.
+
+---
+
+## Temuan Verifikasi Orderan 5 (citra satelit terbaru)
+
+Sudah diuji 2026-10-12. Orderan 5 **sudah terpenuhi oleh konfigurasi petadunia**,
+jadi tidak perlu dikerjakan dari nol.
+
+### Hasil uji
+
+| Uji | Hasil |
+|---|---|
+| Rilis citra terbaru Esri (dari `waybackconfig.json`) | **World Imagery 2026-09-24** (rl `63116`), total **197 rilis** |
+| Tile Jakarta z18: citra terkini vs rilis 2026-09-24 | **Identik** — 21.280 byte, isi sama |
+| Tile Medan z18 | Identik — 15.619 byte |
+| Tile Surabaya z18 | Identik — 18.983 byte |
+
+Kesimpulan: URL yang dipakai petadunia
+(`server.arcgisonline.com/.../World_Imagery/MapServer/tile/{z}/{y}/{x}`)
+**sudah menunjuk citra terbaru 2026-09-24**. Tidak ada versi yang lebih baru.
+
+### Rilis 2024–2026 yang tersedia (rujukan)
+
+| Tanggal rilis | rl |
+|---|---|
+| 2026-09-24 | 63116 |
+| 2026-08-05 | 26334 |
+| 2026-06-30 | 32246 |
+| 2026-05-28 | 10842 |
+| 2026-04-30 | 49059 |
+| 2026-03-26 | 22869 |
+| 2026-02-26 | 64001 |
+| 2026-01-29 | 22252 |
+| 2025-12-18 | 13192 |
+
+Catatan: rilis tertentu dapat dikunci lewat `wayback.maptiles.arcgis.com` bila
+nanti diperlukan citra yang tidak berubah-ubah.
+
+---
+
+## Penghambat (menunggu dari pemilik proyek)
+
+| No | Yang dibutuhkan | Untuk orderan |
+|----|-----------------|---------------|
+| 1 | Kredensial Neon (connection string, atau URL Data API + JWT) | 1 dan 6 |
+| 2 | Tujuan push GitHub: repo baru atau repo yang sudah ada? | 1 |
+| 3 | Keputusan: kode ke GitHub, data ke Neon — perlu dipastikan | 1 |
+
+Catatan penting soal Neon: **Neon Data API tidak punya lapisan izin sendiri.**
+Setiap permintaan diotorisasi sepenuhnya oleh `GRANT` dan kebijakan
+**Row-Level Security (RLS)** di PostgreSQL. Kebijakan yang salah membuat tabel
+terbuka bagi siapa pun yang memiliki URL endpoint. RLS wajib disiapkan.
 
 ---
 
