@@ -71,6 +71,30 @@ Ditetapkan: 2026-10-12
 
 Ditetapkan: 2026-10-12
 
+## 9. Tanda kehidupan saat bekerja
+
+* Selama mengerjakan pekerjaan — **revisi maupun pembuatan baru** — asisten
+  **tidak boleh diam** di layar.
+* Asisten wajib memberi kabar kemajuan **sambil bekerja**, supaya pemilik
+  proyek tahu komputer sedang bekerja dan bukan hang.
+* Yang wajib disampaikan:
+
+| # | Informasi | Contoh |
+|---|---|---|
+| 1 | Langkah ke berapa dari berapa | `[3 dari 7] Menulis index.html` |
+| 2 | Nama pekerjaan yang sedang dilakukan | `Periksa akses Neon` |
+| 3 | Waktu mulai & selesai tiap langkah | `mulai 21:55 · selesai 21:57 — 2 mnt` |
+| 4 | Perintah dijalankan + hasilnya | `✓ baca berkas (12 KB)` · `✗ gagal: berkas tidak ada` |
+| 5 | Posisi keseluruhan | `sudah 4 dari 7 · sisa 3 · perkiraan 40 mnt` |
+| 6 | Langkah yang berjalan lama (>2 mnt) | `⏳ langkah 4 masih jalan, 3 mnt berjalan…` |
+| 7 | Jalan buntu + cara yang diganti | `⚠️ X gagal 2×, ganti cara Y` (aturan 5) |
+| 8 | Ringkasan akhir | `🏁 7 dari 7 selesai · total 62 mnt · 5 berkas berubah` |
+
+* Bentuknya **ringkas**: satu baris per kejadian, bukan paragraf.
+* **Dilarang menghilang dalam waktu lama tanpa kabar.**
+
+Ditetapkan: 2026-10-12
+
 ## Konvensi status pada rencanakerja.md
 
 | Status | Arti |
