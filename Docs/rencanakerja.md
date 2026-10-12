@@ -23,7 +23,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 5 | Detail peta setara `suwandhih.github.io/petadunia/app/index.html`; citra satelit memakai versi terbaru (data lama sudah banyak berubah, hampir tidak bisa dipakai) | **SUDAH TERPENUHI** — perlu verifikasi ulang | 10 mnt | — |
 | 6 | Tahap awal: peta dan tampilan sudah bisa diakses di PC maupun HP; konsep dasar UI, penempatan data, dan isian data | BARU | 90–150 mnt | — |
 | 7 | Setelan database: aktifkan Neon Data API, buat tabel, pasang RLS, sambungkan aplikasi ke database | BARU | 60–90 mnt | — |
-| 8 | Setelan GitHub: siapkan repo, cabang, GitHub Pages, dan cara unggah perubahan | BARU | 30–45 mnt | — |
+| 8 | Setelan GitHub: siapkan repo, cabang, GitHub Pages, dan cara unggah perubahan | **SEBAGIAN** — repo + remote + push ✅ · GitHub Pages ⛔ | 30–45 mnt | — |
 | 9 | `aturan.md` diganti nama menjadi **`agents.md`** — berisi aturan + catatan agar asisten diingatkan setiap mulai proyek | BARU | 5 mnt | — |
 | 10 | Pastikan `rencanakerja.md` berfungsi sebagai **daftar orderan**: yang belum selesai dan yang sudah selesai | BARU | 5 mnt | — |
 | 11 | Buat **`prompt.md`** — konsep proyek, supaya AI lain dapat membuat ulang **persis sama** | BARU | 30–45 mnt | — |
@@ -173,55 +173,60 @@ Semua akses diuji 2026-10-12. Bukan asumsi.
 
 ## ⚙️ Kesiapan GitHub untuk Proyek Pemetaan
 
-Diperiksa 2026-10-12 22:11 (orderan 13).
+Diperiksa 2026-10-12 22:11 · **Diperbarui 2026-10-12 22:21** (orderan 13).
 
 ### Jawaban singkat
 
-> **Belum siap — tetapi hanya kurang 3 hal**, dan semuanya perlu keputusan
-> pemilik proyek, bukan pekerjaan teknis panjang.
+> **Repo GitHub `Pemetaan` SUDAH DIBUAT dan SUDAH TERSAMBUNG.**
+> Sisa satu pekerjaan: **GitHub Pages** (untuk menayangkan aplikasi lewat web).
 
-### Yang SUDAH siap
+### Hasil (22:21)
+
+| Item | Keadaan |
+|---|---|
+| Repo | ✅ `https://github.com/suwandhih/Pemetaan` |
+| Sifat | ✅ **Publik** |
+| Cabang default | ✅ **`main`** |
+| Remote lokal | ✅ `origin` → `https://github.com/suwandhih/Pemetaan.git` |
+| Cabang lokal | ✅ `main` (diseragamkan dari `master`) |
+| Push | ✅ **12 commit terunggah** |
+| Berkas di GitHub | ✅ `.gitignore`, `Docs/aturan.md`, `Docs/rencanakerja.md` |
+| Sinkron | ✅ `## main...origin/main` — tidak ada selisih |
+| Ukuran | 0 KB (sangat kecil, hanya dokumen) |
+
+### ⚠️ Yang masih perlu dikerjakan
+
+| # | Pekerjaan | Alasan |
+|---|---|---|
+| 1 | **Aktifkan GitHub Pages** | Supaya aplikasi bisa dibuka lewat alamat web (perlu untuk Chrome HP) |
+| 2 | **Nama resmi repo = `Pemetaan`** (huruf besar P) | Sudah dipakai; jangan diubah supaya alamat tidak berubah |
+
+### ✅ Yang sudah siap (lama)
 
 | Item | Keadaan | Bukti |
 |---|---|---|
 | Git terpasang | ✅ | `git version 2.54.0.windows.1` |
 | Git repo lokal | ✅ Aktif | `C:\data\Pemetaan\.git` |
 | Identitas git | ✅ Terisi | `suwandhih@gmail.com` |
-| Akun GitHub | ✅ Ada & aktif | `suwandhih` — 3 repo publik |
-| GitHub Pages berfungsi | ✅ Terbukti | 2 situs lain sudah live (`DataPeta`, `petadunia`) |
-| Riwayat commit lokal | ✅ 7 commit | Sejak `dfd4e52` sampai `07288f3` |
+| Akun GitHub | ✅ Ada & aktif | `suwandhih` |
+| GitHub Pages berfungsi | ✅ Terbukti | 2 situs lain sudah live |
 | Alat pendukung | ✅ Ada | `curl`, `node`, `npm`, `python` |
 
-### Yang BELUM siap
+### ⛔ Tidak tersedia (tercatat)
 
-| # | Kurangnya | Akibat | Perlu apa |
-|---|---|---|---|
-| 1 | **Repo GitHub untuk proyek pemetaan belum ada** | Tidak ada tempat mengunggah | Buat repo baru — **perlu nama & publik/privat** |
-| 2 | **Repo lokal belum tersambung** (`git remote -v` kosong) | `git push` tidak punya tujuan | Alamat repo setelah dibuat |
-| 3 | **`gh` CLI tidak terpasang** | Tidak bisa buat repo otomatis dari sini | Buat repo lewat web, ATAU pasang `gh` |
-
-### Diperiksa dan tidak ditemukan
-
-Nama repo berikut **belum dipakai** di akun `suwandhih` (semua HTTP **404**):
-
-| Nama diuji | Ada? |
-|---|---|
-| `Pemetaan` | ❌ Belum ada |
-| `pemetaan` | ❌ Belum ada |
-| `Peta-Indonesia` | ❌ Belum ada |
-| `peta-indonesia` | ❌ Belum ada |
-| `pemetaan-indonesia` | ❌ Belum ada |
-
-Artinya **nama masih bebas dipilih** — tidak akan bentrok.
+| Alat | Keadaan | Akibat |
+|---|---|---|
+| `gh` CLI | Tidak terpasang | Repo dibuat lewat peramban |
+| GitHub MCP | Hanya baca | Tidak ada alat buat repo dari sini |
 
 ### ⚠️ Peringatan penting
 
 | Hal | Sebab |
 |---|---|
-| **Jangan pakai repo `DataPeta` atau `petadunia`** | Aturan 8 — setiap folder diperuntukkan berbeda; dan dua repo itu proyek lain |
+| **Jangan pakai repo `DataPeta` atau `petadunia`** | Aturan 8 — setiap folder diperuntukkan berbeda |
 | **Repo publik = kode terlihat semua orang** | Jangan pernah menaruh kunci API, password, atau connection string Neon di dalam kode |
 | **Data → Neon, kode → GitHub** | Pemisahan ini wajib, bukan pilihan |
-| **GitHub Pages dilarang untuk situs komersial** | Batas resmi GitHub Pages |
+| **GitHub Pages dilarang untuk situs komersial** | Batas resmi GitHub |
 
 ### Yang dibutuhkan dari pemilik proyek (untuk orderan 8 & 13)
 
@@ -354,6 +359,7 @@ Catatan arah proyek yang sudah disetujui pemilik proyek.
 | 2026-10-12 | **Setelan database & GitHub dijadikan orderan tersendiri** — orderan 7 (database Neon) dan orderan 8 (GitHub), karena keduanya perlu dikerjakan, bukan sekadar syarat. |
 | 2026-10-12 | **Seluruh berkas `.md` dipindahkan ke folder `Docs/`.** Akar proyek bersih dari dokumen. Dicatat sebagai bagian aturan 3b di `Docs/aturan.md`. |
 | 2026-10-12 | **Nama repo GitHub ditetapkan: `Pemetaan`, publik** (`https://github.com/suwandhih/Pemetaan`). Alasan publik: supaya dapat memakai **GitHub Pages gratis**. Struktur dokumen proyek: `agents.md` (aturan + catatan untuk AI), `rencanakerja.md` (orderan), `prompt.md` (konsep agar bisa dibangun ulang persis sama), `CHANGELOG.md` (semua perkembangan). |
+| 2026-10-12 | **Repo GitHub `Pemetaan` DIBUAT dan TERSAMBUNG.** Cabang lokal diseragamkan `master` → `main` mengikuti bawaan GitHub. 12 commit terunggah. Sisa: GitHub Pages belum diaktifkan. |
 
 ---
 
