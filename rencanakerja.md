@@ -23,6 +23,8 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 4 | UI peta memakai citra satelit; harus terlihat gunung, danau, sungai, rumah, jalan, dan nama jalan | BARU | 45–60 mnt | — |
 | 5 | Detail peta setara `suwandhih.github.io/petadunia/app/index.html`; citra satelit memakai versi terbaru (data lama sudah banyak berubah, hampir tidak bisa dipakai) | **SUDAH TERPENUHI** — perlu verifikasi ulang | 10 mnt | — |
 | 6 | Tahap awal: peta dan tampilan sudah bisa diakses di PC maupun HP; konsep dasar UI, penempatan data, dan isian data | BARU | 90–150 mnt | — |
+| 7 | Setelan database: aktifkan Neon Data API, buat tabel, pasang RLS, sambungkan aplikasi ke database | BARU | 60–90 mnt | — |
+| 8 | Setelan GitHub: siapkan repo, cabang, GitHub Pages, dan cara unggah perubahan | BARU | 30–45 mnt | — |
 
 Catatan hubungan antar-orderan:
 
@@ -30,7 +32,16 @@ Catatan hubungan antar-orderan:
 * Orderan 6 adalah **wujud nyata** tahap awal — peta + UI + form isian.
 * Orderan 4 dan 5 hampir seluruhnya berupa konfigurasi, bukan kode baru.
 
-Total perkiraan waktu orderan 1–6: **±4,5–6,5 jam**, dikerjakan bertahap.
+Total perkiraan waktu orderan 1–6: **±4,5–6,5 jam**, dikerjakan bertahap satu per satu.
+
+### Total perkiraan waktu
+
+| Kelompok | Orderan | Estimasi |
+|---|---|---|
+| Peta (aplikasi) | 1–6 | ±4,5–6,5 jam |
+| Setelan database | 7 | ±1–1,5 jam |
+| Setelan GitHub | 8 | ±0,5 jam |
+| **Jumlah** | **1–8** | **±6–8 jam** |
 
 ---
 
@@ -73,16 +84,27 @@ nanti diperlukan citra yang tidak berubah-ubah.
 
 ## Penghambat (menunggu dari pemilik proyek)
 
-| No | Yang dibutuhkan | Untuk orderan |
-|----|-----------------|---------------|
-| 1 | Kredensial Neon (connection string, atau URL Data API + JWT) | 1 dan 6 |
-| 2 | Tujuan push GitHub: repo baru atau repo yang sudah ada? | 1 |
-| 3 | Keputusan: kode ke GitHub, data ke Neon — perlu dipastikan | 1 |
+| No | Yang dibutuhkan | Untuk orderan | Status |
+|----|-----------------|---------------|--------|
+| 1 | **Kredensial Neon** — connection string, atau URL Data API + JWT | 1 dan 6 | ⛔ Belum ada |
+| 2 | **Tujuan push GitHub** — repo baru atau repo yang sudah ada? | 1 | ⛔ Belum diputuskan |
+| 3 | **Pemisahan penyimpanan** — kode ke GitHub (repo publik), data ke Neon (database). Perlu dipastikan karena repo publik = kode terlihat semua orang | 1 | ⛔ Belum diputuskan |
+| 4 | **Password/kunci database** — kalau kredensial diberikan lewat obrolan, tercatat di riwayat sesi. Perlu kesepakatan cara penyerahan | 1 dan 6 | ⛔ Belum diputuskan |
+| 5 | **Aktifkan Data API Neon** atau putuskan memakai driver langsung | 1 dan 6 | ⛔ Belum diputuskan |
+| 6 | **Buat tabel di Neon** — saat ini 0 tabel, belum ada skema | 1 dan 6 | ⛔ Belum diputuskan |
+| 7 | **Aturan RLS** — wajib dibuat sebelum data masuk | 1 dan 6 | ⛔ Belum diputuskan |
 
 Catatan penting soal Neon: **Neon Data API tidak punya lapisan izin sendiri.**
 Setiap permintaan diotorisasi sepenuhnya oleh `GRANT` dan kebijakan
 **Row-Level Security (RLS)** di PostgreSQL. Kebijakan yang salah membuat tabel
 terbuka bagi siapa pun yang memiliki URL endpoint. RLS wajib disiapkan.
+
+Catatan soal Neon Console: Data API saat ini **belum diaktifkan** (masih ada
+tombol `Enable Data API`), dan skema `public` berisi **0 tabel**. Konfigurasi
+bawaan yang terlihat saat pengaktifan: `Use Neon Auth` = **aktif**,
+`Grant public schema access` = **aktif**. Bawaan `Grant public schema access`
+memberi hak baca **dan tulis** ke skema `public` bagi pengguna terautentikasi —
+perlu ditinjau, jangan diterima apa adanya.
 
 ---
 
@@ -236,10 +258,10 @@ Catatan arah proyek yang sudah disetujui pemilik proyek.
 | Tanggal | Keputusan |
 |---|---|
 | 2026-10-12 | Arah aplikasi: peta Indonesia + negara tetangga, detail sampai level rumah/jalan, memakai citra satelit, pengalaman mirip Google Maps. |
-| 2026-10-12 | Fondasi teknologi: **Google Maps JavaScript API tipe hybrid** (citra satelit + label), `maxZoom` ~19–20, marker bertipe AdvancedMarkerElement, difokuskan ke wilayah Indonesia + Asia Tenggara. |
+| 2026-10-12 | ~~Fondasi teknologi: **Google Maps JavaScript API tipe hybrid**, `maxZoom` ~19–20, AdvancedMarkerElement, wilayah Indonesia + Asia Tenggara.~~ **DIBATALKAN** — lihat baris "Google Maps DITOLAK" di bawah. |
 | 2026-10-12 | Backup: **git init + commit setiap perubahan**. |
 | 2026-10-12 | Aturan kerja 1–7 ditetapkan dan dicatat di `aturan.md`. |
-| 2026-10-12 | Sistem CHNGMKR **tidak dipakai**. Fondasi tetap Google Maps JS API murni. |
+| 2026-10-12 | ~~Sistem CHNGMKR **tidak dipakai**. Fondasi tetap Google Maps JS API murni.~~ **DIBATALKAN** — bertentangan dengan baris "Google Maps DITOLAK" dan "Fondasi teknologi FINAL" di bawah. |
 | 2026-10-12 | Data boleh tidak lengkap. Kontribusi pengguna diperlukan untuk melengkapi. |
 | 2026-10-12 | **Google Maps DITOLAK.** Alasan: aturan/harga bisa berubah sepihak, data statistik tidak berada di infrastruktur sendiri, dan bukan peruntukan untuk data tematik. |
 | 2026-10-12 | **CHNGMKR DITOLAK.** Alasan terbukti: (a) CHNGMKR sendiri memakai Google Maps JS API — jadi tidak melepaskan diri dari Google; (b) tidak ada repo terbuka (`github.com/chngmkr` = 404, pencarian GitHub tanpa hasil); (c) kebutuhan mereka beda (`maxZoom: 14`, roadmap, tanpa layer data) sehingga meniru mereka justru menambah pekerjaan bongkar pasang. |
@@ -247,6 +269,7 @@ Catatan arah proyek yang sudah disetujui pemilik proyek.
 | 2026-10-12 | Proyek baru dibangun di `C:\data\Pemetaan`. Proyek **`petadunia`** (`C:\data\Peta dunia`) menjadi **contoh/referensi SAJA** dan tidak diubah. |
 | 2026-10-12 | **Aturan 8 ditetapkan:** dilarang copy-paste seluruh konsep dari folder lain. Hanya boleh mengambil **ide** dan **cara**, lalu ditulis sendiri. Proyek pemetaan harus dibuat sendiri. Setiap folder diperuntukkan berbeda. |
 | 2026-10-12 | **Aturan 9 ditetapkan:** tanda kehidupan saat bekerja. Asisten tidak boleh diam di layar; wajib melaporkan langkah ke berapa, nama pekerjaan, waktu mulai/selesai, hasil perintah, posisi keseluruhan, langkah lama, jalan buntu, dan ringkasan akhir. |
+| 2026-10-12 | **Setelan database & GitHub dijadikan orderan tersendiri** — orderan 7 (database Neon) dan orderan 8 (GitHub), karena keduanya perlu dikerjakan, bukan sekadar syarat. |
 
 ---
 
