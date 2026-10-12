@@ -56,6 +56,10 @@ Catatan arah proyek yang sudah disetujui pemilik proyek.
 | 2026-10-12 | Aturan kerja 1–7 ditetapkan dan dicatat di `aturan.md`. |
 | 2026-10-12 | Sistem CHNGMKR **tidak dipakai**. Fondasi tetap Google Maps JS API murni. |
 | 2026-10-12 | Data boleh tidak lengkap. Kontribusi pengguna diperlukan untuk melengkapi. |
+| 2026-10-12 | **Google Maps DITOLAK.** Alasan: aturan/harga bisa berubah sepihak, data statistik tidak berada di infrastruktur sendiri, dan bukan peruntukan untuk data tematik. |
+| 2026-10-12 | **CHNGMKR DITOLAK.** Alasan terbukti: (a) CHNGMKR sendiri memakai Google Maps JS API — jadi tidak melepaskan diri dari Google; (b) tidak ada repo terbuka (`github.com/chngmkr` = 404, pencarian GitHub tanpa hasil); (c) kebutuhan mereka beda (`maxZoom: 14`, roadmap, tanpa layer data) sehingga meniru mereka justru menambah pekerjaan bongkar pasang. |
+| 2026-10-12 | **Fondasi teknologi FINAL: MapLibre GL JS + Esri World Imagery + OpenFreeMap/OSM.** Tanpa vendor lock, tanpa biaya, dapat dipakai offline. |
+| 2026-10-12 | Proyek baru dibangun di `C:\data\Pemetaan`. Proyek **`petadunia`** (`C:\data\Peta dunia`) menjadi **contoh/referensi SAJA** dan tidak diubah. |
 
 ---
 
@@ -158,6 +162,46 @@ Starter $100/bln · Essentials $275/bln · Pro $1.200/bln (paket langganan).
 Netlify + React/Vite + Google Maps JS API (`maxZoom: 14`, roadmap) + Supabase +
 Cloudflare Turnstile + GA4 + three-globe. Status gratis: semua komponen gratis
 kecuali Google Maps (berbatas).
+
+---
+
+## Referensi: Proyek petadunia
+
+Proyek `suwandhih/petadunia` (`C:\data\Peta dunia`) dipakai sebagai **contoh
+saja**. Tidak diubah dan tidak disentuh.
+
+Peran: sumber acuan pola yang sudah terbukti berjalan pada pemilik proyek.
+
+| Aspek | Isi petadunia | Dipakai sebagai acuan? |
+|---|---|---|
+| Renderer peta | MapLibre GL (`js/lib/maplibre-gl.js`) | Ya |
+| Citra satelit | Esri World Imagery, `maxzoom: 19` | Ya |
+| Lapisan label | `World_Boundaries_and_Places` | Ya |
+| Peta vektor | OpenFreeMap style `liberty` | Ya |
+| Atribusi | `Citra: Esri, Maxar, Earthstar Geographics` | Ya — wajib ditiru |
+| Struktur | `js/inti.js` + `js/lapisan/*.js` per kategori | Ya |
+| Gaya bahasa | Seluruh UI berbahasa Indonesia | Ya |
+| Berkas aturan | Sudah punya `agents.md` (mirip 7 aturan di sini) | Ya |
+
+Kesimpulan pemeriksaan: fondasi yang dipakai petadunia **sudah tepat** dan
+memenuhi seluruh syarat proyek ini (tanpa Google, biaya Rp0, citra sampai level
+rumah, tanpa vendor lock).
+
+### Belum dibaca
+
+`prompt.md` dan `rencanakerja.md` milik petadunia belum ditinjau. Perlu ditinjau
+agar tidak mengulang pekerjaan yang sudah selesai dan tidak melanggar aturan
+yang sudah ditetapkan di sana.
+
+### Kebutuhan yang belum ada di petadunia
+
+| Kebutuhan | Status di petadunia |
+|---|---|
+| 8 kategori keadaan dunia (gempa, kebakaran, gunung, angin, hujan, penerbangan, suhu, awan) | Sudah ada |
+| Kapal laut, kereta | Belum dibuat |
+| Data penduduk / agama / suku per wilayah | Belum ada |
+| Marker cabang / klinik / yayasan | Belum ada |
+| Kontribusi data dari pengguna | Belum ada |
 
 ---
 
