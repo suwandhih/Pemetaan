@@ -24,6 +24,11 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 6 | Tahap awal: peta dan tampilan sudah bisa diakses di PC maupun HP; konsep dasar UI, penempatan data, dan isian data | BARU | 90–150 mnt | — |
 | 7 | Setelan database: aktifkan Neon Data API, buat tabel, pasang RLS, sambungkan aplikasi ke database | BARU | 60–90 mnt | — |
 | 8 | Setelan GitHub: siapkan repo, cabang, GitHub Pages, dan cara unggah perubahan | BARU | 30–45 mnt | — |
+| 9 | `aturan.md` diganti nama menjadi **`agents.md`** — berisi aturan + catatan agar asisten diingatkan setiap mulai proyek | BARU | 5 mnt | — |
+| 10 | Pastikan `rencanakerja.md` berfungsi sebagai **daftar orderan**: yang belum selesai dan yang sudah selesai | BARU | 5 mnt | — |
+| 11 | Buat **`prompt.md`** — konsep proyek, supaya AI lain dapat membuat ulang **persis sama** | BARU | 30–45 mnt | — |
+| 12 | Buat **`CHANGELOG.md`** — catatan semua perkembangan, perbaikan, dan hal baru | BARU | 15–20 mnt | — |
+| 13 | Jawab & siapkan: apakah GitHub sudah siap kerja untuk proyek pemetaan | BARU | 20–30 mnt | — |
 
 Catatan hubungan antar-orderan:
 
@@ -40,7 +45,22 @@ Total perkiraan waktu orderan 1–6: **±4,5–6,5 jam**, dikerjakan bertahap sa
 | Peta (aplikasi) | 1–6 | ±4,5–6,5 jam |
 | Setelan database | 7 | ±1–1,5 jam |
 | Setelan GitHub | 8 | ±0,5 jam |
-| **Jumlah** | **1–8** | **±6–8 jam** |
+| Dokumen proyek | 9–12 | ±1–1,25 jam |
+| Pemeriksaan GitHub | 13 | ±0,5 jam |
+| **Jumlah** | **1–13** | **±7,5–10 jam** |
+
+---
+
+## Status Berkas Dokumen Proyek (rencana)
+
+Berdasarkan orderan 9–12. Struktur yang dituju:
+
+| Berkas | Untuk siapa | Isi | Status |
+|---|---|---|---|
+| **`Docs/agents.md`** | asisten (AI) | Aturan main + catatan agar diingatkan setiap mulai | ⛔ Belum — masih bernama `aturan.md` |
+| **`Docs/rencanakerja.md`** | asisten + manusia | Daftar orderan: belum selesai & sudah selesai | ✅ Ada |
+| **`Docs/prompt.md`** | manusia / AI lain | Konsep proyek — supaya dapat dibuat ulang **persis sama** | ⛔ Belum ada |
+| **`Docs/CHANGELOG.md`** | manusia | Catatan semua perkembangan, perbaikan, hal baru | ⛔ Belum ada |
 
 ---
 
@@ -148,6 +168,69 @@ Semua akses diuji 2026-10-12. Bukan asumsi.
 | 21:48–21:53 | Temuan proyek `DataPeta` — baca dokumen & struktur | ~5 mnt |
 | 21:53–21:56 | Tulis catatan & commit | ~3 mnt |
 | | **Total** | **±25 mnt** |
+
+---
+
+## ⚙️ Kesiapan GitHub untuk Proyek Pemetaan
+
+Diperiksa 2026-10-12 22:11 (orderan 13).
+
+### Jawaban singkat
+
+> **Belum siap — tetapi hanya kurang 3 hal**, dan semuanya perlu keputusan
+> pemilik proyek, bukan pekerjaan teknis panjang.
+
+### Yang SUDAH siap
+
+| Item | Keadaan | Bukti |
+|---|---|---|
+| Git terpasang | ✅ | `git version 2.54.0.windows.1` |
+| Git repo lokal | ✅ Aktif | `C:\data\Pemetaan\.git` |
+| Identitas git | ✅ Terisi | `suwandhih@gmail.com` |
+| Akun GitHub | ✅ Ada & aktif | `suwandhih` — 3 repo publik |
+| GitHub Pages berfungsi | ✅ Terbukti | 2 situs lain sudah live (`DataPeta`, `petadunia`) |
+| Riwayat commit lokal | ✅ 7 commit | Sejak `dfd4e52` sampai `07288f3` |
+| Alat pendukung | ✅ Ada | `curl`, `node`, `npm`, `python` |
+
+### Yang BELUM siap
+
+| # | Kurangnya | Akibat | Perlu apa |
+|---|---|---|---|
+| 1 | **Repo GitHub untuk proyek pemetaan belum ada** | Tidak ada tempat mengunggah | Buat repo baru — **perlu nama & publik/privat** |
+| 2 | **Repo lokal belum tersambung** (`git remote -v` kosong) | `git push` tidak punya tujuan | Alamat repo setelah dibuat |
+| 3 | **`gh` CLI tidak terpasang** | Tidak bisa buat repo otomatis dari sini | Buat repo lewat web, ATAU pasang `gh` |
+
+### Diperiksa dan tidak ditemukan
+
+Nama repo berikut **belum dipakai** di akun `suwandhih` (semua HTTP **404**):
+
+| Nama diuji | Ada? |
+|---|---|
+| `Pemetaan` | ❌ Belum ada |
+| `pemetaan` | ❌ Belum ada |
+| `Peta-Indonesia` | ❌ Belum ada |
+| `peta-indonesia` | ❌ Belum ada |
+| `pemetaan-indonesia` | ❌ Belum ada |
+
+Artinya **nama masih bebas dipilih** — tidak akan bentrok.
+
+### ⚠️ Peringatan penting
+
+| Hal | Sebab |
+|---|---|
+| **Jangan pakai repo `DataPeta` atau `petadunia`** | Aturan 8 — setiap folder diperuntukkan berbeda; dan dua repo itu proyek lain |
+| **Repo publik = kode terlihat semua orang** | Jangan pernah menaruh kunci API, password, atau connection string Neon di dalam kode |
+| **Data → Neon, kode → GitHub** | Pemisahan ini wajib, bukan pilihan |
+| **GitHub Pages dilarang untuk situs komersial** | Batas resmi GitHub Pages |
+
+### Yang dibutuhkan dari pemilik proyek (untuk orderan 8 & 13)
+
+| # | Pertanyaan | Pilihan |
+|---|---|---|
+| 1 | Nama repo | belum ditentukan (nama masih bebas) |
+| 2 | Publik atau privat? | publik = bisa pakai GitHub Pages gratis · privat = perlu cara lain untuk menayangkan |
+| 3 | Perlu GitHub Pages? | kalau ya, repo harus publik (kecuali akun berbayar) |
+| 4 | Buat repo lewat mana? | web GitHub sendiri, atau saya bantu kalau `gh` dipasang |
 
 ---
 
