@@ -1,7 +1,6 @@
 # Rencana Kerja
 
 Daftar induk seluruh orderan. Lihat aturan mainnya di [aturan.md](./aturan.md).
-
 Aturan pengelolaan:
 * Orderan dikerjakan satu per satu (aturan 6).
 * Status `SELESAI` hanya sah bila dinyatakan pemilik proyek, disertai tanggal
@@ -270,6 +269,7 @@ Catatan arah proyek yang sudah disetujui pemilik proyek.
 | 2026-10-12 | **Aturan 8 ditetapkan:** dilarang copy-paste seluruh konsep dari folder lain. Hanya boleh mengambil **ide** dan **cara**, lalu ditulis sendiri. Proyek pemetaan harus dibuat sendiri. Setiap folder diperuntukkan berbeda. |
 | 2026-10-12 | **Aturan 9 ditetapkan:** tanda kehidupan saat bekerja. Asisten tidak boleh diam di layar; wajib melaporkan langkah ke berapa, nama pekerjaan, waktu mulai/selesai, hasil perintah, posisi keseluruhan, langkah lama, jalan buntu, dan ringkasan akhir. |
 | 2026-10-12 | **Setelan database & GitHub dijadikan orderan tersendiri** — orderan 7 (database Neon) dan orderan 8 (GitHub), karena keduanya perlu dikerjakan, bukan sekadar syarat. |
+| 2026-10-12 | **Seluruh berkas `.md` dipindahkan ke folder `Docs/`.** Akar proyek bersih dari dokumen. Dicatat sebagai bagian aturan 3b di `Docs/aturan.md`. |
 
 ---
 

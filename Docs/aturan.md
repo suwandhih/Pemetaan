@@ -8,6 +8,8 @@ Ditetapkan: 2026-10-12
 ## 1. Backup wajib pada setiap revisi / penambahan
 
 * Setiap revisi atau penambahan sistem maupun data harus didahului backup.
+* **Seluruh berkas `.md` proyek berada di folder `Docs/`.** Tidak ada berkas
+  `.md` di akar proyek.
 * Mekanisme backup yang disetujui: **Git** (`git init` + commit setiap perubahan).
 * Commit dibuat sebelum pekerjaan dimulai (titik pulih) dan sesudah pekerjaan
   selesai terverifikasi.
@@ -33,6 +35,17 @@ Ditetapkan: 2026-10-12
   pekerjaan benar-benar berjalan.
 * Laporan hasil harus menyertakan bukti pengujian yang sudah dilakukan.
 
+* Setiap pekerjaan disertai **perkiraan waktu** sebelum dimulai.
+* Selama bekerja, asisten wajib memberi **tanda kehidupan** di layar (aturan 9).
+
+## 3b. Lokasi berkas dokumen
+
+* **Seluruh berkas `.md` wajib berada di folder `Docs/`.**
+* Akar proyek hanya berisi berkas aplikasi & konfigurasi, bukan dokumen.
+* Rujukan antar dokumen di dalam `Docs/` memakai jalur relatif (`./nama.md`).
+
+Ditetapkan: 2026-10-12 (perintah pemilik proyek)
+
 ## 4. Setiap pekerjaan disertai estimasi waktu
 
 * Setiap pembuatan sistem baru, fitur baru, atau revisi harus menyertakan
@@ -55,7 +68,7 @@ Ditetapkan: 2026-10-12
 
 ## 7. rencanakerja.md sebagai daftar induk orderan
 
-* `rencanakerja.md` memuat seluruh orderan dari pemilik proyek.
+* `rencanakerja.md` (di folder `Docs/`) memuat seluruh orderan dari pemilik proyek.
 * Orderan yang selesai diberi tanda selesai **beserta tanggal penyelesaian**.
 * Status "selesai" hanya sah bila dinyatakan oleh pemilik proyek.
 * Sebelum mengerjakan orderan berikutnya, selalu konfirmasi terlebih dahulu.
