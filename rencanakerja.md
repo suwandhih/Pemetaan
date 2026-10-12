@@ -245,6 +245,7 @@ Catatan arah proyek yang sudah disetujui pemilik proyek.
 | 2026-10-12 | **CHNGMKR DITOLAK.** Alasan terbukti: (a) CHNGMKR sendiri memakai Google Maps JS API — jadi tidak melepaskan diri dari Google; (b) tidak ada repo terbuka (`github.com/chngmkr` = 404, pencarian GitHub tanpa hasil); (c) kebutuhan mereka beda (`maxZoom: 14`, roadmap, tanpa layer data) sehingga meniru mereka justru menambah pekerjaan bongkar pasang. |
 | 2026-10-12 | **Fondasi teknologi FINAL: MapLibre GL JS + Esri World Imagery + OpenFreeMap/OSM.** Tanpa vendor lock, tanpa biaya, dapat dipakai offline. |
 | 2026-10-12 | Proyek baru dibangun di `C:\data\Pemetaan`. Proyek **`petadunia`** (`C:\data\Peta dunia`) menjadi **contoh/referensi SAJA** dan tidak diubah. |
+| 2026-10-12 | **Aturan 8 ditetapkan:** dilarang copy-paste seluruh konsep dari folder lain. Hanya boleh mengambil **ide** dan **cara**, lalu ditulis sendiri. Proyek pemetaan harus dibuat sendiri. Setiap folder diperuntukkan berbeda. |
 
 ---
 

@@ -60,6 +60,17 @@ Ditetapkan: 2026-10-12
 * Status "selesai" hanya sah bila dinyatakan oleh pemilik proyek.
 * Sebelum mengerjakan orderan berikutnya, selalu konfirmasi terlebih dahulu.
 
+## 8. Dilarang menyalin isi dari folder lain
+
+* **Dilarang melakukan copy-paste seluruh konsep** dari folder/proyek lain.
+* Yang **diperbolehkan**: mengambil **ide** dan **cara** — lalu dipahami dan
+  ditulis sendiri.
+* Di proyek pemetaan, pekerjaan harus **dibuat sendiri**.
+* Alasan: kalau di-copy paste, bila ada masalah menjadi rumit. **Setiap folder
+  diperuntukkan berbeda** — jangan disamakan tanpa dipahami.
+
+Ditetapkan: 2026-10-12
+
 ## Konvensi status pada rencanakerja.md
 
 | Status | Arti |
