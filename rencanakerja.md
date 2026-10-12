@@ -86,6 +86,126 @@ terbuka bagi siapa pun yang memiliki URL endpoint. RLS wajib disiapkan.
 
 ---
 
+## Catatan Akses (diverifikasi)
+
+Semua akses diuji 2026-10-12. Bukan asumsi.
+
+| Layanan | Alamat | Status uji | Keterangan |
+|---|---|---|---|
+| Neon Console | `console.neon.tech` | ✅ Masuk (sebagai `suwandhi`) | Punya akses baca |
+| Neon — proyek | `pemetaan` (`lucky-lake-42845210`) | ✅ Terbaca | — |
+| Neon — branch | `br-summer-fire-azexd37m` (`production`) | ✅ Terbaca | Branch default |
+| Neon — region | AWS Asia Pacific 1 (**Singapura**) | ✅ Terbaca | Dekat Indonesia — latensi baik |
+| Neon — Postgres | Versi **18** | ✅ Terbaca | — |
+| Neon — plan | **Free plan** | ✅ Terbaca | — |
+| Neon — compute | 0.25 ↔ 2 CU, scale-to-zero 5 menit | ✅ Terbaca | — |
+| Neon — Data API | **BELUM aktif** — masih ada tombol `Enable Data API` | ✅ Terbaca | Belum pernah diaktifkan |
+| Neon — tabel | **0 tabel** di skema `public` | ✅ Terbaca | Masih kosong |
+| Neon — fungsional | Compute 0 CU-hrs · Storage 0 kB · Transfer 0 kB | ✅ Terbaca | Belum dipakai sama sekali |
+| Neon — IP restrictions | `None set` | ✅ Terbaca | — |
+| Neon — dibuat | 2026-10-12 21:16:29 | ✅ Terbaca | — |
+| GitHub | Akun `suwandhih` | ✅ API jalan | — |
+| GitHub repo | `petadunia` (publik) | ✅ Terbaca | Branch: `main`, `gh-pages` |
+| GitHub repo | **`DataPeta` (publik)** | ✅ Terbaca | Branch: `main` saja |
+| GitHub repo | `alkitab-projek` (publik) | ✅ Terbaca | Tidak terkait |
+| GitHub Pages | `suwandhih.github.io/DataPeta/` | ✅ **HTTP 200** | Aktif |
+| GitHub Pages | `suwandhih.github.io/petadunia/` | ✅ **HTTP 200** | Aktif |
+| GitHub Pages (petadunia) | Berkas di branch `gh-pages` | ✅ Terbaca | Isinya sama dengan `app/` |
+
+---
+
+## Catatan Waktu (2026-10-12)
+
+| Pukul | Kegiatan | Lama |
+|---|---|---|
+| 20:59 | Mulai permintaan: pelajari Neon lalu GitHub | — |
+| 21:00–21:06 | Unduh dokumentasi Neon + GitHub | ~6 mnt |
+| 21:06–21:09 | Percobaan berbagi halaman peramban (gagal) | ~3 mnt |
+| 21:40–21:42 | Berhasil masuk Neon Console, baca proyek & branch | ~2 mnt |
+| 21:42–21:45 | Periksa Data API, tabel, role Neon | ~3 mnt |
+| 21:45–21:48 | Periksa GitHub repo, branch, Pages | ~3 mnt |
+| 21:48–21:53 | Temuan proyek `DataPeta` — baca dokumen & struktur | ~5 mnt |
+| 21:53–21:56 | Tulis catatan & commit | ~3 mnt |
+| | **Total** | **±25 mnt** |
+
+---
+
+## 🚨 TEMUAN BESAR: proyek `DataPeta` sudah ada dan tumpang tindih
+
+Ini ditemukan saat memeriksa GitHub. **Wajib diputuskan sebelum kode apa pun
+ditulis di `C:\data\Pemetaan`.**
+
+### Bukti keberadaan
+
+| Uji | Hasil |
+|---|---|
+| Folder lokal | ✅ **`C:\data\DataPeta` ADA** |
+| Git lokal | ✅ Aktif, branch `main`, working tree **bersih** |
+| Commit terakhir | `fa27bff` — *"Papan order: catat lanjutan 11 Okt 2026 (lab UI belum diperiksa Bapak)"* |
+| Repo GitHub | ✅ `suwandhih/DataPeta` (publik), branch `main` |
+| Situs aktif | ✅ **`https://suwandhih.github.io/DataPeta/` → 200** |
+| Isi data | **8,62 MB**, 568 berkas |
+| Batas wilayah | **514 berkas desa** + **38 berkas kecamatan** dalam `data/wilayah/` |
+| Data tematik | `penduduk.js` · `agama.js` · `suku.js` · `pulau.js` · `gunung.js` · `danau.js` · `sungai.js` |
+| Alat bantu | `alat/` berisi 12 skrip: `buat-penduduk.js`, `buat-agama.js`, `buat-pulau.js`, `buat-wilayah.js`, `unduh-citra-satelit.py`, dll |
+| Berkas data mentah | `bps-agama-mentah.txt`, `bps-penduduk-2026.json`, `agama-dalam-angka.json` |
+
+### DataPeta SUDAH mengerjakan orderan 1–6
+
+| Orderan di `C:\data\Pemetaan` | Sudah di DataPeta? | Bukti |
+|---|---|---|
+| 1 — Chrome + GitHub + cloud DB + PC/HP | ✅ Sudah | GitHub Pages aktif; Cloudflare Worker + backend cloud; `js/penyimpanan.js` (IndexedDB) |
+| 2 — UI HP tegak, peta Sumatera–Jawa | ✅ Sudah diputuskan | Keputusan Bapak 11 Okt 2026: *"HP dipilih TEGAK"*, deteksi layar otomatis |
+| 3 — Peta freeze + panel hide/unhide | ⏳ Sedang ditangani | `lab-UI.html` + ruang bawah 3 keadaan (tutup · separuh · penuh) |
+| 4 — Citra satelit (gunung, danau, sungai, jalan) | ✅ Sudah | K17 — Esri World Imagery, tanpa kunci API |
+| 5 — Detail setara petadunia + citra terbaru | ✅ Sudah | K17 |
+| 6 — Tahap awal peta + UI + form isian | ✅ Sudah jauh lebih maju | `index.html` 11,9 KB · `js/app.js` 114,8 KB |
+
+### Data yang sudah ada di DataPeta
+
+| Data | Sudah ada |
+|---|---|
+| Penduduk | ✅ `data/penduduk.js` |
+| Agama | ✅ `data/agama.js` (41,4 KB) |
+| Suku | ✅ `data/suku.js` — 28 suku, titik di ibu kota provinsi, ditandai **"perkiraan"** |
+| Batas wilayah kecamatan | ✅ 38 berkas |
+| Batas wilayah desa | ✅ 514 berkas |
+| Negara dunia | ✅ `data/negara-dunia.js` (819 KB) |
+| Kapulauan Seribu | ✅ `data/kepulauan-seribu.js` |
+
+### Pekerjaan yang sudah direncanakan di DataPeta (belum selesai)
+
+| Kode | Pekerjaan | Status |
+|---|---|---|
+| K30 | Tahap 1 (catatan sumber per baris), Tahap 3 (klaim wilayah & kerja tim), Tahap 4 (uji & dokumen), Tahap 5 (pengamanan & login SHA-256) | ⏳ |
+| K31 | Pilih titik di peta detail + alamat lengkap (±3 hari) | ⏳ |
+| K32 | Tabel daftar wilayah — penduduk + agama (±8 jam) | Disetujui Bapak 11 Okt 2026 |
+| — | `lab-UI.html` belum diperiksa Bapak dari HP | Menunggu |
+
+### Kendala yang sudah tercatat di DataPeta
+
+| Kendala | Catatan |
+|---|---|
+| 8 provinsi data agama tidak bisa dilengkapi | Riau · Bengkulu · Jatim · NTB · Sulteng · Papua · Papua Selatan · Papua Barat Daya — 11 jalur sudah habis |
+| Pindai BPS Pusat / Dukcapil pusat | **Sudah habis** — jangan diulang (aturan B14) |
+| Kode provinsi berganda di `data/peta-indonesia.js` | 4 provinsi Papua berkode `"91"`, 2 berkode `"92"` — aplikasi tidak terpengaruh, tapi **jangan pakai `KODE_PROV`** |
+| Peta di HP tegak masih kecil | 21–38% tinggi bidang — masalah bentuk peta, belum dibahas |
+
+### ⚠️ Dampak pada proyek ini
+
+Tiga kemungkinan, dan **hanya pemilik proyek yang bisa memutuskan**:
+
+| Pilihan | Akibat |
+|---|---|
+| A — Lanjutkan di `DataPeta` | Orderan 1–6 hampir selesai; tinggal lanjut K30/K31/K32. Proyek `C:\data\Pemetaan` dibatalkan atau jadi catatan saja |
+| B — Tetap di `C:\data\Pemetaan` | Risiko: pekerjaan **duplikat besar**, dua aplikasi mirip, dan mengulang pemindaian sumber yang sudah dinyatakan habis |
+| C — Batasi `C:\data\Pemetaan` | Hanya untuk hal yang **benar-benar baru** dan tidak ada di DataPeta |
+
+Catatan penting: memilih B berarti melanggar semangat aturan pemilik proyek
+sendiri (*"jangan dikerjakan dua kali"*, seperti tertulis di papan order DataPeta).
+
+---
+
 ## Catatan Kebutuhan (belum menjadi orderan)
 
 Bukan orderan. Hanya rekaman kebutuhan yang disampaikan pemilik proyek, supaya
