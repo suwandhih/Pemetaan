@@ -1,4 +1,10 @@
-# Aturan Kerja
+# agents.md — Aturan Kerja Proyek Pemetaan
+
+> Lokasi: `C:\data\Pemetaan` · berkas ini = **aturan main asisten (AI)**.
+> 📌 **Baca ulang berkas ini setiap kali sesi dimulai** — bukan asumsi, bukan
+> "mungkin sudah ingat".
+> 🔴 **Isi berkas ini HANYA ATURAN.** Riwayat panjang ❌ tidak boleh di sini →
+> taruh di `CHANGELOG.md`.
 
 Aturan tetap yang ditetapkan pemilik proyek. Berlaku untuk seluruh sesi kerja,
 termasuk sesi lanjutan. Tidak boleh diubah tanpa perintah pemilik proyek.
@@ -117,3 +123,60 @@ Ditetapkan: 2026-10-12
 | `MENUNGGU KONFIRMASI` | Pekerjaan + verifikasi selesai, menunggu keputusan pemilik proyek |
 | `SELESAI` | Dinyatakan selesai oleh pemilik proyek (wajib berisi tanggal) |
 | `DITUNDA` | Dihentikan atas permintaan pemilik proyek |
+
+---
+
+## Catatan untuk Asisten (dibaca setiap mulai proyek)
+
+Bagian ini yang membuat asisten **teringat** — bukan sekadar punya aturan.
+
+### 🔴 Lima hal paling penting (ingat ini dulu, selalu)
+
+| # | Hal |
+|---|---|
+| 1 | **Jangan mulai apa pun tanpa aba-aba pemilik proyek.** |
+| 2 | **Baca ulang `agents.md` ini setiap sesi dimulai.** |
+| 3 | **Backup dulu** (git commit) sebelum dan sesudah setiap revisi. |
+| 4 | **Orderan dikerjakan satu per satu** — selesai → uji → lapor → lanjut. |
+| 5 | **Jangan mengarang data.** Sumber tidak memberi angka → katakan tidak ada. |
+
+### 📚 Daftar berkas dokumen proyek
+
+| Berkas | Untuk siapa | Isi |
+|---|---|---|
+| **`Docs/agents.md`** | asisten (AI) | **Hanya aturan** + catatan pengingat sesi |
+| **`Docs/rencanakerja.md`** | asisten + manusia | **Daftar orderan**: belum selesai & sudah selesai |
+| **`Docs/prompt.md`** | manusia / AI lain | **Konsep** — supaya dapat dibangun ulang persis sama |
+| **`Docs/CHANGELOG.md`** | manusia | **Semua perkembangan**, perbaikan, dan hal baru |
+
+⚠️ Seluruh berkas `.md` wajib di `Docs/` (aturan 3b). Akar proyek hanya berisi
+berkas aplikasi & konfigurasi.
+
+### ✅ Urutan kerja baku setiap sesi
+
+1. Baca `agents.md` ini utuh.
+2. Baca `rencanakerja.md` — lihat orderan mana yang sedang berjalan.
+3. Sebut **perkiraan waktu** sebelum mulai (aturan 4).
+4. Beri **tanda kehidupan** sambil bekerja (aturan 9).
+5. Uji sendiri bagian yang berubah, sertakan bukti (aturan 3).
+6. Lapor hasil, tunggu keputusan pemilik proyek (aturan 6 & 7).
+7. Update dokumen **sekali di akhir**, bukan di tengah pekerjaan.
+
+### ⚠️ Jebakan yang sudah pernah terjadi di proyek ini
+
+| Hal | Sebab | Pelajaran |
+|---|---|---|
+| Perubahan nama `aturan.md` → `agents.md` sempat tidak tersimpan | Dilakukan dari luar sesi, asisten tidak menyimpan | Periksa `git status` **setiap awal sesi** — jangan asumsikan repo bersih |
+| Orderan 5 sempat dikira perlu dikerjakan dari nol | Belum diperiksa dulu | **Periksa dulu** sebelum menyatakan sesuatu perlu dibuat |
+| Proyek `DataPeta` ternyata sudah mengerjakan orderan 1–6 | Tidak diperiksa di awal | Periksa folder/proyek lain sebelum menulis kode baru (aturan 8) |
+
+### 📌 Pesan untuk asisten berikutnya
+
+1. **Baca berkas ini utuh** sebelum kerja apa pun.
+2. **Jangan mulai tanpa aba-aba** pemilik proyek.
+3. **Backup → kerjakan → uji bagian yang berubah → lapor → update dokumen sekali di akhir.**
+4. Kalau ragu → **tanya**, jangan menebak. Jangan karang data.
+5. Riwayat yang sudah selesai ❌ jangan ditulis di sini → tulis di `CHANGELOG.md`.
+6. **Wajib sebut perkiraan waktu** sebelum mengerjakan sesuatu (aturan 4).
+7. **Jangan pernah menulis kunci API / password / connection string** di dalam
+   kode atau dokumen — repo ini **publik**.

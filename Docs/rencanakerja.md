@@ -24,7 +24,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 6 | Tahap awal: peta dan tampilan sudah bisa diakses di PC maupun HP; konsep dasar UI, penempatan data, dan isian data | BARU | 90–150 mnt | — |
 | 7 | Setelan database: aktifkan Neon Data API, buat tabel, pasang RLS, sambungkan aplikasi ke database | BARU | 60–90 mnt | — |
 | 8 | Setelan GitHub: siapkan repo, cabang, GitHub Pages, dan cara unggah perubahan | **SEBAGIAN** — repo + remote + push ✅ · GitHub Pages ⛔ | 30–45 mnt | — |
-| 9 | `aturan.md` diganti nama menjadi **`agents.md`** — berisi aturan + catatan agar asisten diingatkan setiap mulai proyek | BARU | 5 mnt | — |
+| 9 | `aturan.md` diganti nama menjadi **`agents.md`** — berisi aturan + catatan agar asisten diingatkan setiap mulai proyek | MENUNGGU KONFIRMASI | 5 mnt | — |
 | 10 | Pastikan `rencanakerja.md` berfungsi sebagai **daftar orderan**: yang belum selesai dan yang sudah selesai | BARU | 5 mnt | — |
 | 11 | Buat **`prompt.md`** — konsep proyek, supaya AI lain dapat membuat ulang **persis sama** | BARU | 30–45 mnt | — |
 | 12 | Buat **`CHANGELOG.md`** — catatan semua perkembangan, perbaikan, dan hal baru | BARU | 15–20 mnt | — |
@@ -57,7 +57,7 @@ Berdasarkan orderan 9–12. Struktur yang dituju:
 
 | Berkas | Untuk siapa | Isi | Status |
 |---|---|---|---|
-| **`Docs/agents.md`** | asisten (AI) | Aturan main + catatan agar diingatkan setiap mulai | ⛔ Belum — masih bernama `aturan.md` |
+| **`Docs/agents.md`** | asisten (AI) | Aturan main + catatan agar diingatkan setiap mulai | ✅ Ada — nama & isi sudah diperbarui |
 | **`Docs/rencanakerja.md`** | asisten + manusia | Daftar orderan: belum selesai & sudah selesai | ✅ Ada |
 | **`Docs/prompt.md`** | manusia / AI lain | Konsep proyek — supaya dapat dibuat ulang **persis sama** | ⛔ Belum ada |
 | **`Docs/CHANGELOG.md`** | manusia | Catatan semua perkembangan, perbaikan, hal baru | ⛔ Belum ada |
@@ -103,7 +103,20 @@ nanti diperlukan citra yang tidak berubah-ubah.
 
 ## Penghambat (menunggu dari pemilik proyek)
 
-### 🔴 PERLU DIPUTUSKAN BESOK — perubahan belum tersimpan
+### ✅ SUDAH DIPUTUSKAN 2026-10-16 — pilihan C dipakai
+
+Pemilik proyek memilih **opsi C**: pakai `agents.md` + tambahkan bagian
+"Catatan untuk Asisten". Sudah dikerjakan dan di-commit.
+
+| Hal | Keadaan |
+|---|---|
+| `Docs/aturan.md` | Sudah tidak ada (rename dikenali git sebagai `R`) |
+| `Docs/agents.md` | Ada — aturan + bagian "Catatan untuk Asisten" |
+| Commit titik pulih | `9d027e4` — rename disimpan apa adanya |
+| Commit hasil | `agents.md` + `rencanakerja.md` diperbarui (commit sesudah titik pulih) |
+
+<details>
+<summary>Catatan temuan lama (2026-10-12 22:25) — sudah selesai</summary>
 
 Ditemukan 2026-10-12 22:25 saat pemeriksaan akhir sebelum berhenti.
 
@@ -130,6 +143,8 @@ tanpa perintah), asisten **belum menyimpan perubahan ini**.
 Catatan: opsi **C** sesuai dengan maksud orderan 9 yang sudah tercatat —
 `agents.md` bukan sekadar ganti nama, tetapi juga memuat catatan agar asisten
 diingatkan setiap mulai proyek.
+
+</details>
 
 ---
 
