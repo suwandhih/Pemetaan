@@ -33,6 +33,8 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 15 | **Fitur citra satelit atau peta** — peta memakai citra satelit, tetapi bisa juga dalam bentuk peta (contoh acuan: `petadunia`) | MENUNGGU KONFIRMASI | 30–45 mnt | — |
 | 16 | **Data jumlah penduduk berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan, disajikan seperti `DataPeta`; sumber Dukcapil Kemendagri | MENUNGGU KONFIRMASI | 90–150 mnt | — |
 | 17 | **User input data anggota** — tambah/ubah/hapus data per lokasi; pengelompokan bisa per desa, kecamatan, kabupaten, atau provinsi; konsep diambil dari `DataPeta` lalu disesuaikan | MENUNGGU KONFIRMASI | 90–120 mnt | — |
+| 18 | **Form Tambah Anggota + Peta interaktif di bawah form** — saat pilih provinsi peta otomatis fokus ke provinsi; pilih kab/kota fokus lebih dalam ke kab/kota; pilih kecamatan fokus ke kecamatan; pilih desa/kelurahan fokus ke desa/kelurahan | BARU (dicatat untuk besok) | 30–45 mnt | — |
+| 19 | **Fitur Cari `[⌕]`** — pencarian lokasi/wilayah atau nama anggota/yayasan | BARU (dicatat untuk besok) | 30–45 mnt | — |
 
 ### Rincian Orderan 14 (perintah 2026-10-16)
 
@@ -1545,3 +1547,17 @@ Pengelola kategori (`#anggota-kategori-panel`) yang bisa dibuka dari
 | Klik `Kesehatan` | ✅ kotak yang sama terisi `"Kesehatan"` + tombol berganti `[Edit][Del]` (`btnTambahTampil: false`, `btnEditTampil: true`, `btnDelTampil: true`) |
 | Tambah `Olahraga` → klik `Olahraga` → ubah jadi `Koperasi` → klik `[Edit]` | ✅ berubah tanpa popup |
 | Klik `Koperasi` → klik `[Del]` | ✅ terhapus tanpa popup |
+
+---
+
+## Catatan Rencana Kerja Berikutnya (dicatat 2026-10-16 malam untuk dilanjutkan besok)
+
+1. **Orderan 18 — Form Tambah Anggota + Peta di bawah form isian:**
+   - Saat mengisi form `Tambah Anggota`, peta ditempatkan/terlihat di bawah form isian agar berfungsi aktif.
+   - Saat pilih **Provinsi** → peta otomatis bergerak & tampil fokus pada provinsi tersebut.
+   - Saat pilih **Kabupaten/Kota** → peta otomatis masuk lebih dalam ke bagian kabupaten/kota tersebut.
+   - Saat pilih **Kecamatan** → peta otomatis fokus pada kecamatannya.
+   - Saat pilih **Desa/Kelurahan** → peta otomatis fokus pada desa/kelurahannya.
+
+2. **Orderan 19 — Fitur Cari `[⌕]`:**
+   - Menambahkan fitur pencarian `[⌕]` untuk mencari lokasi/wilayah maupun mencari anggota/yayasan yang sudah diinput.
