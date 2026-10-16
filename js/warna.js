@@ -23,7 +23,7 @@
   'use strict';
 
   var PETA = {
-    'tanpa': { nama: 'Tanpa warna', ikon: '\uD83C\uDF10', tingkat: null },
+    'tanpa': { nama: 'Populasi', ikon: '\uD83D\uDC41', tingkat: null },
     'provinsi': { nama: 'Provinsi', ikon: '\uD83D\uDDFA\uFE0F', tingkat: 'provinsi', berkas: 'prop-nasional.js', kunci: 'PROP' },
     'kabkota': { nama: 'Kabupaten/Kota', ikon: '\uD83C\uDFD9\uFE0F', tingkat: 'kabkota', berkas: 'kab-nasional.js', kunci: 'KAB' },
     'kecamatan': { nama: 'Kecamatan', ikon: '\uD83D\uDCCD', tingkat: 'kecamatan', kunci: 'KEC' },
@@ -519,9 +519,14 @@
 
   function tandai() {
     if (!elTombol) { return; }
-    var p = PETA[aktif];
-    document.getElementById('warna-ikon').textContent = p.ikon;
-    document.getElementById('warna-nama').textContent = p.nama;
+    var p = PETA[aktif] || PETA.tanpa;
+    var nyala = aktif !== 'tanpa';
+    document.getElementById('warna-nama').textContent = 'Populasi';
+    document.getElementById('warna-ikon').textContent = '\uD83D\uDC41';
+    elTombol.setAttribute('aria-pressed', nyala ? 'true' : 'false');
+    elTombol.title = nyala
+      ? 'Populasi (' + p.nama + ') aktif \u2014 klik untuk mematikan'
+      : 'Klik untuk memilih tingkat populasi';
     var b = document.querySelectorAll('.pilihan-warna');
     for (var i = 0; i < b.length; i++) {
       var ini = b[i].dataset.warna === aktif;
@@ -544,6 +549,7 @@
 
     Object.keys(PETA).forEach(function (id) {
       var p = PETA[id];
+      if (!p.tingkat) { return; }
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'pilihan-warna';
@@ -557,7 +563,15 @@
       elWarna.appendChild(b);
     });
 
-    elTombol.addEventListener('click', function () { bukaTutup(elWarna.hidden); });
+    /* Klik pilih ON, klik lagi OFF. */
+    elTombol.addEventListener('click', function () {
+      if (aktif !== 'tanpa') {
+        bukaTutup(false);
+        ganti('tanpa');
+        return;
+      }
+      bukaTutup(elWarna.hidden);
+    });
 
     document.addEventListener('click', function (e) {
       if (elWarna.hidden) { return; }

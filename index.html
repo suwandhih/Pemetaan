@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261016-14">
-<link rel="stylesheet" href="css/gaya.css?v=20261016-14">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261016-15">
+<link rel="stylesheet" href="css/gaya.css?v=20261016-15">
 </head>
 <body>
 
@@ -17,22 +17,21 @@
   <div id="peta"></div>
 
   <header id="bilah-atas">
-      <button id="tombol-jenis" type="button" aria-haspopup="listbox" aria-expanded="false">
-        <span id="jenis-ikon">&#128752;</span>
-        <span id="jenis-nama">Citra Satelit</span>
-        <span class="panah">&#9662;</span>
-      </button>
-      <button id="tombol-warna" type="button" aria-haspopup="listbox" aria-expanded="false">
-        <span id="warna-ikon">&#127760;</span>
-        <span id="warna-nama">Tanpa warna</span>
-        <span class="panah">&#9662;</span>
-      </button>
+    <button id="tombol-jenis" type="button" aria-haspopup="listbox" aria-expanded="false">
+      <span id="jenis-ikon">&#128752;</span>
+      <span id="jenis-nama">Satelit</span>
+      <span class="panah">&#9662;</span>
+    </button>
+    <button id="tombol-warna" type="button" aria-haspopup="listbox" aria-expanded="false" aria-pressed="false">
+      <span id="warna-nama">Populasi</span>
+      <span id="warna-ikon">&#128065;</span>
+    </button>
+    <div id="grup-anggota">
+      <button id="tombol-anggota" type="button" aria-label="Daftar anggota">Anggota</button>
       <button id="anggota-tampil" type="button" aria-pressed="true"
-              title="Tampilkan / sembunyikan penanda anggota di peta">
-        <span id="tampil-ikon">&#128065;</span>
-        <span id="tampil-nama">Anggota</span>
-      </button>
-    </header>
+              title="Tampilkan / sembunyikan penanda anggota di peta">&#128065;</button>
+    </div>
+  </header>
 
     <!-- Orderan 15: daftar jenis peta (satelit / jalan / gelap / medan) -->
     <div id="pemilih-peta" role="listbox" aria-label="Jenis peta" hidden></div>
@@ -116,7 +115,6 @@
         </div>
 
       <footer id="bilah-bawah">
-              <button id="tombol-anggota" type="button" aria-label="Daftar anggota">&#9776; Anggota</button>
               <button id="geser-kiri" type="button" aria-label="Geser ke kiri">&#9664;</button>
               <span id="posisi">—</span>
               <button id="geser-kanan" type="button" aria-label="Geser ke kanan">&#9654;</button>
@@ -125,12 +123,12 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261016-14"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261016-14"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261016-14"></script>
-<script src="js/inti.js?v=20261016-14"></script>
-<script src="js/warna.js?v=20261016-14"></script>
-<script src="js/simpanan.js?v=20261016-14"></script>
-<script src="js/member.js?v=20261016-14"></script>
+<script src="js/lib/maplibre-gl.js?v=20261016-15"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261016-15"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261016-15"></script>
+<script src="js/inti.js?v=20261016-15"></script>
+<script src="js/warna.js?v=20261016-15"></script>
+<script src="js/simpanan.js?v=20261016-15"></script>
+<script src="js/member.js?v=20261016-15"></script>
 </body>
 </html>

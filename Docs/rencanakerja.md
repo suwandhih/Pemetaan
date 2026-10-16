@@ -1448,3 +1448,35 @@ untuk on/off, kurang standar."
 | Klik 1x dari halaman peta → OFF | ✅ `aria-pressed="false"`, penanda `OB` langsung hilang (`visibility: none`), tombol redup & dicoret |
 | Klik 1x lagi → ON | ✅ `aria-pressed="true"`, penanda `OB` langsung muncul kembali (`visibility: visible`) |
 | Galat halaman | ✅ 0 |
+
+---
+
+## Pembenahan menu di atas peta (perintah 2026-10-16)
+
+### Permintaan pemilik proyek
+
+1. `[Citra Satelit]` diubah menjadi `[Satelit]`
+2. `[Peta Jalan]` diubah menjadi `[Map]`
+3. `Peta Gelap` dan `Peta Medan` dihapus
+4. `[Tanpa warna]` diganti `[Populasi 👁]` — klik pilih ON, klik lagi OFF
+5. Tombol `[Anggota][👁]` di bilah atas
+
+### Perubahan
+
+| Berkas | Perubahan |
+|---|---|
+| `js/inti.js` | Daftar `JENIS` diringkas jadi 2 opsi: `Satelit` (`id: 'satelit'`) dan `Map` (`id: 'jalan'`); `Peta Gelap` & `Peta Medan` dihapus |
+| `js/warna.js` | Tombol `#tombol-warna` menampilkan `Populasi 👁`. Saat OFF (`aktif === 'tanpa'`), klik membuka daftar 4 tingkat (`Provinsi`, `Kabupaten/Kota`, `Kecamatan`, `Desa/Kelurahan`) → pilih tingkat → ON (`aria-pressed="true"`). Saat ON, klik lagi langsung OFF (`ganti('tanpa')`) |
+| `index.html` | Bilah atas memuat `[Satelit ▾]`, `[Populasi 👁]`, dan `#grup-anggota` (`[Anggota][👁]`). Bilah bawah kembali berisi `◀`, `#posisi`, `▶`. Penanda versi naik ke `?v=20261016-15` |
+| `css/gaya.css` | Gaya `#tombol-warna[aria-pressed="true"]`, `#grup-anggota`, `#tombol-anggota`, dan `#anggota-tampil` di bilah atas |
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Pilihan jenis peta | ✅ hanya 2: `["Satelit", "Map"]` |
+| Tampilan tombol Populasi saat OFF | ✅ `Populasi 👁`, `aria-pressed="false"` |
+| Klik `Populasi 👁` → pilih `Provinsi` | ✅ `aria-pressed="true"`, 38 fitur provinsi tergambar (ON) |
+| Klik lagi `Populasi 👁` | ✅ langsung OFF (`aria-pressed="false"`, `dropdownTerbuka: false`, `fiturWilayah: 0`) |
+| Ukuran bilah atas | ✅ `Satelit` (88 px) + `Populasi 👁` (82 px) + `Anggota` (67 px) + `👁` (30 px) = 267 px dari 428 px, `potong: false` |
+| Galat halaman | ✅ 0 |

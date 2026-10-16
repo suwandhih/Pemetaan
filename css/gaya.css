@@ -109,7 +109,7 @@ body {
   opacity: 0.7;
 }
 
-/* Orderan 16 — tombol pembuka pilihan tingkat peta penduduk. */
+/* Orderan 16 — tombol pembuka pilihan tingkat peta penduduk ([Populasi 👁]). */
 #tombol-warna {
   display: inline-flex;
   align-items: center;
@@ -132,21 +132,18 @@ body {
   background: rgba(255, 255, 255, 0.2);
 }
 
-#tombol-warna[aria-expanded="true"] {
+#tombol-warna[aria-expanded="true"],
+#tombol-warna[aria-pressed="true"] {
   border-color: #63c2de;
-  background: rgba(99, 194, 222, 0.22);
+  background: rgba(99, 194, 222, 0.24);
 }
 
-#tombol-warna .panah {
-  font-size: 9px;
-  opacity: 0.7;
+#tombol-warna[aria-pressed="false"] #warna-ikon {
+  opacity: 0.55;
 }
 
 #warna-nama {
   font-weight: 600;
-  max-width: 88px;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* Daftar tingkat penduduk */
@@ -399,17 +396,6 @@ body {
   text-align: right;
 }
 
-/* Tombol "Anggota" di ujung kiri bilah bawah. Panjangnya mengikuti
-   tulisan — tanpa `width: auto` ia terpotong jadi "☰ Ang". */
-#bilah-bawah #tombol-anggota {
-  width: auto;
-  flex: none;
-  padding: 0 10px;
-  font-size: 11.5px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
 #bilah-bawah button {
   width: 44px;
   height: 30px;
@@ -436,15 +422,34 @@ body {
   opacity: 0.85;
 }
 
-/* Orderan 17 — tombol daftar anggota di bilah bawah. */
+/* Grup tombol [Anggota][👁] di sebelah kanan bilah atas. */
+#grup-anggota {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 #tombol-anggota {
-  width: auto;
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
   padding: 0 9px;
-  font-size: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
   font-weight: 600;
+  line-height: 1;
   white-space: nowrap;
-  /* Ditaruh di ujung kiri bilah bawah supaya tulisan "Anggota" terbaca
-     utuh, tidak lagi terpotong seperti waktu di ujung kanan. */
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-anggota:active {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Panel daftar anggota — menutupi bilah atas & bawah, peta tetap di bawahnya. */
@@ -508,24 +513,22 @@ body {
   cursor: pointer;
 }
 
-/* Tombol tampil/sembunyi penanda anggota langsung di bilah atas peta.
+/* Tombol tampil/sembunyi penanda anggota [👁] di sebelah tombol [Anggota].
    Terang = penanda tampil, redup = penanda disembunyikan. */
 #anggota-tampil {
-  margin-left: auto;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  justify-content: center;
+  width: 30px;
   height: 28px;
-  padding: 0 9px;
+  padding: 0;
   border: 1px solid rgba(88, 166, 255, 0.55);
   border-radius: 8px;
   background: rgba(88, 166, 255, 0.22);
   color: var(--terang);
   font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
   line-height: 1;
-  white-space: nowrap;
   cursor: pointer;
   touch-action: manipulation;
 }
@@ -537,11 +540,7 @@ body {
 #anggota-tampil[aria-pressed="false"] {
   border-color: rgba(255, 255, 255, 0.18);
   background: rgba(255, 255, 255, 0.06);
-  opacity: 0.55;
-}
-
-#anggota-tampil[aria-pressed="false"] #tampil-nama {
-  text-decoration: line-through;
+  opacity: 0.5;
 }
 
 /* Tombol tingkat pengelompokan */

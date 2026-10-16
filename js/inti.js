@@ -20,7 +20,7 @@
   var JENIS = [
     {
       id: 'satelit',
-      nama: 'Citra Satelit',
+      nama: 'Satelit',
       ikon: '\uD83D\uDEF0\uFE0F',
       ket: 'Esri World Imagery',
       atribusi: 'Citra: Esri, Maxar, Earthstar Geographics',
@@ -30,30 +30,12 @@
     },
     {
       id: 'jalan',
-      nama: 'Peta Jalan',
+      nama: 'Map',
       ikon: '\uD83D\uDDFA\uFE0F',
       ket: 'OpenStreetMap',
       atribusi: 'Peta: \u00A9 OpenStreetMap contributors',
       latar: '#dfe6ec',
       dasar: { tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], maks: 19 }
-    },
-    {
-      id: 'gelap',
-      nama: 'Peta Gelap',
-      ikon: '\uD83C\uDF19',
-      ket: 'CARTO Dark Matter',
-      atribusi: 'Peta: \u00A9 OpenStreetMap contributors \u00B7 CARTO',
-      latar: '#0a0e13',
-      dasar: { tiles: ['https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'], maks: 20 }
-    },
-    {
-      id: 'medan',
-      nama: 'Peta Medan',
-      ikon: '\u26F0\uFE0F',
-      ket: 'Esri World Terrain',
-      atribusi: 'Medan: Esri, USGS, NOAA',
-      latar: '#0d1218',
-      dasar: { tiles: [ARCGIS + 'World_Terrain_Base/MapServer/tile/{z}/{y}/{x}'], maks: 13 }
     }
   ];
 
