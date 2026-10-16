@@ -1108,3 +1108,60 @@ sebagai jaring pengaman untuk peramban yang mengabaikannya.
 | `color-scheme` pada pemilih Kategori | ✅ `dark`, opsi terpilih `rgb(31,111,235)` |
 | Pilihan bertingkat masih bekerja | ✅ pilih BALI → 9 kabupaten; pilih BANGKALAN → penduduk 1.042.031 jiwa |
 | Tangkapan layar form | ✅ nama wilayah terbaca jelas |
+
+---
+
+## Perbaikan — pilihan kecamatan & desa/kelurahan kosong (perintah 2026-10-16)
+
+### Keluhan pemilik proyek
+
+"Kecamatan dan desa/kelurahan kosong, belum diisi."
+
+### Sebab
+
+Berkas data kecamatan (38 berkas) dan desa (514 berkas, 71 MB) tidak
+dimuat saat aplikasi dibuka — terlalu berat. Sebelumnya berkas ini hanya
+dimuat oleh **peta tematik** saat pemakai membuka tingkat itu. Form
+anggota membaca daftar yang sudah dimuat itu, jadi selama peta tematik
+belum pernah dibuka di tingkat tersebut, pilihannya kosong.
+
+### Perbaikan
+
+| Berkas | Perubahan |
+|---|---|
+| `js/member.js` | Form anggota kini **memuat sendiri** berkas kecamatan & desa saat wilayah dipilih |
+| `index.html` | Penanda versi naik ke `?v=20261016-09` |
+
+Cara kerjanya:
+
+| Pilihan | Berkas yang dimuat | Ukuran |
+|---|---|---|
+| Provinsi dipilih | `kec-<provinsi>.js` | ±100–200 KB |
+| Kabupaten/kota dipilih | (kecamatan sudah dimuat di langkah sebelumnya) | — |
+| Kecamatan dipilih | `desa-<kabupaten tanpa titik>.js` | ±70–250 KB |
+
+Tambahan:
+- Pemilih menampilkan tulisan "**— memuat daftar kecamatan… —**" selama
+  berkas diunduh, supaya tidak terlihat seperti kerusakan.
+- Bagian yang sudah diunduh disimpan di kunci `window` sendiri
+  (`WARNA_KEC_51`, `WARNA_DESA_5103`) sehingga tidak saling menimpa bila
+  pemakai berpindah-pindah wilayah.
+- Berkas yang gagal dimuat ditandai kosong supaya tidak dicoba berulang.
+
+### Bug ditemukan & diperbaiki
+
+| No | Bug | Sebab | Perbaikan |
+|---|---|---|---|
+| 1 | Permintaan `kecamatan-51.js` → **404** | Nama berkas sebenarnya `kec-51.js` dan `desa-5103.js` (singkatan, tanpa titik) | Tabel nama berkas disesuaikan |
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Pilih BALI | ✅ kecamatan dimuat sendiri dari `kec-51.js` |
+| Pilih BADUNG | ✅ 7 kecamatan: ABIANSEMAL, KUTA, KUTA SELATAN, KUTA UTARA, MENGWI, PETANG |
+| Pilih ABIANSEMAL | ✅ 19 desa: ABIANSEMAL, ABIANSEMAL DAUH YEH CANI, ANGANTAKA, AYUNAN, BLAHKIUH, … |
+| Keterangan penduduk | ✅ "Kecamatan ini berpenduduk 100.001 jiwa · KK 28.229 · luas 67 km² · kepadatan 1.493 jiwa/km²" |
+| Simpan anggota 4 tingkat | ✅ tersimpan lengkap di Neon: `51` / `51.03` / `51.03.03` / `51.03.03.2005` — BALI / BADUNG / ABIANSEMAL / ANGANTAKA |
+| Pengelompokan tingkat desa | ✅ grup **ANGANTAKA · ABIANSEMAL** |
+| Data uji dibersihkan | ✅ `jumlah: 0` |

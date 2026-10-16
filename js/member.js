@@ -80,13 +80,106 @@
   }
 
   /* Daftar data untuk satu tingkat. Kecamatan & desa hanya dimuat sebagian
-     (per provinsi / per kabupaten), jadi daftarnya bisa kosong. */
-  function daftarTingkat(id) {
-    if (id === 'provinsi') { return window.WARNA_PROP || []; }
-    if (id === 'kabkota') { return window.WARNA_KAB || []; }
-    if (id === 'kecamatan') { return window.WARNA_KEC || []; }
-    return window.WARNA_DESA || [];
-  }
+       (per provinsi / per kabupaten), jadi daftarnya bisa kosong sampai
+       berkasnya selesai dimuat — lihat pastikanTingkat(). */
+    function daftarTingkat(id) {
+      if (id === 'provinsi') { return window.WARNA_PROP || []; }
+      if (id === 'kabkota') { return window.WARNA_KAB || []; }
+      if (id === 'kecamatan') { return bagianKecamatan(); }
+      return bagianDesa();
+    }
+
+    /* ---------- pemuatan berkas kecamatan & desa ---------- */
+
+    /* Nama berkas data memakai singkatan: kec-<provinsi>.js dan
+       desa-<kabupaten tanpa titik>.js. */
+    var AWALAN_BERKAS = { kecamatan: 'kec', desa: 'desa' };
+    var KUNCI_DATA = { kecamatan: 'KEC', desa: 'DESA' };
+
+    function kunciTingkat(tingkat, bagian) {
+      return 'WARNA_' + KUNCI_DATA[tingkat] + '_' + bagian;
+    }
+
+    function sudahDimuat(tingkat, bagian) {
+      return !!window[kunciTingkat(tingkat, bagian)];
+    }
+
+    function muatTingkat(tingkat, bagian) {
+      var kunci = kunciTingkat(tingkat, bagian);
+      if (window[kunci]) { return Promise.resolve(window[kunci]); }
+      return new Promise(function (selesai, gagal) {
+        var s = document.createElement('script');
+        s.src = 'data/wilayah-warna/' + AWALAN_BERKAS[tingkat] + '-' + bagian + '.js';
+        s.onload = function () {
+          /* Berkas menulis ke window.WARNA_<TINGKAT> (nama yang sama untuk
+             seluruh bagian). Dipindahkan ke kunci sendiri supaya bagian
+             wilayah lain tidak saling menimpa. */
+          var d = window['WARNA_' + KUNCI_DATA[tingkat]];
+          window[kunci] = d || [];
+          selesai(window[kunci]);
+        };
+        s.onerror = function () {
+          window[kunci] = [];
+          gagal(new Error('tidak termuat: ' + tingkat + ' ' + bagian));
+        };
+        document.head.appendChild(s);
+      });
+    }
+
+    /* Menggabungkan seluruh bagian yang sudah dimuat (bisa lebih dari satu
+       bila pemakai berpindah-pindah wilayah). */
+    function gabungBagian(tingkat) {
+      var awalan = 'WARNA_' + KUNCI_DATA[tingkat] + '_';
+      var gabung = [];
+      for (var k in window) {
+        if (k.indexOf(awalan) !== 0) { continue; }
+        if (!Array.isArray(window[k])) { continue; }
+        gabung = gabung.concat(window[k]);
+      }
+      return gabung;
+    }
+
+    function bagianKecamatan() { return gabungBagian('kecamatan'); }
+    function bagianDesa() { return gabungBagian('desa'); }
+
+    /* Menyiapkan berkas yang diperlukan untuk mengisi tingkat tertentu,
+       lalu mengisi pemilihnya. Dipakai saat pemakai memilih wilayah. */
+    var SEDANG_MUAT = {};
+
+    function pastikanTingkat(tingkat) {
+      if (tingkat !== 'kecamatan' && tingkat !== 'desa') { return Promise.resolve(); }
+
+      var prov = pilihEl('provinsi') ? pilihEl('provinsi').value : '';
+      var kab = pilihEl('kabkota') ? pilihEl('kabkota').value : '';
+      if (!prov) { return Promise.resolve(); }
+
+      var bagian = tingkat === 'kecamatan'
+        ? prov
+        : (kab ? kab.replace(/\./g, '') : '');
+      if (!bagian) { return Promise.resolve(); }
+
+      var kunci = tingkat + ':' + bagian;
+      if (sudahDimuat(tingkat, bagian)) { return Promise.resolve(); }
+      if (SEDANG_MUAT[kunci]) { return SEDANG_MUAT[kunci]; }
+
+      SEDANG_MUAT[kunci] = muatTingkat(tingkat, bagian)
+        .catch(function () { return null; })
+        .then(function () {
+          delete SEDANG_MUAT[kunci];
+          /* Isi lagi setelah berkas siap — kalau tidak, daftar tetap kosong. */
+          isiTurunan(tingkat === 'kecamatan' ? 'kabkota' : 'kecamatan');
+          bacaWilayah();
+        });
+      return SEDANG_MUAT[kunci];
+    }
+
+    /* Memberi tahu pemakai bahwa daftar sedang dimuat / tidak tersedia.
+       Tanpa ini pemilih kosong terlihat seperti kerusakan. */
+    function catatPemuatan(tingkat, pesan) {
+      var p = pilihEl(tingkat);
+      if (!p || !pesan) { return; }
+      p.innerHTML = '<option value="">' + pesan + '</option>';
+    }
 
   function kolomTingkat(id) {
     for (var i = 0; i < TINGKAT.length; i++) {
@@ -469,27 +562,44 @@
       }), 2);
       isiPilih(pilihEl('kecamatan'), [], 3);
       isiPilih(pilihEl('desa'), [], 4);
-      return;
-    }
+        /* Daftar kecamatan belum ada di perangkat ini — ambil berkasnya. */
+        if (nilaiProv) {
+          catatPemuatan('kecamatan', '\u2014 memuat daftar kecamatan\u2026 \u2014');
+          pastikanTingkat('kecamatan');
+        }
+        return;
+      }
 
-    if (t === 'kabkota') {
-      /* Kecamatan hanya ada bila berkas kecamatan provinsi itu sudah dimuat
-         (dibuka saat peta tematik tingkat kecamatan dipakai). Kalau belum,
-         daftarnya kosong dan pemakai diminta membuka tingkat itu dulu. */
-      isiPilih(pilihEl('kecamatan'), daftarTingkat('kecamatan').filter(function (d) {
-        return kodeDari(d, 2) === nilaiKab;
-      }), 3);
-      isiPilih(pilihEl('desa'), [], 4);
-      return;
-    }
+      if (t === 'kabkota') {
+        /* Kecamatan dipecah per provinsi. Bila berkasnya belum dimuat,
+           pemilih diberi keterangan lalu diisi sendiri begitu selesai. */
+        if (!sudahDimuat('kecamatan', nilaiProv)) {
+          catatPemuatan('kecamatan', '\u2014 memuat daftar kecamatan\u2026 \u2014');
+          isiPilih(pilihEl('desa'), [], 4);
+          pastikanTingkat('kecamatan');
+          return;
+        }
+        isiPilih(pilihEl('kecamatan'), daftarTingkat('kecamatan').filter(function (d) {
+          return kodeDari(d, 2) === nilaiKab;
+        }), 3);
+        isiPilih(pilihEl('desa'), [], 4);
+        return;
+      }
 
-    if (t === 'kecamatan') {
-      var nilaiKec = pilihEl('kecamatan') ? pilihEl('kecamatan').value : '';
-      isiPilih(pilihEl('desa'), daftarTingkat('desa').filter(function (d) {
-        return kodeDari(d, 3) === nilaiKec;
-      }), 4);
+      if (t === 'kecamatan') {
+        var nilaiKec = pilihEl('kecamatan') ? pilihEl('kecamatan').value : '';
+        /* Desa dipecah per kabupaten/kota — bagiannya kode kabupaten tanpa titik. */
+        var kab = nilaiKab ? nilaiKab.replace(/\./g, '') : '';
+        if (kab && !sudahDimuat('desa', kab)) {
+          catatPemuatan('desa', '\u2014 memuat daftar desa\u2026 \u2014');
+          pastikanTingkat('desa');
+          return;
+        }
+        isiPilih(pilihEl('desa'), daftarTingkat('desa').filter(function (d) {
+          return kodeDari(d, 3) === nilaiKec;
+        }), 4);
+      }
     }
-  }
 
   function bacaWilayah() {
     wilayah = {
