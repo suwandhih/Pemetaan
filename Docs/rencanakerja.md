@@ -1480,3 +1480,41 @@ untuk on/off, kurang standar."
 | Klik lagi `Populasi 👁` | ✅ langsung OFF (`aria-pressed="false"`, `dropdownTerbuka: false`, `fiturWilayah: 0`) |
 | Ukuran bilah atas | ✅ `Satelit` (88 px) + `Populasi 👁` (82 px) + `Anggota` (67 px) + `👁` (30 px) = 267 px dari 428 px, `potong: false` |
 | Galat halaman | ✅ 0 |
+
+---
+
+## Fitur Tambah / Ubah / Hapus Kategori Anggota (perintah 2026-10-16)
+
+### Pertanyaan & permintaan pemilik proyek
+
+"Kategori member (Kesehatan, Sekolah) diinput di mana atau add, edit,
+delete?"
+
+### Yang dibuat
+
+Pengelola kategori (`#anggota-kategori-panel`) yang bisa dibuka dari
+**dua tempat**:
+
+1. **Dari Daftar Anggota (`#panel-anggota`):** klik tombol **`Kategori`**
+   di kepala panel (sebelah `+ Anggota`).
+2. **Dari Form Tambah/Ubah Anggota (`#form-anggota`):** klik tombol
+   **`Kelola`** tepat di sebelah label `Kategori`.
+
+### Fungsi lengkap (tersinkron ke database Neon)
+
+| Fungsi | Cara pakai | Perilaku |
+|---|---|---|
+| **Tambah (Add)** | Ketik nama di kotak `Nama kategori baru…` → klik **`+ Tambah`** (atau tekan Enter) | Disimpan ke tabel `kategori` di Neon, langsung muncul di daftar dan terpilih di dropdown `#fa-kategori` |
+| **Ubah (Edit)** | Klik langsung pada **nama kategori** (mis. `Sekolah`) | Muncul isian nama baru; seluruh anggota yang memakai kategori lama otomatis diperbarui kategorinya di Neon |
+| **Hapus (Delete)** | Klik tombol **`✕`** di sebelah kanan nama kategori | Jika masih dipakai oleh anggota, penghapusan ditolak dengan peringatan jumlah anggota yang memakainya; jika kosong, dihapus dari Neon |
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Buka panel kategori | ✅ menampilkan 6 kategori: `Kesehatan, Lainnya, Pemerintahan, Sekolah, Sosial, Yayasan` |
+| Tambah kategori `Olahraga` | ✅ masuk daftar & dropdown `#fa-kategori` (7 kategori) |
+| Ubah `Olahraga` → `Koperasi` | ✅ berubah menjadi `Koperasi` di daftar & Neon |
+| Coba hapus `Yayasan` (sedang dipakai 1 anggota) | ✅ ditolak: `"Tidak bisa dihapus — masih dipakai 1 anggota. Ubah dulu kategori anggotanya."` |
+| Hapus `Koperasi` (tidak dipakai) | ✅ terhapus dari daftar & Neon, kembali 6 kategori |
+| Buka dari dalam Form (`Kelola`) | ✅ kotak kelola muncul langsung di bawah pilihan Kategori di dalam form |

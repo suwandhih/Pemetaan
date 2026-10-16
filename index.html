@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261016-15">
-<link rel="stylesheet" href="css/gaya.css?v=20261016-15">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261016-18">
+<link rel="stylesheet" href="css/gaya.css?v=20261016-18">
 </head>
 <body>
 
@@ -52,11 +52,24 @@
           <div id="anggota-kepala">
             <h2 id="anggota-judul">Anggota</h2>
             <span id="anggota-jumlah"></span>
+            <button id="anggota-kat-tombol" type="button" title="Tambah, ubah, atau hapus kategori">Kategori</button>
             <button id="anggota-tambah" type="button">+ Anggota</button>
             <button id="anggota-tutup" type="button" aria-label="Tutup daftar anggota">&#10005;</button>
           </div>
           <div id="anggota-tingkat" role="group" aria-label="Kelompokkan menurut"></div>
-                    <div id="anggota-sambung" title="Keadaan sambungan ke database"></div>
+          <div id="anggota-sambung" title="Keadaan sambungan ke database"></div>
+          <div id="anggota-kategori-panel" hidden>
+            <div class="kat-kepala">
+              <span>Kelola Kategori (klik nama untuk ubah, &#10005; untuk hapus)</span>
+              <button id="anggota-kat-tutup" type="button" aria-label="Tutup kelola kategori">&#10005;</button>
+            </div>
+            <div id="kat-daftar" class="kat-daftar"></div>
+            <div class="kat-tambah-baris">
+              <input class="fa-input" id="kat-baru" type="text" placeholder="Nama kategori baru…" />
+              <button id="kat-tambah" type="button">+ Tambah</button>
+            </div>
+            <p class="fa-catatan fa-peringatan" id="kat-pesan" hidden></p>
+          </div>
                     <div id="anggota-kunci" hidden>
                       <p class="anggota-kunci-catatan">
                         Masukkan KODE DATABASE sekali di perangkat ini (PC dan HP).
@@ -93,7 +106,10 @@
 
             <div class="fa-baris2">
               <div>
-                <label class="fa-label" for="fa-kategori">Kategori</label>
+                <div class="fa-label-baris">
+                  <label class="fa-label" for="fa-kategori">Kategori</label>
+                  <button id="fa-kat-kelola" type="button" class="fa-tautan-kecil">Kelola</button>
+                </div>
                 <select class="fa-input" id="fa-kategori"></select>
               </div>
               <div>
@@ -123,12 +139,12 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261016-15"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261016-15"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261016-15"></script>
-<script src="js/inti.js?v=20261016-15"></script>
-<script src="js/warna.js?v=20261016-15"></script>
-<script src="js/simpanan.js?v=20261016-15"></script>
-<script src="js/member.js?v=20261016-15"></script>
+<script src="js/lib/maplibre-gl.js?v=20261016-18"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261016-18"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261016-18"></script>
+<script src="js/inti.js?v=20261016-18"></script>
+<script src="js/warna.js?v=20261016-18"></script>
+<script src="js/simpanan.js?v=20261016-18"></script>
+<script src="js/member.js?v=20261016-18"></script>
 </body>
 </html>

@@ -499,13 +499,189 @@
     if (!elFKategori) { return; }
     var lama = elFKategori.value;
     elFKategori.innerHTML = '';
-    kategori.forEach(function (k) {
+    kategori.slice().sort(function (a, b) {
+      return a.localeCompare(b, 'id');
+    }).forEach(function (k) {
       var o = document.createElement('option');
       o.value = k;
       o.textContent = k;
       elFKategori.appendChild(o);
     });
     if (lama && kategori.indexOf(lama) >= 0) { elFKategori.value = lama; }
+    gambarKategoriAtur();
+  }
+
+  /* ---------- kelola kategori (tambah / ubah / hapus) ---------- */
+
+  var elKatPanel = null;
+  var elKatDaftar = null;
+  var elKatBaru = null;
+  var elKatPesan = null;
+  var elKatTombol = null;
+
+  function siapkanKategori() {
+    elKatPanel = document.getElementById('anggota-kategori-panel');
+    elKatDaftar = document.getElementById('kat-daftar');
+    elKatBaru = document.getElementById('kat-baru');
+    elKatPesan = document.getElementById('kat-pesan');
+    elKatTombol = document.getElementById('anggota-kat-tombol');
+    var elKatTutup = document.getElementById('anggota-kat-tutup');
+    var elKatTambah = document.getElementById('kat-tambah');
+    var elFaKelola = document.getElementById('fa-kat-kelola');
+
+    if (!elKatPanel) { return; }
+
+    if (elKatTombol) {
+      elKatTombol.addEventListener('click', function () {
+        var diPanel = elKatPanel.parentElement === elPanel;
+        if (elSambung && elSambung.parentNode) {
+          elSambung.parentNode.insertBefore(elKatPanel, elSambung.nextSibling);
+        }
+        elKatPanel.hidden = diPanel ? !elKatPanel.hidden : false;
+        elKatTombol.classList.toggle('nyala', !elKatPanel.hidden);
+        pesanKategori('');
+        gambarKategoriAtur();
+      });
+    }
+
+    if (elFaKelola) {
+      elFaKelola.addEventListener('click', function () {
+        var baris2 = elFKategori ? elFKategori.closest('.fa-baris2') : null;
+        var diForm = elKatPanel.parentElement !== elPanel;
+        if (baris2 && baris2.parentNode) {
+          baris2.parentNode.insertBefore(elKatPanel, baris2.nextSibling);
+        }
+        elKatPanel.hidden = diForm ? !elKatPanel.hidden : false;
+        pesanKategori('');
+        gambarKategoriAtur();
+      });
+    }
+
+    if (elKatTutup) {
+      elKatTutup.addEventListener('click', function () {
+        elKatPanel.hidden = true;
+        if (elKatTombol) { elKatTombol.classList.remove('nyala'); }
+      });
+    }
+
+    if (elKatTambah) {
+      elKatTambah.addEventListener('click', tambahKategori);
+    }
+    if (elKatBaru) {
+      elKatBaru.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); tambahKategori(); }
+      });
+    }
+  }
+
+  function pesanKategori(teks) {
+    if (!elKatPesan) { return; }
+    elKatPesan.textContent = teks || '';
+    elKatPesan.hidden = !teks;
+  }
+
+  function gambarKategoriAtur() {
+    if (!elKatDaftar) { return; }
+    elKatDaftar.innerHTML = '';
+    kategori.slice().sort(function (a, b) {
+      return a.localeCompare(b, 'id');
+    }).forEach(function (kat) {
+      var baris = document.createElement('div');
+      baris.className = 'kat-baris';
+
+      var titik = document.createElement('span');
+      titik.className = 'kat-warna';
+      titik.style.background = warnaKategori(kat);
+
+      var nama = document.createElement('button');
+      nama.type = 'button';
+      nama.className = 'kat-nama';
+      nama.textContent = kat;
+      nama.title = 'Klik untuk mengubah nama kategori';
+      nama.addEventListener('click', function () { ubahKategori(kat); });
+
+      var hapus = document.createElement('button');
+      hapus.type = 'button';
+      hapus.className = 'kat-hapus';
+      hapus.textContent = '\u2715';
+      hapus.title = 'Hapus kategori ' + kat;
+      hapus.addEventListener('click', function () { hapusKategori(kat); });
+
+      baris.appendChild(titik);
+      baris.appendChild(nama);
+      baris.appendChild(hapus);
+      elKatDaftar.appendChild(baris);
+    });
+  }
+
+  function tambahKategori() {
+    if (!elKatBaru) { return; }
+    var nama = elKatBaru.value.trim();
+    if (!nama) {
+      pesanKategori('Nama kategori belum diisi.');
+      elKatBaru.focus();
+      return;
+    }
+    var sudahAda = kategori.some(function (k) {
+      return k.toLowerCase() === nama.toLowerCase();
+    });
+    if (sudahAda) {
+      pesanKategori('Kategori "' + nama + '" sudah ada.');
+      return;
+    }
+    elKatBaru.value = '';
+    pesanKategori('');
+    Simpanan.simpanKategori(nama).then(function () {
+      return muat();
+    }).then(function () {
+      if (elFKategori) { elFKategori.value = nama; }
+    });
+  }
+
+  function ubahKategori(lama) {
+    var jawab = prompt('Ubah nama kategori:', lama);
+    if (jawab === null) { return; }
+    var baru = jawab.trim();
+    if (!baru || baru === lama) { return; }
+    var bentrok = kategori.some(function (k) {
+      return k !== lama && k.toLowerCase() === baru.toLowerCase();
+    });
+    if (bentrok) {
+      pesanKategori('Kategori "' + baru + '" sudah ada.');
+      return;
+    }
+    pesanKategori('');
+    var pakai = anggota.filter(function (a) { return a.kategori === lama; });
+    Simpanan.simpanKategori(baru).then(function () {
+      return Promise.all(pakai.map(function (a) {
+        var salin = {};
+        for (var k in a) { if (Object.prototype.hasOwnProperty.call(a, k)) { salin[k] = a[k]; } }
+        salin.kategori = baru;
+        salin.diubah = new Date().toISOString();
+        return Simpanan.simpanAnggota(salin);
+      }));
+    }).then(function () {
+      return Simpanan.hapusKategori(lama);
+    }).then(function () {
+      return muat();
+    }).then(function () {
+      if (elFKategori && elFKategori.value === lama) { elFKategori.value = baru; }
+      gambarPenanda();
+    });
+  }
+
+  function hapusKategori(kat) {
+    var jumlahPakai = anggota.filter(function (a) { return a.kategori === kat; }).length;
+    if (jumlahPakai > 0) {
+      pesanKategori('Tidak bisa dihapus \u2014 masih dipakai ' + jumlahPakai +
+        ' anggota. Ubah dulu kategori anggotanya.');
+      return;
+    }
+    if (!confirm('Hapus kategori "' + kat + '"?')) { return; }
+    pesanKategori('');
+    Simpanan.hapusKategori(kat).then(function () {
+      return muat();
+    });
   }
 
   var LABEL = {
@@ -1196,7 +1372,8 @@
     terpasang = true;
 
     siapkanForm();
-    bangunPemilih();
+        siapkanKategori();
+        bangunPemilih();
         siapkanKunci();
         pasangTampil();
 
