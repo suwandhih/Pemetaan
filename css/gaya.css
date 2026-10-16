@@ -1,0 +1,138 @@
+/* Pemetaan — tampilan
+   Syarat 14c/14d: HP tegak, dan di PC lebar peta = lebar HP supaya
+   tampilan di dua perangkat sama. */
+
+:root {
+  --lebar-hp: 430px;
+  --tinggi-bilah: 40px;
+  --gelap: #0b0f14;
+  --terang: #e8eef5;
+  --garis: rgba(255, 255, 255, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #05080b;
+  color: var(--terang);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+/* Lebar bingkai = lebar HP, di HP maupun di PC (syarat 14d) */
+#bingkai {
+  position: relative;
+  width: min(100vw, var(--lebar-hp));
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--gelap);
+}
+
+@media (min-width: 480px) {
+  #bingkai {
+    border-left: 1px solid #1e2833;
+    border-right: 1px solid #1e2833;
+  }
+}
+
+#peta {
+  position: absolute;
+  inset: 0;
+}
+
+#bilah-atas,
+#bilah-bawah {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--tinggi-bilah);
+  padding: 0 10px;
+  background: rgba(11, 15, 20, 0.78);
+  backdrop-filter: blur(6px);
+  font-size: 13px;
+}
+
+#bilah-atas {
+  top: 0;
+  border-bottom: 1px solid var(--garis);
+}
+
+#bilah-bawah {
+  bottom: 0;
+  border-top: 1px solid var(--garis);
+}
+
+#judul {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+#wilayah {
+  margin-left: auto;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+#bilah-bawah button {
+  width: 44px;
+  height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--terang);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#bilah-bawah button:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#posisi {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+#atribusi {
+  position: absolute;
+  right: 6px;
+  bottom: calc(var(--tinggi-bilah) + 4px);
+  z-index: 2;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.55);
+  text-shadow: 0 1px 2px #000;
+  pointer-events: none;
+}
+
+#galat {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.6;
+  background: var(--gelap);
+}
