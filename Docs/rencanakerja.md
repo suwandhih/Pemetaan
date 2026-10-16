@@ -1206,3 +1206,88 @@ dipotong dengan "…" bila tidak muat, tidak lagi menekan tombol peta.
 | Posisi tombol Anggota | ✅ ujung **kiri** bilah bawah |
 | Tulisan tombol | ✅ `☰ Anggota` utuh, lebar **81 px**, `potong: false` |
 | Galat halaman | ✅ **0** (sempat muncul galat `elWilayah` null, sudah diperbaiki dengan pemeriksaan) |
+
+---
+
+## Perbaikan tampilan penanda anggota (perintah 2026-10-16)
+
+### Keluhan pemilik proyek
+
+"Hasil input member yang tampil di peta sebaiknya tidak menutupi nama
+lokasi. Saya pikir tulisan `OB` dibuat dot-garis dan kolom `OB` atau
+bulat — hindari menimpa nama lokasi."
+
+### Keadaan sebelum
+
+Penanda anggota berupa **satu bulatan berwarna** yang menempel tepat di
+titik lokasi. Karena peta dasar Esri sudah memuat nama tempat
+("Bandung", "Surabaya") sebagai bagian dari gambarnya, bulatan itu
+menutupi nama tempat.
+
+### Perbaikan
+
+Bentuk penanda diganti mengikuti usulan pemilik proyek:
+
+```
+   ( OB )    ← bulatan putih, cincin warna kategori, berisi kode anggota
+     •       ← garis putus-putus (dua titik)
+     •       ←    "
+     ●       ← titik kecil tepat di lokasi
+```
+
+| Butir | Keterangan |
+|---|---|
+| Titik lokasi | radius 3 px, warna kategori — lokasi tetap tepat |
+| Garis putus-putus | dua titik 1,6 px pada 10 px dan 18 px di atas lokasi |
+| Bulatan | radius 9,5 px, **latar putih** + cincin warna kategori 2,5 px, naik 27 px di atas lokasi |
+| Kode anggota | 10 px, warna gelap di dalam bulatan |
+
+Latar bulatan diubah jadi **putih dengan cincin warna**, bukan bulatan
+berwarna penuh — supaya tetap terbaca di atas citra satelit gelap maupun
+peta terang.
+
+### Usaha yang dicoba lalu dibatalkan
+
+Sempat dicoba menambahkan lapisan label dari sumber ubin vektor
+OpenFreeMap supaya nama tempat bisa dikendalikan. **Dibatalkan** karena
+dua sebab:
+
+1. Lapisannya kosong — nama lapisan pada sumber itu bukan `place`,
+   sehingga tidak ada tulisan yang muncul.
+2. Kalau berhasil pun akan membuat **tulisan ganda** dengan label yang
+   menyatu di citra Esri.
+
+### Yang dipakai sebagai gantinya
+
+Pengaturan tumpang-tindih MapLibre. Lapisan `anggota-huruf` dibuat
+**paling akhir** sehingga diproses lebih dulu; tempat yang dipakai
+penanda ditandai `hasOffscreen` dan label peta dasar yang datang
+kemudian **tidak digambar di situ**. Hasilnya nama tempat tetap terbaca
+dan kode anggota tetap terlihat.
+
+### Catatan MapLibre
+
+`circle-translate` dan `text-offset` **tidak bisa berbeda per anggota**
+(bukan *paint* yang boleh memakai data). Jadi jarak bulatan ke titik
+lokasi sama untuk semua anggota. `text-offset` memakai satuan em =
+ukuran huruf, sehingga -2,7 em × 10 px = 27 px, sama dengan pergeseran
+bulatannya.
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Lapisan terpasang | ✅ `anggota-titik`, `anggota-putus-1`, `anggota-putus-2`, `anggota-lingkaran`, `anggota-huruf` |
+| Data penanda | ✅ 3 fitur (OB, BD, SB) |
+| `text-allow-overlap` | ✅ `false` — penanda mengalah pada label peta dasar |
+| Tampilan di Bandung (z8,6) | ✅ bulatan **BD** di atas, titik lokasi tepat di bawahnya, nama "**Bandung**" tetap terbaca |
+| Tampilan di Jepara (z8) | ✅ titik lokasi di pantai, bulatan **OB** di atasnya, nama tempat sekitar tetap terbaca |
+| Galat halaman | ✅ 0 |
+| Data uji dibersihkan | ✅ tinggal 1 anggota milik pemilik proyek |
+
+### Temuan sampingan (bukan cacat)
+
+Saat menguji, citra di sekitar Bandung tampak **berwarna merah**. Ternyata
+itu **lapisan tematik kepadatan penduduk** (merah = kepadatan tinggi),
+bukan kerusakan. Setelah pilihan warna dikembalikan ke "Tanpa warna",
+citra tampil normal.

@@ -912,52 +912,128 @@
     if (!peta.getSource('anggota')) {
       peta.addSource('anggota', { type: 'geojson', data: fc });
 
-      peta.addLayer({
-        id: 'anggota-lingkaran',
-        type: 'circle',
-        source: 'anggota',
-        paint: {
-          'circle-radius': 9,
-          'circle-color': ['get', 'warna'],
-          'circle-stroke-color': '#0b0f14',
-          'circle-stroke-width': 2
+          /* Bentuk penanda: titik kecil di lokasi, garis putus-putus ke atas,
+             lalu bulatan berisi kode anggota.
+             Alasannya (perintah 16 Okt 2026): bulatan yang menempel langsung di
+             titik lokasi menutupi nama tempat dari peta dasar ("Bandung",
+             "Surabaya"). Dengan naik ke atas dan hanya titik kecil di bawahnya,
+             lokasi tetap terbaca sedangkan anggota tetap kelihatan.
+
+             Catatan MapLibre: `circle-translate` dan `text-offset` tidak bisa
+             berbeda per anggota (bukan paint data-driven), jadi dipakai satu
+             jarak tetap untuk semua. `text-offset` memakai satuan em = ukuran
+             huruf, jadi -2,7 em x 10 px = 27 px, sama dengan bulatannya. */
+          var JARAK = -27;
+
+          peta.addLayer({
+            id: 'anggota-titik',
+            type: 'circle',
+            source: 'anggota',
+            paint: {
+              'circle-radius': 3,
+              'circle-color': ['get', 'warna'],
+              'circle-stroke-color': '#0b0f14',
+              'circle-stroke-width': 1.5
+            }
+          });
+
+          /* Garis putus-putus: dua titik kecil sebagai penyambung. */
+          peta.addLayer({
+            id: 'anggota-putus-1',
+            type: 'circle',
+            source: 'anggota',
+            paint: {
+              'circle-radius': 1.6,
+              'circle-color': ['get', 'warna'],
+              'circle-translate': [0, -10],
+              'circle-opacity': 0.85
+            }
+          });
+
+          peta.addLayer({
+            id: 'anggota-putus-2',
+            type: 'circle',
+            source: 'anggota',
+            paint: {
+              'circle-radius': 1.6,
+              'circle-color': ['get', 'warna'],
+              'circle-translate': [0, -18],
+              'circle-opacity': 0.85
+            }
+          });
+
+          /* Bulatan kode: latar terang, cincin warna kategori — supaya terbaca
+             di atas citra satelit gelap maupun peta terang. */
+          peta.addLayer({
+            id: 'anggota-lingkaran',
+            type: 'circle',
+            source: 'anggota',
+            paint: {
+              'circle-radius': 9.5,
+              'circle-color': '#f2f7fc',
+              'circle-stroke-color': ['get', 'warna'],
+              'circle-stroke-width': 2.5,
+              'circle-translate': [0, JARAK]
+            }
+          });
+
+          /* Huruf/kode di dalam bulatan. Butuh `glyphs` di gaya peta — sudah
+             ditambahkan di js/inti.js (diuji 16 Okt 2026). */
+          peta.addLayer({
+            id: 'anggota-huruf',
+            type: 'symbol',
+            source: 'anggota',
+            layout: {
+              'text-field': ['get', 'inisial'],
+              'text-size': 10,
+              'text-font': ['Open Sans Bold'],
+              'text-offset': [0, JARAK / 10]
+            },
+            paint: { 'text-color': '#0b0f14' }
+          });
+
+          /* Nama tempat dari peta dasar digambar menyatu dengan ubin, jadi tidak
+           bisa dipindahkan. Supaya bulatan anggota tidak menimpa nama tempat,
+           dipakai pengaturan tumpang-tindih MapLibre: tempat yang sudah dipakai
+           penanda ditandai `hasOffscreen`, sehingga label peta dasar tidak
+           digambar di situ — yang paling penting nama tempat tetap terbaca. */
+
+          var LAPISAN_ANGGOTA = ['anggota-titik', 'anggota-putus-1', 'anggota-putus-2',
+            'anggota-lingkaran', 'anggota-huruf'];
+
+                /* Lapisan `anggota-huruf` dibiarkan mengikuti aturan tumpang-tindih
+             MapLibre. Karena dibuat paling akhir, ia diproses lebih dulu —
+             tempat yang dipakai penanda ditandai `hasOffscreen`, sehingga label
+             peta dasar yang datang kemudian tidak ikut digambar di tempat itu.
+
+             Tanpa `text-allow-overlap`, nama tempat (mis. "Bandung") tetap
+             terbaca dan penandanya bergeser. */
+                peta.setLayoutProperty('anggota-huruf', 'text-allow-overlap', false);
+                peta.setLayoutProperty('anggota-huruf', 'text-ignore-placement', false);
+
+          LAPISAN_ANGGOTA.forEach(function (id) {
+            peta.on('click', id, function (e) {
+              if (e.features && e.features.length) { kartuAnggota(e.features[0].properties.id); }
+            });
+            peta.on('mouseenter', id, function () {
+              peta.getCanvas().style.cursor = 'pointer';
+            });
+            peta.on('mouseleave', id, function () {
+              peta.getCanvas().style.cursor = '';
+            });
+          });
+        } else {
+          peta.getSource('anggota').setData(fc);
         }
-      });
+      }
 
-      /* Huruf awal di dalam penanda. Butuh `glyphs` di gaya peta — sudah
-         ditambahkan di js/inti.js (diuji 16 Okt 2026). */
-      peta.addLayer({
-        id: 'anggota-huruf',
-        type: 'symbol',
-        source: 'anggota',
-        layout: {
-          'text-field': ['get', 'inisial'],
-          'text-size': 9,
-          'text-font': ['Open Sans Bold'],
-          'text-allow-overlap': true
-        },
-        paint: { 'text-color': '#0b0f14' }
-      });
+  /* ---------- label peta dasar ---------- */
 
-      peta.on('click', 'anggota-lingkaran', function (e) {
-        if (e.features && e.features.length) { kartuAnggota(e.features[0].properties.id); }
-      });
-      peta.on('mouseenter', 'anggota-lingkaran', function () {
-        peta.getCanvas().style.cursor = 'pointer';
-      });
-      peta.on('mouseleave', 'anggota-lingkaran', function () {
-        peta.getCanvas().style.cursor = '';
-      });
-    } else {
-      peta.getSource('anggota').setData(fc);
-    }
-  }
-
-  function kartuAnggota(id) {
-    var a = null;
-    for (var i = 0; i < anggota.length; i++) {
-      if (anggota[i].id === id) { a = anggota[i]; }
-    }
+    function kartuAnggota(id) {
+      var a = null;
+      for (var i = 0; i < anggota.length; i++) {
+        if (anggota[i].id === id) { a = anggota[i]; }
+      }
     if (!a) { return; }
     var baris = [
       ['Wilayah', [a.desa, a.kecamatan, a.kabkota, a.provinsi]
