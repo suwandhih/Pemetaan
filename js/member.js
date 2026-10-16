@@ -51,6 +51,20 @@
   var elKunciIsian = document.getElementById('anggota-kunci-isian');
   var elKunciSimpan = document.getElementById('anggota-kunci-simpan');
   var elKunciPesan = document.getElementById('anggota-kunci-pesan');
+  var elTampil = document.getElementById('anggota-tampil');
+
+  /* Semua lapisan penanda anggota. Dipakai untuk menyembunyikan /
+     menampilkan penanda tanpa perlu membuang datanya (orderan lanjutan
+     16 Okt 2026). */
+  var LAPISAN_PENANDA = [
+    'anggota-titik', 'anggota-tumpuk-titik', 'anggota-tumpuk-putus-1',
+    'anggota-tumpuk-putus-2', 'anggota-tumpuk', 'anggota-tumpuk-angka',
+    'anggota-putus-1', 'anggota-putus-2', 'anggota-putus-3', 'anggota-putus-4',
+    'anggota-lingkaran', 'anggota-huruf'
+  ];
+
+  var KUNCI_TAMPIL = 'anggota_tampil';
+  var penandaTampil = true;
 
   /* ---------- bantu ---------- */
 
@@ -1100,6 +1114,11 @@
         } else {
           peta.getSource('anggota').setData(fc);
         }
+
+        /* Gaya peta diganti (orderan 15) → seluruh lapisan dibuang lalu dibuat
+           ulang. Keadaan tampil/sembunyi harus dipasang lagi, kalau tidak
+           penandanya muncul kembali walau sedang disembunyikan. */
+        terapkanTampil();
       }
 
   /* ---------- pindah peta ke satu anggota ---------- */
@@ -1137,6 +1156,37 @@
     elPanel.setAttribute('aria-hidden', 'true');
   }
 
+    /* ---------- tombol tampil / sembunyi penanda ---------- */
+
+    function pasangTampil() {
+      if (!elTampil) { return; }
+      elTampil.addEventListener('click', function () {
+        penandaTampil = !penandaTampil;
+        terapkanTampil();
+        Simpanan.simpanAtur(KUNCI_TAMPIL, penandaTampil ? '1' : '0');
+      });
+      /* Keadaan terakhir diingat, jadi tidak perlu diatur ulang tiap dibuka. */
+      Simpanan.ambilAtur(KUNCI_TAMPIL).then(function (v) {
+        if (v === '0') { penandaTampil = false; }
+        terapkanTampil();
+      });
+    }
+
+    function terapkanTampil() {
+      if (!peta) { return; }
+      if (elTampil) {
+        elTampil.setAttribute('aria-pressed', penandaTampil ? 'true' : 'false');
+        elTampil.title = penandaTampil
+          ? 'Sembunyikan penanda anggota di peta'
+          : 'Tampilkan penanda anggota di peta';
+      }
+      LAPISAN_PENANDA.forEach(function (id) {
+        if (peta.getLayer(id)) {
+          peta.setLayoutProperty(id, 'visibility', penandaTampil ? 'visible' : 'none');
+        }
+      });
+    }
+
   /* ---------- mulai ---------- */
 
   function mulai() {
@@ -1148,6 +1198,7 @@
     siapkanForm();
     bangunPemilih();
         siapkanKunci();
+        pasangTampil();
 
     document.getElementById('tombol-anggota').addEventListener('click', function () {
       if (elPanel.hidden) { bukaPanel(); } else { tutupPanel(); }
@@ -1176,7 +1227,8 @@
       gambarPenanda: gambarPenanda,
       bukaPanel: bukaPanel,
           bukaForm: bukaForm,
-          gambarSambung: gambarSambung
+          gambarSambung: gambarSambung,
+          terapkanTampil: terapkanTampil
         };
   }
 

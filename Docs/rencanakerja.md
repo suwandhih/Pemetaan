@@ -1362,3 +1362,62 @@ terbaca walau anggotanya ribuan. Yang perlu diperhatikan hanya kecepatan
 unduh data awalnya (satu permintaan `ambilSemua`); bila nanti jumlah
 anggota sudah sangat besar, data bisa diambil bertahap menurut wilayah
 yang sedang terlihat.
+
+---
+
+## Tombol tampil / sembunyi penanda anggota (perintah 2026-10-16)
+
+### Permintaan pemilik proyek
+
+"Kalau saya mau hide/unhide data member pada peta belum ada — perlu ada
+tombol on/off untuk member."
+
+### Yang dibuat
+
+Tombol **👁** di kepala panel **☰ Anggota**, di antara `+ Anggota` dan
+tombol tutup (✕).
+
+| Keadaan | Tampilan tombol | Arti |
+|---|---|---|
+| Penanda tampil | biru terang, `aria-pressed="true"` | penanda digambar di peta |
+| Penanda sembunyi | redup, `aria-pressed="false"` | penanda disembunyikan |
+
+Tooltip tombol ikut berganti: "Sembunyikan penanda anggota di peta" /
+"Tampilkan penanda anggota di peta".
+
+### Cara kerjanya
+
+Seluruh 12 lapisan penanda (`anggota-titik`, `anggota-tumpuk`,
+`anggota-lingkaran`, `anggota-huruf`, dan garis-garis penghubung)
+digilir dan diberi `visibility: visible/none` memakai
+`setLayoutProperty`.
+
+**Yang disembunyikan hanya penandanya di peta.** Daftar anggota di panel
+tetap lengkap — `3 anggota` tetap tampil dan semuanya masih bisa
+diubah. Jadi tombol ini mengatur tampilan peta, bukan menghapus data.
+
+Pilihan **diingat** di tabel `pengaturan` database (kunci
+`anggota_tampil`), jadi keadaan terakhir bertahan walau halaman ditutup
+atau dibuka dari perangkat lain.
+
+### Satu hal yang perlu dijaga
+
+Mengganti jenis peta (orderan 15) membuang **seluruh** lapisan lalu
+membuatnya kembali. Tanpa penanganan khusus, penanda yang sedang
+disembunyikan akan muncul lagi. Karena itu keadaan tampil/sembunyi
+dipasang ulang setiap kali `gambarPenanda()` selesai.
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Tombol ada | ✅ `#anggota-tampil` muncul di kepala panel |
+| Keadaan awal | ✅ `aria-pressed="true"`, `anggota-lingkaran: visible` |
+| Ditekan → sembunyi | ✅ `aria-pressed="false"`, `anggota-lingkaran/titik/huruf/tumpuk: none` |
+| Daftar tetap utuh | ✅ tetap `3 anggota`, anggota masih bisa diubah |
+| Ditekan lagi → tampil | ✅ ketiga lapisan kembali `visible` |
+| Muat ulang halaman | ✅ tetap tersembunyi (diingat dari database `anggota_tampil = 0`) |
+| Ganti jenis peta ke Peta Jalan | ✅ lapisan dibuat ulang dan **tetap tersembunyi** |
+| Tampilan di peta | ✅ penanda **ON** terlihat di Bandung saat menyala |
+| Galat halaman | ✅ 0 |
+| Data uji | ✅ dibersihkan, pengaturan dikembalikan ke `anggota_tampil = 1` |

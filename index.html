@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261016-12">
-<link rel="stylesheet" href="css/gaya.css?v=20261016-12">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261016-13">
+<link rel="stylesheet" href="css/gaya.css?v=20261016-13">
 </head>
 <body>
 
@@ -49,7 +49,9 @@
             <h2 id="anggota-judul">Anggota</h2>
             <span id="anggota-jumlah"></span>
             <button id="anggota-tambah" type="button">+ Anggota</button>
-            <button id="anggota-tutup" type="button" aria-label="Tutup daftar anggota">&#10005;</button>
+                        <button id="anggota-tampil" type="button" aria-pressed="true"
+                                title="Tampilkan / sembunyikan penanda anggota di peta">&#128065;</button>
+                        <button id="anggota-tutup" type="button" aria-label="Tutup daftar anggota">&#10005;</button>
           </div>
           <div id="anggota-tingkat" role="group" aria-label="Kelompokkan menurut"></div>
                     <div id="anggota-sambung" title="Keadaan sambungan ke database"></div>
@@ -120,12 +122,12 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261016-12"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261016-12"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261016-12"></script>
-<script src="js/inti.js?v=20261016-12"></script>
-<script src="js/warna.js?v=20261016-12"></script>
-<script src="js/simpanan.js?v=20261016-12"></script>
-<script src="js/member.js?v=20261016-12"></script>
+<script src="js/lib/maplibre-gl.js?v=20261016-13"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261016-13"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261016-13"></script>
+<script src="js/inti.js?v=20261016-13"></script>
+<script src="js/warna.js?v=20261016-13"></script>
+<script src="js/simpanan.js?v=20261016-13"></script>
+<script src="js/member.js?v=20261016-13"></script>
 </body>
 </html>

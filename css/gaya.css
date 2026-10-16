@@ -508,6 +508,27 @@ body {
   cursor: pointer;
 }
 
+/* Tombol tampil/sembunyi penanda anggota di peta.
+   Terang = penanda tampil, redup = penanda disembunyikan. */
+#anggota-tampil {
+  width: 30px;
+  height: 26px;
+  border: 1px solid rgba(88, 166, 255, 0.5);
+  border-radius: 7px;
+  background: rgba(88, 166, 255, 0.22);
+  color: var(--terang);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#anggota-tampil[aria-pressed="false"] {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  opacity: 0.5;
+}
+
 /* Tombol tingkat pengelompokan */
 #anggota-tingkat {
   display: flex;
