@@ -29,17 +29,47 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 11 | Buat **`prompt.md`** — konsep proyek, supaya AI lain dapat membuat ulang **persis sama** | BARU | 30–45 mnt | — |
 | 12 | Buat **`CHANGELOG.md`** — catatan semua perkembangan, perbaikan, dan hal baru | BARU | 15–20 mnt | — |
 | 13 | Jawab & siapkan: apakah GitHub sudah siap kerja untuk proyek pemetaan | BARU | 20–30 mnt | — |
-| 14 | **Peta Indonesia + negara tetangga** — fokus Indonesia, tetangga tetap tampil supaya tidak kosong; beberapa pulau Indonesia berbatasan langsung dengan negara lain | DIKERJAKAN | 45–60 mnt | — |
+| 14 | **Peta Indonesia + negara tetangga** — fokus Indonesia, tetangga tetap tampil supaya tidak kosong; beberapa pulau Indonesia berbatasan langsung dengan negara lain | MENUNGGU KONFIRMASI | 45–60 mnt | — |
 
 ### Rincian Orderan 14 (perintah 2026-10-16)
 
 | Butir | Isi | Status |
 |---|---|---|
-| 14a | Peta Indonesia sebagai **fokus utama**; negara tetangga **tetap tampil** supaya terlihat nyata, bukan kosong | ⬜ |
-| 14b | Pulau Indonesia yang **berbatasan langsung** dengan negara lain (Kalimantan–Malaysia, Papua–PNG, Timor, dll.) harus tampak menyatu, tidak terpotong | ⬜ |
-| 14c | **Letak peta di HP tegak (portrait)** | ⬜ |
-| 14d | **Di PC lebarnya sama dengan lebar HP** — supaya tampilan di 2 perangkat **sama** | ⬜ |
-| 14e | **Konsep scroll kiri–kanan** pada peta | ⬜ |
+| 14a | Peta Indonesia sebagai **fokus utama**; negara tetangga **tetap tampil** supaya terlihat nyata, bukan kosong | ✅ |
+| 14b | Pulau Indonesia yang **berbatasan langsung** dengan negara lain (Kalimantan–Malaysia, Papua–PNG, Timor, dll.) harus tampak menyatu, tidak terpotong | ✅ |
+| 14c | **Letak peta di HP tegak (portrait)** | ✅ |
+| 14d | **Di PC lebarnya sama dengan lebar HP** — supaya tampilan di 2 perangkat **sama** | ✅ |
+| 14e | **Konsep scroll kiri–kanan** pada peta | ✅ |
+
+### Berkas yang dibuat (orderan 14)
+
+| Berkas | Isi |
+|---|---|
+| `index.html` | Kerangka: peta, bilah atas (nama wilayah), bilah bawah (posisi + tombol geser) |
+| `css/gaya.css` | Tampilan; lebar bingkai = `min(100vw, 430px)` → di PC sama dengan HP |
+| `js/inti.js` | Peta MapLibre, citra Esri, batas geser, hitung zoom, tombol geser |
+| `js/lib/maplibre-gl.js` | MapLibre GL JS 5.9.0 — disimpan lokal (954 KB) |
+| `js/lib/maplibre-gl.css` | Gaya bawaan MapLibre (69 KB) |
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Sumber citra & batas Esri | ✅ HTTP 200 · `image/jpeg` & `image/png` · CORS `*` |
+| MapLibre 5.9.0 dari unpkg | ✅ HTTP 200 · CORS `*` · disimpan lokal |
+| Sintaks `maplibre-gl.js` & `inti.js` | ✅ `node --check` lulus keduanya |
+| Peta tampil | ✅ 1 kanvas, **0 galat** halaman, 0 galat konsol |
+| Tinggi Indonesia pas di layar | ✅ z4,5 · Aceh sampai Timor tampak |
+| Geser kiri–kanan | ✅ 118,0° → 122,2° → 113,8° (tombol ◀ ▶) |
+| Ujung geser barat | ✅ 97,3° BT — Sumatera + Malaysia, **tidak kosong** |
+| Ujung geser timur | ✅ 142,7° BT — Papua + PNG, **tidak kosong** |
+| Pulau berbatasan tampak utuh | ✅ Kalimantan–Malaysia · Papua–PNG (garis batas putih terlihat) |
+| Lebar di PC | ✅ jendela 1152 px → bingkai **430 px** (sama dengan HP) |
+| Lebar di HP | ✅ jendela 312 px → bingkai **312 px** (penuh) |
+| Bilah tidak menutupi peta | ✅ tinggi peta dikurangi 2 × 40 px bilah |
+
+Catatan: uji dijalankan lewat server lokal `python -m http.server` di
+`127.0.0.1:8777`, bukan `file://`, supaya sama dengan keadaan di GitHub Pages.
 
 Catatan hubungan antar-orderan:
 
