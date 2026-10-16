@@ -1008,3 +1008,15 @@ Database: Neon `pemetaan` · cabang `production` · PostgreSQL 18.6 · region Si
 - Data yang sudah ada di HP/PC **tidak otomatis pindah**. Setelah kode
   dimasukkan, data lama di peramban akan terlihat sampai data dari
   database dimuat, lalu yang tampil adalah isi database.
+
+### Uji tambahan di situs live GitHub Pages (2026-10-16)
+
+| Uji | Hasil |
+|---|---|
+| Halaman live memuat berkas versi `?v=20261016-06` | ✅ 9 penanda versi, semua `200` |
+| Panel anggota di situs live | ✅ isian kode tampil, tulisan `Belum tersambung — kode database belum diisi` |
+| Kode dimasukkan di situs live | ✅ `Tersambung — data sama di HP dan PC` |
+| Tulis dari peramban lain (mewakili HP) | ✅ `Anggota dari HP` (KOTA SURABAYA) & `Anggota dari PC` (KOTA JAKARTA PUSAT) |
+| Baca di peramban ini | ✅ **kedua anggota tampil**, pengelompokan per provinsi benar |
+| Penanda di peta | ✅ 2 penanda terpasang |
+| Data uji dibersihkan | ✅ `jumlah: 0` |
