@@ -29,6 +29,17 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 11 | Buat **`prompt.md`** — konsep proyek, supaya AI lain dapat membuat ulang **persis sama** | BARU | 30–45 mnt | — |
 | 12 | Buat **`CHANGELOG.md`** — catatan semua perkembangan, perbaikan, dan hal baru | BARU | 15–20 mnt | — |
 | 13 | Jawab & siapkan: apakah GitHub sudah siap kerja untuk proyek pemetaan | BARU | 20–30 mnt | — |
+| 14 | **Peta Indonesia + negara tetangga** — fokus Indonesia, tetangga tetap tampil supaya tidak kosong; beberapa pulau Indonesia berbatasan langsung dengan negara lain | DIKERJAKAN | 45–60 mnt | — |
+
+### Rincian Orderan 14 (perintah 2026-10-16)
+
+| Butir | Isi | Status |
+|---|---|---|
+| 14a | Peta Indonesia sebagai **fokus utama**; negara tetangga **tetap tampil** supaya terlihat nyata, bukan kosong | ⬜ |
+| 14b | Pulau Indonesia yang **berbatasan langsung** dengan negara lain (Kalimantan–Malaysia, Papua–PNG, Timor, dll.) harus tampak menyatu, tidak terpotong | ⬜ |
+| 14c | **Letak peta di HP tegak (portrait)** | ⬜ |
+| 14d | **Di PC lebarnya sama dengan lebar HP** — supaya tampilan di 2 perangkat **sama** | ⬜ |
+| 14e | **Konsep scroll kiri–kanan** pada peta | ⬜ |
 
 Catatan hubungan antar-orderan:
 
