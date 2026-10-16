@@ -1518,3 +1518,30 @@ Pengelola kategori (`#anggota-kategori-panel`) yang bisa dibuka dari
 | Coba hapus `Yayasan` (sedang dipakai 1 anggota) | ✅ ditolak: `"Tidak bisa dihapus — masih dipakai 1 anggota. Ubah dulu kategori anggotanya."` |
 | Hapus `Koperasi` (tidak dipakai) | ✅ terhapus dari daftar & Neon, kembali 6 kategori |
 | Buka dari dalam Form (`Kelola`) | ✅ kotak kelola muncul langsung di bawah pilihan Kategori di dalam form |
+
+---
+
+## Perbaikan Kelola Kategori — tanpa popup & layar kerja bersih (perintah 2026-10-16)
+
+### Permintaan pemilik proyek
+
+1. "Jangan sistem popup untuk edit — misal klik Kesehatan: kolom `Nama kategori baru… [+ Tambah]` jika menambah kategori baru, di tempat yang sama di kolom tersebut muncul `Kesehatan [Edit][Del]`."
+2. "Kalau pilih Kategori, di background masih ada form + Anggota itu sangat mengganggu; di bawah `Nama kategori baru… [+ Tambah]` ada daftar data yang diinput — disangka ada hubungan dengan kategori padahal tidak. Jadi pilih Kategori layar kerja dibersihkan."
+
+### Perubahan
+
+| Berkas | Perubahan |
+|---|---|
+| `index.html` | Baris input kategori memiliki `#kat-baru` beserta 3 tombol di tempat yang sama: `#kat-tambah` (`+ Tambah`), `#kat-ubah` (`Edit`), dan `#kat-hapus` (`Del`). Penanda versi naik ke `?v=20261016-20` |
+| `js/member.js` | Seluruh popup `prompt()`/`confirm()` pada kategori dihapus. Saat belum ada kategori dipilih: tampil `Nama kategori baru… [+ Tambah]`. Saat kategori diklik (mis. `Kesehatan`): kotak yang sama terisi `Kesehatan` dengan tombol `[Edit][Del]`. Saat `Kategori` dibuka (`bukaModeKategori(true)`): form `+ Anggota` ditutup dan layar kerja dibersihkan |
+| `css/gaya.css` | `#panel-anggota.mode-kategori` menyembunyikan `#anggota-tambah`, `#anggota-jumlah`, `#anggota-tingkat`, dan `#anggota-daftar` sehingga di bawah kotak kategori benar-benar bersih |
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Buka `Kategori` | ✅ layar kerja bersih (`tombolTambahAnggotaTampil: false`, `daftarAnggotaTampil: false`) |
+| Mode awal (tambah) | ✅ kotak kosong + tombol `[+ Tambah]` (`btnTambahTampil: true`, `btnEditTampil: false`, `btnDelTampil: false`) |
+| Klik `Kesehatan` | ✅ kotak yang sama terisi `"Kesehatan"` + tombol berganti `[Edit][Del]` (`btnTambahTampil: false`, `btnEditTampil: true`, `btnDelTampil: true`) |
+| Tambah `Olahraga` → klik `Olahraga` → ubah jadi `Koperasi` → klik `[Edit]` | ✅ berubah tanpa popup |
+| Klik `Koperasi` → klik `[Del]` | ✅ terhapus tanpa popup |

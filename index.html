@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261016-18">
-<link rel="stylesheet" href="css/gaya.css?v=20261016-18">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261016-20">
+<link rel="stylesheet" href="css/gaya.css?v=20261016-20">
 </head>
 <body>
 
@@ -60,13 +60,14 @@
           <div id="anggota-sambung" title="Keadaan sambungan ke database"></div>
           <div id="anggota-kategori-panel" hidden>
             <div class="kat-kepala">
-              <span>Kelola Kategori (klik nama untuk ubah, &#10005; untuk hapus)</span>
-              <button id="anggota-kat-tutup" type="button" aria-label="Tutup kelola kategori">&#10005;</button>
+              <span>Klik kategori untuk Edit / Del, atau ketik nama baru untuk + Tambah</span>
             </div>
             <div id="kat-daftar" class="kat-daftar"></div>
             <div class="kat-tambah-baris">
               <input class="fa-input" id="kat-baru" type="text" placeholder="Nama kategori baru…" />
               <button id="kat-tambah" type="button">+ Tambah</button>
+              <button id="kat-ubah" type="button" hidden>Edit</button>
+              <button id="kat-hapus" type="button" hidden>Del</button>
             </div>
             <p class="fa-catatan fa-peringatan" id="kat-pesan" hidden></p>
           </div>
@@ -139,12 +140,12 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261016-18"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261016-18"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261016-18"></script>
-<script src="js/inti.js?v=20261016-18"></script>
-<script src="js/warna.js?v=20261016-18"></script>
-<script src="js/simpanan.js?v=20261016-18"></script>
-<script src="js/member.js?v=20261016-18"></script>
+<script src="js/lib/maplibre-gl.js?v=20261016-20"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261016-20"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261016-20"></script>
+<script src="js/inti.js?v=20261016-20"></script>
+<script src="js/warna.js?v=20261016-20"></script>
+<script src="js/simpanan.js?v=20261016-20"></script>
+<script src="js/member.js?v=20261016-20"></script>
 </body>
 </html>
