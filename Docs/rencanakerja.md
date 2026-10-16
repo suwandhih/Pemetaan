@@ -32,6 +32,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 14 | **Peta Indonesia + negara tetangga** — fokus Indonesia, tetangga tetap tampil supaya tidak kosong; beberapa pulau Indonesia berbatasan langsung dengan negara lain | MENUNGGU KONFIRMASI | 45–60 mnt | — |
 | 15 | **Fitur citra satelit atau peta** — peta memakai citra satelit, tetapi bisa juga dalam bentuk peta (contoh acuan: `petadunia`) | MENUNGGU KONFIRMASI | 30–45 mnt | — |
 | 16 | **Data jumlah penduduk berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan, disajikan seperti `DataPeta`; sumber Dukcapil Kemendagri | MENUNGGU KONFIRMASI | 90–150 mnt | — |
+| 17 | **User input data anggota** — tambah/ubah/hapus data per lokasi; pengelompokan bisa per desa, kecamatan, kabupaten, atau provinsi; konsep diambil dari `DataPeta` lalu disesuaikan | MENUNGGU KONFIRMASI | 90–120 mnt | — |
 
 ### Rincian Orderan 14 (perintah 2026-10-16)
 
@@ -190,6 +191,100 @@ dalam derajat). Terukur 2026-10-16:
 | `index.html` | Tombol jenis warna, daftar tingkat, kartu wilayah, keterangan warna |
 | `css/gaya.css` | Gaya tombol + daftar + kartu + keterangan warna |
 | `js/inti.js` | Pencari kode provinsi & kab/kota untuk memuat berkas bagian |
+
+### Rincian Orderan 17 (perintah 2026-10-16)
+
+Pemilik proyek: *"lanjut user input data member-nya... per lokasi atau kota atau
+desa bisa per kab atau provinsi — bisa pelajari c:\data\datapeta sudah dibuat
+konsep dipindahkan dan sesuaikan dengan kondisi pemetaan"*.
+
+| Butir | Isi | Status |
+|---|---|---|
+| 17a | **Tambah** anggota: nama, wilayah, kategori, inisial, keterangan | ✅ |
+| 17b | **Ubah** anggota (wilayah dikunci, sisanya bisa diubah) | ✅ |
+| 17c | **Hapus** anggota (dengan konfirmasi) | ✅ |
+| 17d | Daftar anggota dikelompokkan per **Desa/Kelurahan · Kecamatan · Kabupaten/Kota · Provinsi** | ✅ |
+| 17e | Satu wilayah boleh punya **banyak** anggota (tombol [+][✎][−] per wilayah) | ✅ |
+| 17f | **Penanda di peta** — satu titik per anggota, warna menurut kategori | ✅ |
+| 17g | Klik penanda → keterangan lengkap anggota | ✅ |
+| 17h | Data **tersimpan permanen** di peramban (IndexedDB, tanpa internet) | ✅ |
+| 17i | Pemilih wilayah 4 tingkat dari data Dukcapil + jumlah penduduk otomatis | ✅ |
+
+### Yang diambil dari `DataPeta`, dan yang disesuaikan
+
+| Bagian | DataPeta | Pemetaan (setelah disesuaikan) | Sebab |
+|---|---|---|---|
+| Data satu anggota | `nama`, `wilayah` (teks), `kategori`, `lon`, `lat`, `inisial`, `rincian[]` | sama, **ditambah kode wilayah 4 tingkat** | Kode resmi tidak bisa salah tulis; nama bisa |
+| Penyimpanan | IndexedDB `peta-indonesia` | IndexedDB `pemetaan` (3 tabel) | Sama, tapi berkas terpisah (`js/simpanan.js`) supaya nanti mudah diganti Neon |
+| Daftar anggota | dikelompokkan per kota | dikelompokkan **4 tingkat pilihan** | Permintaan pemilik proyek |
+| Tombol wilayah | [+][✎][−] per kota | sama, per wilayah tingkat terpilih | Konsepnya bagus, dipertahankan |
+| Form isian | panel samping, peta tetap terlihat | **lembar bawah** (bisa ditutup) | Bingkai Pemetaan hanya 430 px — panel samping tidak muat |
+| Kunci wilayah | saat ubah / tambah dari baris kota | sama | Dipertahankan |
+| Penanda | SVG di atas gambar | **lapisan MapLibre** (circle + huruf) | Pemetaan memakai MapLibre, bukan SVG |
+| Kategori | daftar bisa ditambah | 6 kategori awal: Yayasan · Sekolah · Kesehatan · Sosial · Pemerintahan · Lainnya | — |
+
+### ⚠️ Temuan penting: kolom `luas_wilayah` Dukcapil tidak bisa dipercaya
+
+Diukur 2026-10-16: dari 514 kabupaten/kota, **33 baris** jelas salah satuan
+(kemungkinan hektar, bukan km²). Bukti:
+
+| Wilayah | Kolom Dukcapil | Kenyataan | Hitungan sendiri dari batas |
+|---|---|---|---|
+| KOTA SURABAYA | **335.925** km² | ±330 km² | 328 km² ✓ |
+| KOTA BANDUNG | 166.593 km² | ±167 km² | 163 km² ✓ |
+| KOTA MEDAN | 279,29 km² ← benar | ±265 km² | 274 km² ✓ |
+| KOTA MALANG | — | ±145 km² | benar setelah dihitung |
+
+Seluruh Indonesia hanya 1,9 juta km², jadi 335.925 km² untuk satu kota
+mustahil. Karena itu **luas dihitung sendiri** dari batas poligon resmi
+(rumus kelebihan bola, sama dengan yang dipakai Mapbox/geojson-area) di
+`PD.luasKm2()`. Kepadatan pun dihitung dari luas itu, **tidak** memakai kolom
+`kepadatan_penduduk` yang sering kosong.
+
+Dampak: skala warna peta tematik (orderan 16) juga diperbaiki — sebelumnya
+kabupaten yang luasnya salah tampak sebagai "jarang penduduk" padahal padat.
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Simpan anggota baru | ✅ "Yayasan Cahaya Nusantara" di Kota Surabaya tersimpan |
+| Jumlah penduduk otomatis | ✅ "KOTA SURABAYA berpenduduk 3.018.022 jiwa · KK 1.004.044 · luas 328 km² · kepadatan 9.208 jiwa/km²" |
+| Daftar dikelompokkan per kab/kota | ✅ 3 wilayah: BADUNG · JAKARTA PUSAT · KOTA SURABAYA |
+| Daftar dikelompokkan per provinsi | ✅ JAWA TIMUR (3 anggota dari data uji awal) |
+| Ganti tingkat saat ada data | ✅ per kab/kota → "KOTA SURABAYA"; per provinsi → "JAWA TIMUR" |
+| Penanda di peta | ✅ 3 titik · lapisan `anggota-lingkaran` + `anggota-huruf` ada |
+| Warna penanda menurut kategori | ✅ Yayasan ungu · Sekolah kuning · Kesehatan biru |
+| Data tersimpan permanen | ✅ muat ulang halaman → 3 anggota tetap ada |
+| Wilayah dikunci saat ubah | ✅ pilihan wilayah `disabled` + catatan kuning |
+| Lebar PC = lebar HP | ✅ PC 1152 px → bingkai 430 px → panel 428 px |
+| Galat konsol | ✅ **0 galat** |
+
+### Bug yang ditemukan & diperbaiki (orderan 17)
+
+| # | Bug | Sebab | Perbaikan |
+|---|---|---|---|
+| 1 | Peta tergambar **dua kali** (2 kanvas) | `js/inti.js` termuat dua kali — kesalahan saat menyunting `index.html` | Duplikat dibuang |
+| 2 | Peringatan `text-field requires glyphs` | Gaya peta tidak punya `glyphs`, padahal penanda memakai huruf | `glyphs` ditambahkan di `bangunGaya()` (diuji HTTP 200 · CORS `*`) |
+| 3 | Pemilih wilayah tidak muncul | `bangunPemilih()` tidak dipanggil di `mulai()` | Dipanggil |
+| 4 | Indeks kolom salah (nama/jiwa tertukar) | Salah hitung: nama ada di `a[jumlahKolom]`, bukan `a[jumlahKolom-1]` | Rumus kolom diperbaiki + ditulis di kepala berkas |
+| 5 | Atribut `data-tingkat` bentrok | Dipakai tombol panel **dan** pilihan form | Tombol panel → `data-kelompok` |
+| 6 | Berkas lama tetap dipakai peramban | Singgahan (`cache`) Chrome | Penanda versi `?v=YYYYMMDD-nn` di `index.html` |
+| 7 | Luas wilayah janggal (Surabaya 335.925 km²) | Kolom `luas_wilayah` Dukcapil salah satuan pada 33 baris | Luas dihitung sendiri dari poligon |
+
+### Berkas yang dibuat (orderan 17)
+
+| Berkas | Isi |
+|---|---|
+| `js/simpanan.js` | IndexedDB: tabel `anggota`, `kategori`, `pengaturan` |
+| `js/member.js` | Daftar anggota, pemilih 4 tingkat, form, penanda peta, kartu |
+| `index.html` | Panel anggota, tombol `☰ Anggota`, form lembar bawah, penanda versi |
+| `css/gaya.css` | Gaya panel, tombol tingkat, baris anggota, form, kartu |
+| `js/inti.js` | `PD.luasKm2()` (luas dari poligon) + penyedia peta untuk modul lain |
+
+Catatan: kalau database **Neon** (orderan 7) nanti sudah siap, hanya
+`js/simpanan.js` yang perlu diganti — seluruh pemakaian di `js/member.js`
+memakai nama fungsi yang sama.
 
 Catatan: uji dijalankan lewat server lokal `python -m http.server` di
 `127.0.0.1:8777`, bukan `file://`, supaya sama dengan keadaan di GitHub Pages.

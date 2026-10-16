@@ -150,26 +150,31 @@
     for (var i = 0; i < daftar.length; i++) {
       var d = daftar[i];
       var a = d.a;
-      var padat = a[banyakKolom + 3];
-      var jiwa = a[banyakKolom];
-      var luas = a[banyakKolom + 2];
-      if (!(padat > 0) && jiwa > 0 && luas > 0) { padat = jiwa / luas; }
-      fitur.push({
-        type: 'Feature',
-        id: i,
-        properties: {
-          nama: a[banyakKolom - 1],
+        var jiwa = a[banyakKolom];
+        var kk = a[banyakKolom + 1];
+        /* Luas & kepadatan dihitung SENDIRI dari batas poligon, tidak memakai
+           kolom Dukcapil. Diukur 16 Okt 2026: kolom `luas_wilayah` salah
+           satuan pada 33 dari 514 kabupaten/kota (KOTA SURABAYA tercatat
+           335.925 km² — mustahil), dan kolom `kepadatan_penduduk` sering
+           kosong. Karena itu keduanya dihitung dari batas resmi. */
+        var luas = (typeof PD !== 'undefined' && PD.luasKm2) ? PD.luasKm2(d.g) : 0;
+        var padat = (jiwa > 0 && luas > 0) ? jiwa / luas : 0;
+        fitur.push({
+          type: 'Feature',
+          id: i,
+          properties: {
+            nama: a[banyakKolom - 1],
             kode: kodeWilayah(a),
-          jiwa: jiwa,
-          kk: a[banyakKolom + 1],
-          luas: luas,
-          padat: padat
-        },
-        geometry: { type: 'MultiPolygon', coordinates: jadiMulti(d.g) }
-      });
+            jiwa: jiwa,
+            kk: kk,
+            luas: luas,
+            padat: padat
+          },
+          geometry: { type: 'MultiPolygon', coordinates: jadiMulti(d.g) }
+        });
+      }
+      return { type: 'FeatureCollection', features: fitur };
     }
-    return { type: 'FeatureCollection', features: fitur };
-  }
 
   /* ---------- warna ---------- */
 

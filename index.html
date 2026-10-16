@@ -5,8 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0f14">
 <title>Pemetaan — Peta Indonesia</title>
-<link rel="stylesheet" href="js/lib/maplibre-gl.css">
-<link rel="stylesheet" href="css/gaya.css">
+<!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
+     tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
+     sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261016-04">
+<link rel="stylesheet" href="css/gaya.css?v=20261016-04">
 </head>
 <body>
 
@@ -41,19 +44,75 @@
 
     <div id="derajat" hidden></div>
 
-  <footer id="bilah-bawah">
-    <button id="geser-kiri" type="button" aria-label="Geser ke kiri">&#9664;</button>
-    <span id="posisi">—</span>
-    <button id="geser-kanan" type="button" aria-label="Geser ke kanan">&#9654;</button>
-  </footer>
+        <!-- Orderan 17: daftar anggota / lokasi tersimpan -->
+        <aside id="panel-anggota" hidden aria-hidden="true" aria-label="Daftar anggota">
+          <div id="anggota-kepala">
+            <h2 id="anggota-judul">Anggota</h2>
+            <span id="anggota-jumlah"></span>
+            <button id="anggota-tambah" type="button">+ Anggota</button>
+            <button id="anggota-tutup" type="button" aria-label="Tutup daftar anggota">&#10005;</button>
+          </div>
+          <div id="anggota-tingkat" role="group" aria-label="Kelompokkan menurut"></div>
+          <div id="anggota-daftar"></div>
+        </aside>
+
+        <!-- Orderan 17: form isian anggota (lembar bawah, peta tetap terlihat) -->
+        <div id="form-anggota" hidden>
+          <div class="fa-kepala">
+            <h2 id="fa-judul">Tambah Anggota</h2>
+            <button id="fa-tutup" type="button" aria-label="Tutup form">&#10005;</button>
+          </div>
+
+          <div class="fa-isi">
+            <label class="fa-label" for="fa-nama">Nama anggota</label>
+            <input class="fa-input" id="fa-nama" type="text" placeholder="Contoh: Yayasan Cahaya Nusantara" />
+
+            <label class="fa-label">Wilayah (pilih dari tingkat atas ke bawah)</label>
+            <div id="fa-tingkat-wilayah"></div>
+            <input class="fa-input fa-nonaktif" id="fa-wilayah" type="text" readonly
+                   placeholder="Belum dipilih" />
+            <p class="fa-catatan" id="fa-penduduk" hidden></p>
+            <p class="fa-catatan fa-peringatan" id="fa-pratinjau" hidden></p>
+
+            <div class="fa-baris2">
+              <div>
+                <label class="fa-label" for="fa-kategori">Kategori</label>
+                <select class="fa-input" id="fa-kategori"></select>
+              </div>
+              <div>
+                <label class="fa-label" for="fa-inisial">Inisial penanda</label>
+                <input class="fa-input" id="fa-inisial" type="text" maxlength="3" placeholder="CN" />
+              </div>
+            </div>
+
+            <label class="fa-label" for="fa-rincian">Keterangan (satu per baris, format: Nama = Isi)</label>
+            <textarea class="fa-input fa-area" id="fa-rincian" rows="4"
+                      placeholder="Berdiri = 2015&#10;Bidang = Pendidikan anak"></textarea>
+          </div>
+
+          <div class="fa-aksi">
+            <button class="fa-tombol fa-hapus" id="fa-hapus" type="button" hidden>Hapus</button>
+            <button class="fa-tombol" id="fa-batal" type="button">Batal</button>
+            <button class="fa-tombol fa-simpan" id="fa-simpan" type="button">Simpan</button>
+          </div>
+        </div>
+
+      <footer id="bilah-bawah">
+        <button id="geser-kiri" type="button" aria-label="Geser ke kiri">&#9664;</button>
+        <span id="posisi">—</span>
+        <button id="geser-kanan" type="button" aria-label="Geser ke kanan">&#9654;</button>
+        <button id="tombol-anggota" type="button" aria-label="Daftar anggota">&#9776; Anggota</button>
+      </footer>
 
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js"></script>
-<script src="js/inti.js"></script>
-<script src="data/wilayah-warna/prop-nasional.js"></script>
-<script src="data/wilayah-warna/kab-nasional.js"></script>
-<script src="js/warna.js"></script>
+<script src="js/lib/maplibre-gl.js?v=20261016-04"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261016-04"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261016-04"></script>
+<script src="js/inti.js?v=20261016-04"></script>
+<script src="js/warna.js?v=20261016-04"></script>
+<script src="js/simpanan.js?v=20261016-04"></script>
+<script src="js/member.js?v=20261016-04"></script>
 </body>
 </html>

@@ -163,6 +163,43 @@
     return dx * dx + dy * dy;
   }
 
+  /* Luas wilayah (km2) dihitung SENDIRI dari batas poligon — bukan dari kolom
+     luas_wilayah Dukcapil.
+     Sebabnya (diukur 16 Okt 2026): kolom itu tidak konsisten satuannya.
+     33 dari 514 kabupaten/kota jelas salah — mis. KOTA SURABAYA tercatat
+     335.925 km2 (seluruh Indonesia hanya 1,9 juta km2) sedangkan KOTA MEDAN
+     279,29 km2. Karena itu luas dihitung dari batas resminya.
+
+     Rumus: kelebihan bola (spherical excess) — sama dengan yang dipakai
+     Mapbox/geojson-area. Jari-jari bumi 6.378.137 m. */
+  var JARI_BUMI = 6378137;
+
+  function luasKm2(koordinat) {
+    var luas = 0;
+    (function telusur(x) {
+      if (!x || !x.length) { return; }
+      if (typeof x[0][0] === 'number') {
+        luas += Math.abs(luasCincin(x));
+        return;
+      }
+      for (var i = 0; i < x.length; i++) { telusur(x[i]); }
+    })(koordinat);
+    return luas / 1e6;
+  }
+
+  function luasCincin(cincin) {
+    var jumlah = 0;
+    for (var i = 0; i < cincin.length; i++) {
+      var p1 = cincin[i];
+      var p2 = cincin[(i + 1) % cincin.length];
+      jumlah += (p2[0] - p1[0]) * Math.PI / 180 *
+        (2 + Math.sin(p1[1] * Math.PI / 180) + Math.sin(p2[1] * Math.PI / 180));
+    }
+    return jumlah * JARI_BUMI * JARI_BUMI / 2;
+  }
+
+  PD.luasKm2 = luasKm2;
+
   /* Mencari kab/kota yang paling dekat dengan sebuah titik (cadangan). */
   function kodeKabupatenDi(titik) {
     var daftar = window.WARNA_KAB;
@@ -280,6 +317,11 @@
     try { localStorage.setItem(KUNCI_SIMPAN, id); } catch (e) { /* diabaikan */ }
   }
 
+  /* Font untuk teks peta (huruf di dalam penanda anggota). Diuji 16 Okt 2026:
+   HTTP 200 · CORS `*`. MapLibre menolak lapisan `symbol` tanpa `glyphs`,
+   jadi alamat ini wajib ada di gaya peta. */
+  var GLYPHS = 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf';
+
   function bangunGaya(j) {
     var sumber = {
       dasar: {
@@ -312,7 +354,7 @@
       });
     }
 
-    return { version: 8, sources: sumber, layers: lapisan };
+    return { version: 8, glyphs: GLYPHS, sources: sumber, layers: lapisan };
   }
 
   /* Orderan 15 — tombol pembuka di bilah atas + daftar pilihan yang melayang.
