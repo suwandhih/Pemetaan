@@ -23,12 +23,12 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 5 | Detail peta setara `suwandhih.github.io/petadunia/app/index.html`; citra satelit memakai versi terbaru (data lama sudah banyak berubah, hampir tidak bisa dipakai) | **SUDAH TERPENUHI** — perlu verifikasi ulang | 10 mnt | — |
 | 6 | Tahap awal: peta dan tampilan sudah bisa diakses di PC maupun HP; konsep dasar UI, penempatan data, dan isian data | BARU | 90–150 mnt | — |
 | 7 | Setelan database: aktifkan Neon Data API, buat tabel, pasang RLS, sambungkan aplikasi ke database | BARU | 60–90 mnt | — |
-| 8 | Setelan GitHub: siapkan repo, cabang, GitHub Pages, dan cara unggah perubahan | **SEBAGIAN** — repo + remote + push ✅ · GitHub Pages ⛔ | 30–45 mnt | — |
+| 8 | Setelan GitHub: siapkan repo, cabang, GitHub Pages, dan cara unggah perubahan | MENUNGGU KONFIRMASI — repo + remote + push ✅ · **GitHub Pages ✅ aktif** | 30–45 mnt | — |
 | 9 | `aturan.md` diganti nama menjadi **`agents.md`** — berisi aturan + catatan agar asisten diingatkan setiap mulai proyek | MENUNGGU KONFIRMASI | 5 mnt | — |
 | 10 | Pastikan `rencanakerja.md` berfungsi sebagai **daftar orderan**: yang belum selesai dan yang sudah selesai | BARU | 5 mnt | — |
 | 11 | Buat **`prompt.md`** — konsep proyek, supaya AI lain dapat membuat ulang **persis sama** | BARU | 30–45 mnt | — |
 | 12 | Buat **`CHANGELOG.md`** — catatan semua perkembangan, perbaikan, dan hal baru | BARU | 15–20 mnt | — |
-| 13 | Jawab & siapkan: apakah GitHub sudah siap kerja untuk proyek pemetaan | BARU | 20–30 mnt | — |
+| 13 | Jawab & siapkan: apakah GitHub sudah siap kerja untuk proyek pemetaan | MENUNGGU KONFIRMASI | 20–30 mnt | — |
 | 14 | **Peta Indonesia + negara tetangga** — fokus Indonesia, tetangga tetap tampil supaya tidak kosong; beberapa pulau Indonesia berbatasan langsung dengan negara lain | MENUNGGU KONFIRMASI | 45–60 mnt | — |
 
 ### Rincian Orderan 14 (perintah 2026-10-16)
@@ -282,12 +282,27 @@ Diperiksa 2026-10-12 22:11 · **Diperbarui 2026-10-12 22:21** (orderan 13).
 | Sinkron | ✅ `## main...origin/main` — tidak ada selisih |
 | Ukuran | 0 KB (sangat kecil, hanya dokumen) |
 
+### ✅ GitHub Pages SUDAH AKTIF (2026-10-16)
+
+| Hal | Keadaan |
+|---|---|
+| Alamat situs | **https://suwandhih.github.io/Pemetaan/** |
+| Cara aktif | `gh api -X POST repos/suwandhih/Pemetaan/pages` — cabang `main`, jalur `/` |
+| Status build | ✅ `built` (2026-10-16 16:07 WIB) |
+| HTTPS | ✅ dipaksa aktif (`https_enforced: true`) |
+| Uji berkas | ✅ 6 dari 6 → HTTP 200 (`/`, `index.html`, `css/gaya.css`, `js/inti.js`, `js/lib/maplibre-gl.js`, `js/lib/maplibre-gl.css`) |
+| Uji tampilan | ✅ peta tampil, 1 kanvas, **0 galat** halaman, 0 galat konsol |
+| Lebar di PC | ✅ 430 px (sama dengan HP) |
+
+⚠️ **Koreksi catatan lama:** `gh` CLI **ternyata sudah terpasang** (versi 2.102.0,
+login sebagai `suwandhih`). Catatan "gh tidak terpasang" di bagian bawah sudah
+tidak berlaku.
+
 ### ⚠️ Yang masih perlu dikerjakan
 
 | # | Pekerjaan | Alasan |
 |---|---|---|
-| 1 | **Aktifkan GitHub Pages** | Supaya aplikasi bisa dibuka lewat alamat web (perlu untuk Chrome HP) |
-| 2 | **Nama resmi repo = `Pemetaan`** (huruf besar P) | Sudah dipakai; jangan diubah supaya alamat tidak berubah |
+| 1 | **Nama resmi repo = `Pemetaan`** (huruf besar P) | Sudah dipakai; jangan diubah supaya alamat tidak berubah |
 
 ### ✅ Yang sudah siap (lama)
 
@@ -304,7 +319,7 @@ Diperiksa 2026-10-12 22:11 · **Diperbarui 2026-10-12 22:21** (orderan 13).
 
 | Alat | Keadaan | Akibat |
 |---|---|---|
-| `gh` CLI | Tidak terpasang | Repo dibuat lewat peramban |
+| ~~`gh` CLI~~ | ✅ **Sudah terpasang** — versi 2.102.0, login `suwandhih` (diperiksa 2026-10-16) | Bisa mengurus repo & Pages dari sini |
 | GitHub MCP | Hanya baca | Tidak ada alat buat repo dari sini |
 
 ### ⚠️ Peringatan penting
