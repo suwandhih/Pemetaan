@@ -31,6 +31,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 13 | Jawab & siapkan: apakah GitHub sudah siap kerja untuk proyek pemetaan | MENUNGGU KONFIRMASI | 20–30 mnt | — |
 | 14 | **Peta Indonesia + negara tetangga** — fokus Indonesia, tetangga tetap tampil supaya tidak kosong; beberapa pulau Indonesia berbatasan langsung dengan negara lain | MENUNGGU KONFIRMASI | 45–60 mnt | — |
 | 15 | **Fitur citra satelit atau peta** — peta memakai citra satelit, tetapi bisa juga dalam bentuk peta (contoh acuan: `petadunia`) | MENUNGGU KONFIRMASI | 30–45 mnt | — |
+| 16 | **Data jumlah penduduk berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan, disajikan seperti `DataPeta`; sumber Dukcapil Kemendagri | MENUNGGU KONFIRMASI | 90–150 mnt | — |
 
 ### Rincian Orderan 14 (perintah 2026-10-16)
 
@@ -68,6 +69,127 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | Lebar di PC | ✅ jendela 1152 px → bingkai **430 px** (sama dengan HP) |
 | Lebar di HP | ✅ jendela 312 px → bingkai **312 px** (penuh) |
 | Bilah tidak menutupi peta | ✅ tinggi peta dikurangi 2 × 40 px bilah |
+
+### Rincian Orderan 16 (perintah 2026-10-16)
+
+Pemilik proyek memilih **pilihan A**: data penduduk sampai kecamatan & desa
+diambil dari **Dukcapil Kemendagri**.
+
+| Butir | Isi | Status |
+|---|---|---|
+| 16a | Jumlah penduduk **provinsi** (38) | ✅ |
+| 16b | Jumlah penduduk **kabupaten/kota** (514) | ✅ |
+| 16c | Jumlah penduduk **kecamatan** (7.285) | ✅ |
+| 16d | Jumlah penduduk **desa/kelurahan** (83.489) | ✅ |
+| 16e | Peta diwarnai menurut datanya (warna bertingkat 9 kelas) | ✅ |
+| 16f | Keterangan warna + sumber data tampil di layar | ✅ |
+| 16g | Klik wilayah → jumlah penduduk, KK, luas, kepadatan, kode wilayah | ✅ |
+| 16h | Berjalan bersama 4 jenis peta (orderan 15) | ✅ |
+
+### Sumber data (ditemukan 2026-10-16, sangat penting)
+
+Sebelumnya disimpulkan *"Dukcapil Pusat tidak menerbitkan rekap yang bisa
+diunduh"*. **Kesimpulan itu keliru.** Setelah menelusuri halaman
+`dukcapil.kemendagri.go.id`, ditemukan tautan
+`gis.dukcapil.kemendagri.go.id/peta` yang di dalamnya ada ArcGIS
+**Experience Builder**. Dari sana ditemukan **FeatureServer terbuka**:
+
+| Tingkat | Layanan / lapisan | Jumlah | Poligon? |
+|---|---|---|---|
+| Provinsi | `AGR_VISUAL_PROP_FIX` / 1 | 38 | ✅ |
+| Kabupaten/Kota | `AGR_VISUAL_KAB_FIX` / 3 | 514 | ✅ |
+| Kecamatan | `AGR_VISUAL_KEC_FIX` / 2 | 7.285 | ✅ |
+| Desa/Kelurahan | `AGR_VISUAL_KEL_FIX` / 0 | 83.489 | ✅ |
+
+Diuji 2026-10-16: **HTTP 200**, **CORS `*`**, **tanpa kunci API**, dan tiap
+fitur memuat **jumlah penduduk + poligon batasnya**. Ini menutup kebutuhan
+orderan 16 tanpa perlu menelusuri ±500 situs daerah.
+
+Kolom yang tersedia jauh lebih banyak daripada kebutuhan awal: jumlah
+penduduk · kepala keluarga · luas wilayah · kepadatan · agama (7 kolom) ·
+jenis kelamin · kelompok umur · pendidikan · pekerjaan · golongan darah.
+
+### ⚠️ Angka Dukcapil BEDA dengan BPS — bukan salah, memang beda dasar
+
+| Sumber | Jumlah penduduk Indonesia | Sifat |
+|---|---|---|
+| **Dukcapil Kemendagri** (yang dipakai) | **284.973.643** jiwa | hasil pencatatan administrasi (KTP/KK) |
+| BPS 2026 (dipakai `DataPeta`) | **287.198.383** jiwa | hasil proyeksi sensus |
+
+Selisih **2.224.740 jiwa (±0,8%)**. Sebabnya berbeda: Dukcapil menghitung
+orang yang **tercatat** di KTP/KK, BPS menghitung **perkiraan** jumlah
+penduduk. Contoh terukur: Bali — Dukcapil 4.375.263 vs BPS 4.488.243
+(selisih 112.980). Karena itu **sumbernya selalu ditulis di layar**, tidak
+disamarkan.
+
+### Berkas data (hasil pengambilan)
+
+Ambil ulang dengan: `node alat/ambil-dukcapil.js --tingkat=provinsi,kabkota,kecamatan,desa`
+
+| Kelompok | Berkas | Jumlah | Ukuran | Dimuat |
+|---|---|---|---|---|
+| Provinsi | `prop-nasional.js` | 38 | 1,4 MB | bersama halaman |
+| Kabupaten/Kota | `kab-nasional.js` | 514 | 1,8 MB | bersama halaman |
+| Kecamatan | `kec-<provinsi>.js` | 38 | 3,5 MB | saat tingkat kecamatan dipilih |
+| Desa/Kelurahan | `desa-<kabkota>.js` | 514 | 71 MB | saat tingkat desa dipilih |
+
+Karena batas desa seluruh Indonesia besarnya 71 MB, tingkat **desa hanya
+dibuka saat peta diperbesar sampai z8**, dan yang dimuat hanya kab/kota yang
+terlihat di layar (rata-rata 140 KB tiap berkas). Tingkat **kecamatan**
+memakai batas z5.
+
+### Penyederhana poligon (diukur, bukan dikira)
+
+Dukcapil menyediakan penyederhana di sisi peladen (`maxAllowableOffset`,
+dalam derajat). Terukur 2026-10-16:
+
+| Tingkat | Penyederhana | Hasil |
+|---|---|---|
+| Provinsi | 0,02° | 1,4 MB · 83.439 titik |
+| Kabupaten/Kota | 0,01° | 1,9 MB · 514 fitur |
+| Kecamatan | 0,01° | ±150 KB tiap provinsi |
+| Desa/Kelurahan | 0,0005° (±55 m) | ±140 KB tiap kabupaten · 28 titik/desa |
+
+### Bug yang ditemukan & diperbaiki (2026-10-16)
+
+| # | Bug | Sebab | Perbaikan |
+|---|---|---|---|
+| 1 | Permintaan 1 provinsi mengembalikan 7.285 kecamatan (berkas 3,6 MB × 38) | Saringan dikirim sebagai parameter sendiri (`&no_prop=11`) — **diabaikan ArcGIS** | Saringan dijadikan bagian dari `where` |
+| 2 | Desa kab 11.16 berisi desa provinsi lain | `no_kab` saja tidak unik (angka 16 ada di banyak provinsi) | Saringan memakai `no_prop` **dan** `no_kab` |
+| 3 | Berkas `desa-515.js` → 404 (padahal ada `desa-5101.js`) | Kode disusun dari angka sehingga nol di depan hilang (`51` + `8` = `518`, bukan `5108`) | Kode disusun ulang di peramban dengan penambal nol |
+| 4 | Peringatan MapLibre `zoom expression…` | `zoom` dibungkus `case` | Lebar garis dibuat tetap |
+| 5 | Peringatan MapLibre `feature-state … with filters` | `feature-state` dipakai di `filter` | Dipindah ke `paint` |
+| 6 | Peringatan `Branch labels must be unique` | Nama kecamatan bisa kembar dalam 1 provinsi | Ekspresi warna memakai **kode wilayah**, bukan nama |
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| FeatureServer Dukcapil | ✅ HTTP 200 · CORS `*` · tanpa kunci |
+| Jumlah fitur tiap tingkat | ✅ 38 · 514 · 7.285 · 83.489 — sama dengan daftar resmi |
+| Jumlah penduduk terbaca | ✅ 284.973.643 jiwa (Dukcapil) |
+| Peta tematik provinsi | ✅ 38 wilayah · 9 kelas kepadatan 5 – ≥1.000 jiwa/km² |
+| Peta tematik kab/kota | ✅ 514 wilayah · kelas kepadatan |
+| Peta tematik kecamatan | ✅ 1.320 kecamatan (Jateng+Jatim+Yogyakarta) saat z7 |
+| Peta tematik desa | ✅ 1.798 desa/kelurahan saat z9 |
+| Klik wilayah | ✅ "KALIMANTAN TENGAH · 2.825.290 jiwa · 922.338 KK · 153.444 km² · 18 jiwa/km²" |
+| Kode wilayah | ✅ `35.14.09` · `33.09.10.2007` — nol di depan utuh |
+| Berjalan bersama 4 jenis peta | ✅ lapisan tematik dipasang ulang saat peta dasar diganti |
+| Tombol "Perbesar dulu" | ✅ muncul saat tingkat desa dibuka pada z4,6 |
+| Lebar tetap sama di PC & HP | ✅ PC 1152 px → bingkai 430 px · HP 390 px → 312 px |
+| Keterangan warna muat di layar | ✅ HP 312 px → panel 164 px, tidak keluar layar |
+| Galat konsol | ✅ **0 galat**, 0 peringatan |
+
+### Berkas yang dibuat (orderan 16)
+
+| Berkas | Isi |
+|---|---|
+| `alat/ambil-dukcapil.js` | Pengambil data Dukcapil (4 tingkat, penyederhana, ulang otomatis) |
+| `js/warna.js` | Peta tematik: kelas kuantil 9 warna, keterangan, kartu wilayah |
+| `data/wilayah-warna/*.js` | 554 berkas data (73 MB) |
+| `index.html` | Tombol jenis warna, daftar tingkat, kartu wilayah, keterangan warna |
+| `css/gaya.css` | Gaya tombol + daftar + kartu + keterangan warna |
+| `js/inti.js` | Pencari kode provinsi & kab/kota untuk memuat berkas bagian |
 
 Catatan: uji dijalankan lewat server lokal `python -m http.server` di
 `127.0.0.1:8777`, bukan `file://`, supaya sama dengan keadaan di GitHub Pages.

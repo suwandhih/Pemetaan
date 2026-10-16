@@ -71,22 +71,34 @@
 
   var PUSAT = [118.0, -2.5];
 
-  /* Perkiraan wilayah menurut titik tengah peta. Dipakai untuk keterangan
-     di bilah atas. Urutan penting: yang lebih khusus diperiksa lebih dulu. */
+  /* Wilayah menurut kotak batas asli Indonesia, dipakai untuk menghitung
+     tinggi tampilan dan mencari kode provinsi yang sedang dilihat. */
   var WILAYAH = [
-    { nama: 'Papua', lon: [130.0, 141.5], lat: [-9.5, 0.5] },
-    { nama: 'Maluku', lon: [125.5, 135.0], lat: [-8.5, 3.0] },
-    { nama: 'Nusa Tenggara', lon: [114.5, 127.5], lat: [-11.5, -7.5] },
-    { nama: 'Sulawesi', lon: [118.0, 125.5], lat: [-6.5, 2.0] },
-    { nama: 'Kalimantan', lon: [108.5, 119.5], lat: [-4.5, 7.5] },
-    { nama: 'Jawa', lon: [105.0, 115.5], lat: [-9.5, -5.0] },
-    { nama: 'Sumatera', lon: [94.5, 106.5], lat: [-6.5, 6.5] }
+    { kode: '11', nama: 'Sumatera', lon: [94.5, 106.5], lat: [-6.5, 6.5] },
+    { kode: '12', nama: 'Jawa', lon: [105.0, 115.5], lat: [-9.5, -5.0] },
+    { kode: '51', nama: 'Bali & Nusa Tenggara', lon: [114.5, 127.5], lat: [-11.5, -7.5] },
+    { kode: '61', nama: 'Kalimantan', lon: [108.5, 119.5], lat: [-4.5, 7.5] },
+    { kode: '71', nama: 'Sulawesi', lon: [118.0, 125.5], lat: [-6.5, 2.0] },
+    { kode: '81', nama: 'Maluku', lon: [125.5, 135.0], lat: [-8.5, 3.0] },
+    { kode: '91', nama: 'Papua', lon: [130.0, 141.5], lat: [-9.5, 0.5] }
   ];
+
+  /* 38 kode provinsi beserta batas kotaknya — dipakai agar peta tematik
+     tingkat kecamatan tahu berkas mana yang harus dimuat. Dibuat dari
+     koordinat titik tengah tiap provinsi. */
+  var PROVINSI_KOTAK = [];
 
   var peta = null;
   var elPeta = document.getElementById('peta');
   var elWilayah = document.getElementById('wilayah');
   var elPosisi = document.getElementById('posisi');
+
+  /* Dipakai modul lain (js/warna.js) — peta & pencari kode wilayah. */
+  var PD = (window.PD = {
+    peta: null,
+    kodeProvinsiSekarang: null,
+    bagianSekarang: null
+  });
 
   function tampilkanGalat(pesan) {
     var el = document.createElement('div');
@@ -125,6 +137,115 @@
       }
     }
     return 'Perairan / negara tetangga';
+  }
+
+  /* Mencari provinsi yang paling dekat dengan titik tengah peta. Dipakai
+     cadangan bila pencarian lewat kotak tidak menghasilkan apa-apa. */
+  function cariProvinsi(lon, lat) {
+    var daftar = window.WARNA_PROP;
+    if (!daftar) { return null; }
+    var terdekat = null;
+    var jarakTerdekat = Infinity;
+    for (var i = 0; i < daftar.length; i++) {
+      var d = daftar[i];
+      var t = kotakDari(d.g);
+      if (!t) { continue; }
+      var tengah = [(t[0] + t[2]) / 2, (t[1] + t[3]) / 2];
+      var j = kuadratJarak(lon, lat, tengah[0], tengah[1]);
+      if (j < jarakTerdekat) { jarakTerdekat = j; terdekat = d.a[0]; }
+    }
+    return terdekat === null ? null : String(terdekat);
+  }
+
+  function kuadratJarak(x1, y1, x2, y2) {
+    var dx = x1 - x2;
+    var dy = y1 - y2;
+    return dx * dx + dy * dy;
+  }
+
+  /* Mencari kab/kota yang paling dekat dengan sebuah titik (cadangan). */
+  function kodeKabupatenDi(titik) {
+    var daftar = window.WARNA_KAB;
+    if (!daftar) { return null; }
+    var terdekat = null;
+    var jarakTerdekat = Infinity;
+    for (var i = 0; i < daftar.length; i++) {
+      var k = KOTAK_KAB[i] && KOTAK_KAB[i].kotak;
+      if (!k) { continue; }
+      var j = kuadratJarak(titik.lng, titik.lat, (k[0] + k[2]) / 2, (k[1] + k[3]) / 2);
+      if (j < jarakTerdekat) { jarakTerdekat = j; terdekat = KOTAK_KAB[i].kode; }
+    }
+    return terdekat;
+  }
+
+  var KOTAK_KAB = [];
+  var KOTAK_PROP = [];
+
+  function siapkanKotakKayu() {
+    if (window.WARNA_PROP) {
+      KOTAK_PROP = window.WARNA_PROP.map(function (d) {
+        return { kode: petakanKode(d.a[0], 2), kotak: kotakDari(d.g) };
+      });
+    }
+    if (window.WARNA_KAB) {
+      KOTAK_KAB = window.WARNA_KAB.map(function (d) {
+        return { kode: d.k.split('.').slice(0, 2).map(function (x) { return petakanKode(x, 2); }).join(''), kotak: kotakDari(d.g) };
+      });
+    }
+  }
+
+  function petakanKode(n, lebar) {
+    return String(n).padStart ? String(n).padStart(lebar, '0') : ('00000000' + n).slice(-lebar);
+  }
+
+  /* Kotak pembatas (bbox) dari seluruh koordinat satu wilayah. */
+  function kotakDari(g) {
+    var k = [Infinity, Infinity, -Infinity, -Infinity];
+    (function telusur(x) {
+      if (!x || !x.length) { return; }
+      if (typeof x[0] === 'number') {
+        if (x[0] < k[0]) { k[0] = x[0]; }
+        if (x[1] < k[1]) { k[1] = x[1]; }
+        if (x[0] > k[2]) { k[2] = x[0]; }
+        if (x[1] > k[3]) { k[1] = k[1]; k[3] = Math.max(k[3], x[1]); }
+        return;
+      }
+      for (var i = 0; i < x.length; i++) { telusur(x[i]); }
+    })(g);
+    return k[0] === Infinity ? null : k;
+  }
+
+  /* Kode bagian yang kotaknya bersentuhan dengan layar. Dipakai peta tematik
+     (orderan 16) supaya SELURUH wilayah yang terlihat ikut diwarnai — bukan
+     hanya yang titik tengahnya paling dekat. */
+  function bagianTerlihat(daftar, batas, palingBanyak) {
+    var hasil = [];
+    for (var i = 0; i < daftar.length && hasil.length < palingBanyak; i++) {
+      var k = daftar[i].kotak;
+      if (!k) { continue; }
+      if (k[2] < batas.getWest() || k[0] > batas.getEast()) { continue; }
+      if (k[3] < batas.getSouth() || k[1] > batas.getNorth()) { continue; }
+      hasil.push(daftar[i].kode);
+    }
+    return hasil;
+  }
+
+  /* Titik tengah seluruh koordinat (cukup untuk memilih berkas kecamatan). */
+  function tengahKotak(g) {
+    var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    (function telusur(k) {
+      if (!k || !k.length) { return; }
+      if (typeof k[0] === 'number') {
+        if (k[0] < minX) { minX = k[0]; }
+        if (k[0] > maxX) { maxX = k[0]; }
+        if (k[1] < minY) { minY = k[1]; }
+        if (k[1] > maxY) { maxY = k[1]; }
+        return;
+      }
+      for (var i = 0; i < k.length; i++) { telusur(k[i]); }
+    })(g);
+    if (minX === Infinity) { return null; }
+    return [(minX + maxX) / 2, (minY + maxY) / 2];
   }
 
   function angka(n, desimal) {
@@ -323,6 +444,28 @@
     document.getElementById('atribusi').textContent = j.atribusi;
     bangunPemilih();
     tandaiPemilih();
+
+    PD.peta = peta;
+    siapkanKotakKayu();
+    PD.kodeProvinsiSekarang = function () {
+      var c = peta.getCenter();
+      return cariProvinsi(c.lng, c.lat);
+    };
+    /* Kecamatan dipecah per provinsi, desa per kab/kota. Yang diambil adalah
+       SEMUA bagian yang kotaknya bersentuhan dengan layar — supaya seluruh
+       wilayah yang terlihat ikut berwarna saat peta digeser. */
+    PD.bagianSekarang = function (tingkat) {
+      var batas = peta.getBounds();
+      if (tingkat === 'kecamatan') {
+        var p = bagianTerlihat(KOTAK_PROP, batas, 6);
+        return p.length ? p : null;
+      }
+      if (tingkat === 'desa') {
+        var k = bagianTerlihat(KOTAK_KAB, batas, 8);
+        return k.length ? k : null;
+      }
+      return null;
+    };
 
     peta.on('load', function () {
       peta.resize();

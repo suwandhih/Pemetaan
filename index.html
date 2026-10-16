@@ -19,11 +19,27 @@
         <span id="jenis-nama">Citra Satelit</span>
         <span class="panah">&#9662;</span>
       </button>
+      <button id="tombol-warna" type="button" aria-haspopup="listbox" aria-expanded="false">
+        <span id="warna-ikon">&#127760;</span>
+        <span id="warna-nama">Tanpa warna</span>
+        <span class="panah">&#9662;</span>
+      </button>
       <span id="wilayah">—</span>
     </header>
 
     <!-- Orderan 15: daftar jenis peta (satelit / jalan / gelap / medan) -->
     <div id="pemilih-peta" role="listbox" aria-label="Jenis peta" hidden></div>
+
+    <!-- Orderan 16: peta tematik jumlah penduduk (Dukcapil Kemendagri) -->
+    <div id="pemilih-warna" role="listbox" aria-label="Peta penduduk" hidden></div>
+
+    <!-- Orderan 16: keterangan angka saat satu wilayah diklik -->
+    <div id="kartu" hidden>
+      <div id="kartu-isian"></div>
+      <button id="kartu-tutup" type="button" aria-label="Tutup">&#10005;</button>
+    </div>
+
+    <div id="derajat" hidden></div>
 
   <footer id="bilah-bawah">
     <button id="geser-kiri" type="button" aria-label="Geser ke kiri">&#9664;</button>
@@ -36,5 +52,8 @@
 
 <script src="js/lib/maplibre-gl.js"></script>
 <script src="js/inti.js"></script>
+<script src="data/wilayah-warna/prop-nasional.js"></script>
+<script src="data/wilayah-warna/kab-nasional.js"></script>
+<script src="js/warna.js"></script>
 </body>
 </html>
