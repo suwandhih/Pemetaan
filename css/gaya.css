@@ -71,6 +71,104 @@ body {
   border-bottom: 1px solid var(--garis);
 }
 
+/* Orderan 15 — tombol pembuka pilihan jenis peta. Lebarnya mengikuti tulisan
+   supaya nama jenis peta terbaca utuh di HP sempit sekalipun. */
+#tombol-jenis {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-jenis:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#tombol-jenis[aria-expanded="true"] {
+  border-color: #58a6ff;
+  background: rgba(88, 166, 255, 0.22);
+}
+
+#jenis-nama {
+  font-weight: 600;
+}
+
+#tombol-jenis .panah {
+  font-size: 9px;
+  opacity: 0.7;
+}
+
+/* Daftar jenis peta — melayang menempel di bawah tombol. Lebarnya dibatasi
+   lebar bingkai supaya di HP sempit pun tidak keluar layar. */
+#pemilih-peta {
+  position: absolute;
+  top: calc(var(--tinggi-bilah) + 4px);
+  left: 8px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 186px;
+  max-width: calc(100% - 16px);
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  background: rgba(11, 15, 20, 0.96);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+#pemilih-peta[hidden] {
+  display: none;
+}
+
+.pilihan-peta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.2;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.pilihan-peta .pilihan-ket {
+  margin-left: auto;
+  padding-left: 10px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+.pilihan-peta:active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.pilihan-peta.nyala {
+  background: rgba(88, 166, 255, 0.26);
+  box-shadow: inset 0 0 0 1px rgba(88, 166, 255, 0.5);
+}
+
 #bilah-bawah {
   bottom: 0;
   border-top: 1px solid var(--garis);

@@ -14,9 +14,16 @@
   <div id="peta"></div>
 
   <header id="bilah-atas">
-    <span id="judul">Pemetaan</span>
-    <span id="wilayah">—</span>
-  </header>
+      <button id="tombol-jenis" type="button" aria-haspopup="listbox" aria-expanded="false">
+        <span id="jenis-ikon">&#128752;</span>
+        <span id="jenis-nama">Citra Satelit</span>
+        <span class="panah">&#9662;</span>
+      </button>
+      <span id="wilayah">—</span>
+    </header>
+
+    <!-- Orderan 15: daftar jenis peta (satelit / jalan / gelap / medan) -->
+    <div id="pemilih-peta" role="listbox" aria-label="Jenis peta" hidden></div>
 
   <footer id="bilah-bawah">
     <button id="geser-kiri" type="button" aria-label="Geser ke kiri">&#9664;</button>

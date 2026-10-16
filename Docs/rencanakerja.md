@@ -30,6 +30,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 12 | Buat **`CHANGELOG.md`** — catatan semua perkembangan, perbaikan, dan hal baru | BARU | 15–20 mnt | — |
 | 13 | Jawab & siapkan: apakah GitHub sudah siap kerja untuk proyek pemetaan | MENUNGGU KONFIRMASI | 20–30 mnt | — |
 | 14 | **Peta Indonesia + negara tetangga** — fokus Indonesia, tetangga tetap tampil supaya tidak kosong; beberapa pulau Indonesia berbatasan langsung dengan negara lain | MENUNGGU KONFIRMASI | 45–60 mnt | — |
+| 15 | **Fitur citra satelit atau peta** — peta memakai citra satelit, tetapi bisa juga dalam bentuk peta (contoh acuan: `petadunia`) | MENUNGGU KONFIRMASI | 30–45 mnt | — |
 
 ### Rincian Orderan 14 (perintah 2026-10-16)
 
@@ -70,6 +71,59 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 
 Catatan: uji dijalankan lewat server lokal `python -m http.server` di
 `127.0.0.1:8777`, bukan `file://`, supaya sama dengan keadaan di GitHub Pages.
+
+### Rincian Orderan 15 (perintah 2026-10-16)
+
+| Butir | Isi | Status |
+|---|---|---|
+| 15a | Peta memakai **citra satelit** (sudah ada dari orderan 14) | ✅ |
+| 15b | Citra satelit **bisa diganti menjadi peta** (jalan, gelap, medan) | ✅ |
+| 15c | Pilihan jenis peta **terbaca jelas** di HP sempit (288 px) — tidak terpotong | ✅ |
+| 15d | Pilihan yang dipakai **diingat** (`localStorage`) saat halaman dibuka ulang | ✅ |
+| 15e | Ganti jenis peta **tidak menggeser** titik tengah & zoom yang sedang dilihat | ✅ |
+
+### Jenis peta yang tersedia (orderan 15)
+
+| Jenis | Sumber ubin | Batas zoom | Keterangan |
+|---|---|---|---|
+| 🛰️ **Citra Satelit** | Esri World Imagery + garis batas Esri | 19 | Pilihan awal; tetap seperti orderan 14 |
+| 🗺️ **Peta Jalan** | OpenStreetMap | 19 | Nama tempat, jalan, batas negara |
+| 🌙 **Peta Gelap** | CARTO Dark Matter | 20 | Peta gelap, enak untuk latar data |
+| ⛰️ **Peta Medan** | Esri World Terrain Base | 13 | Relief daratan, laut, dasar laut |
+
+Semua ubin **raster**, jadi tampilannya sama di HP dan PC, dan tidak butuh
+berkas gaya (style JSON) dari luar.
+
+### Cara memakai
+
+1. Ketuk tombol jenis peta di bilah atas (contoh: **🛰️ Citra Satelit ▾**).
+2. Daftar empat jenis peta terbuka; ketuk salah satu.
+3. Pilihan langsung berlaku dan diingat.
+4. Pintasan papan tuts (PC): tombol angka **1–4**.
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Keempat sumber ubin | ✅ HTTP 200 · CORS `*` (OSM, CARTO, Esri Imagery, Esri Terrain, Esri Boundaries) |
+| Sintaks `js/inti.js` | ✅ `node --check` lulus |
+| Keempat jenis peta tampil | ✅ ubin termuat: satelit 20 · jalan 20 · gelap 10 · medan 10 |
+| Keterangan sumber ikut berubah | ✅ "Citra: Esri…" · "Peta: © OpenStreetMap…" · "Peta: © OpenStreetMap… CARTO" · "Medan: Esri, USGS, NOAA" |
+| Posisi tidak bergeser saat ganti peta | ✅ tetap `118,0° BT · -2,5° · z4,6` di keempat jenis |
+| Tombol terbaca utuh di HP sempit | ✅ jendela 360 px → bingkai 288 px, tombol 108 px, nama tidak terpotong |
+| Daftar pilihan tidak keluar layar | ✅ bingkai 288 px → panel 219 px, `dalamBingkai: true` |
+| Pilihan diingat | ✅ pilih "Peta Jalan" → muat ulang → tombol menampilkan "🗺️ Peta Jalan" |
+| Lebar PC tetap = lebar HP | ✅ jendela 1152 px → bingkai **430 px** |
+| Geser kiri–kanan tetap jalan | ✅ 98,6° (Sumatera) → 141,4° (Papua) |
+| Galat halaman | ✅ **0 galat konsol**, 0 permintaan gagal |
+
+### Berkas yang diubah (orderan 15)
+
+| Berkas | Perubahan |
+|---|---|
+| `js/inti.js` | Daftar `JENIS` peta, `bangunGaya(j)`, `bangunPemilih()`, `gantiJenis()`, `simpanPilihan()` |
+| `index.html` | Tombol `#tombol-jenis` + wadah daftar `#pemilih-peta` |
+| `css/gaya.css` | Gaya tombol jenis peta + daftar pilihan melayang |
 
 Catatan hubungan antar-orderan:
 

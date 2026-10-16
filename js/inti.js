@@ -1,14 +1,64 @@
 /* Pemetaan — inti peta
    Orderan 14: fokus Indonesia, negara tetangga tetap tampil, HP tegak,
-   PC selebar HP, scroll kiri-kanan. */
+   PC selebar HP, scroll kiri-kanan.
+   Orderan 15: pemilih jenis peta — citra satelit atau peta jalan. */
 
 (function () {
   'use strict';
 
+  var ARCGIS = 'https://server.arcgisonline.com/ArcGIS/rest/services/';
+
   var SUMBER = {
-    citra: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    batas: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
+    citra: ARCGIS + 'World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    batas: ARCGIS + 'Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
   };
+
+  /* Orderan 15 — jenis peta yang bisa dipilih. Semuanya ubin raster supaya
+     tampilannya sama di HP dan PC, dan semuanya CORS `*` (diuji 2026-10-16).
+     `maks` = batas zoom resmi penyedia; di atas itu MapLibre memperbesar ubin
+     terakhir, jadi peta tetap jalan. Urutan pertama = pilihan awal. */
+  var JENIS = [
+    {
+      id: 'satelit',
+      nama: 'Citra Satelit',
+      ikon: '\uD83D\uDEF0\uFE0F',
+      ket: 'Esri World Imagery',
+      atribusi: 'Citra: Esri, Maxar, Earthstar Geographics',
+      latar: '#05080b',
+      dasar: { tiles: [SUMBER.citra], maks: 19 },
+      garis: { tiles: [SUMBER.batas], maks: 19, buram: 0.9 }
+    },
+    {
+      id: 'jalan',
+      nama: 'Peta Jalan',
+      ikon: '\uD83D\uDDFA\uFE0F',
+      ket: 'OpenStreetMap',
+      atribusi: 'Peta: \u00A9 OpenStreetMap contributors',
+      latar: '#dfe6ec',
+      dasar: { tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], maks: 19 }
+    },
+    {
+      id: 'gelap',
+      nama: 'Peta Gelap',
+      ikon: '\uD83C\uDF19',
+      ket: 'CARTO Dark Matter',
+      atribusi: 'Peta: \u00A9 OpenStreetMap contributors \u00B7 CARTO',
+      latar: '#0a0e13',
+      dasar: { tiles: ['https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'], maks: 20 }
+    },
+    {
+      id: 'medan',
+      nama: 'Peta Medan',
+      ikon: '\u26F0\uFE0F',
+      ket: 'Esri World Terrain',
+      atribusi: 'Medan: Esri, USGS, NOAA',
+      latar: '#0d1218',
+      dasar: { tiles: [ARCGIS + 'World_Terrain_Base/MapServer/tile/{z}/{y}/{x}'], maks: 13 }
+    }
+  ];
+
+  var KUNCI_SIMPAN = 'peta_jenis';
+  var jenisAktif = JENIS[0].id;
 
   /* Indonesia + negara tetangga. Tetangga ikut masuk supaya peta tidak
      kosong dan pulau yang berbatasan (Kalimantan, Papua, Timor) tampak utuh.
@@ -89,30 +139,140 @@
       angka(c.lat, 1) + '\u00B0 \u00B7 z' + angka(z, 1);
   }
 
-  function gaya() {
-    return {
-      version: 8,
-      sources: {
-        citra: {
-          type: 'raster',
-          tiles: [SUMBER.citra],
-          tileSize: 256,
-          maxzoom: 19,
-          attribution: 'Citra: Esri, Maxar, Earthstar Geographics'
-        },
-        batas: {
-          type: 'raster',
-          tiles: [SUMBER.batas],
-          tileSize: 256,
-          maxzoom: 19
-        }
-      },
-      layers: [
-        { id: 'latar', type: 'background', paint: { 'background-color': '#05080b' } },
-        { id: 'citra', type: 'raster', source: 'citra' },
-        { id: 'batas', type: 'raster', source: 'batas', paint: { 'raster-opacity': 0.9 } }
-      ]
+  function cariJenis(id) {
+    for (var i = 0; i < JENIS.length; i++) {
+      if (JENIS[i].id === id) { return JENIS[i]; }
+    }
+    return JENIS[0];
+  }
+
+  function ambilSimpanan() {
+    try {
+      var n = localStorage.getItem(KUNCI_SIMPAN);
+      return n ? cariJenis(n).id : JENIS[0].id;
+    } catch (e) {
+      return JENIS[0].id;
+    }
+  }
+
+  function simpanPilihan(id) {
+    try { localStorage.setItem(KUNCI_SIMPAN, id); } catch (e) { /* diabaikan */ }
+  }
+
+  function bangunGaya(j) {
+    var sumber = {
+      dasar: {
+        type: 'raster',
+        tiles: j.dasar.tiles,
+        tileSize: 256,
+        maxzoom: j.dasar.maks,
+        attribution: j.atribusi
+      }
     };
+    var lapisan = [
+      { id: 'latar', type: 'background', paint: { 'background-color': j.latar } },
+      { id: 'dasar', type: 'raster', source: 'dasar' }
+    ];
+
+    /* Garis batas negara hanya menempel di atas citra satelit. Peta jalan
+       (OSM/CARTO) sudah memuat garis batasnya sendiri, jadi tidak perlu. */
+    if (j.garis) {
+      sumber.batas = {
+        type: 'raster',
+        tiles: j.garis.tiles,
+        tileSize: 256,
+        maxzoom: j.garis.maks
+      };
+      lapisan.push({
+        id: 'batas',
+        type: 'raster',
+        source: 'batas',
+        paint: { 'raster-opacity': j.garis.buram }
+      });
+    }
+
+    return { version: 8, sources: sumber, layers: lapisan };
+  }
+
+  /* Orderan 15 — tombol pembuka di bilah atas + daftar pilihan yang melayang.
+     Dibuat sendiri (bukan lewat MapLibre) supaya bentuk dan letaknya sama di
+     HP maupun di PC. */
+  function bangunPemilih() {
+    var wadah = document.getElementById('pemilih-peta');
+    var tombol = document.getElementById('tombol-jenis');
+    if (!wadah || !tombol) { return; }
+
+    wadah.innerHTML = '';
+    for (var i = 0; i < JENIS.length; i++) {
+      (function (j) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'pilihan-peta';
+        b.dataset.jenis = j.id;
+        b.setAttribute('role', 'option');
+        b.innerHTML =
+          '<span class="pilihan-ikon">' + j.ikon + '</span>' +
+          '<span class="pilihan-nama">' + j.nama + '</span>' +
+          '<span class="pilihan-ket">' + j.ket + '</span>';
+        b.addEventListener('click', function () {
+          gantiJenis(j.id);
+          bukaTutupPemilih(false);
+        });
+        wadah.appendChild(b);
+      })(JENIS[i]);
+    }
+
+    tombol.addEventListener('click', function () {
+      bukaTutupPemilih(wadah.hidden);
+    });
+
+    /* Klik di luar daftar menutupnya. */
+    document.addEventListener('click', function (e) {
+      if (wadah.hidden) { return; }
+      if (wadah.contains(e.target) || tombol.contains(e.target)) { return; }
+      bukaTutupPemilih(false);
+    });
+  }
+
+  function bukaTutupPemilih(buka) {
+    var wadah = document.getElementById('pemilih-peta');
+    var tombol = document.getElementById('tombol-jenis');
+    if (!wadah || !tombol) { return; }
+    wadah.hidden = !buka;
+    tombol.setAttribute('aria-expanded', buka ? 'true' : 'false');
+  }
+
+  function tandaiPemilih() {
+    var j = cariJenis(jenisAktif);
+    document.getElementById('jenis-ikon').textContent = j.ikon;
+    document.getElementById('jenis-nama').textContent = j.nama;
+
+    var b = document.querySelectorAll('.pilihan-peta');
+    for (var i = 0; i < b.length; i++) {
+      var ini = b[i].dataset.jenis === jenisAktif;
+      b[i].classList.toggle('nyala', ini);
+      b[i].setAttribute('aria-selected', ini ? 'true' : 'false');
+    }
+  }
+
+  /* Mengganti jenis peta tidak menggeser titik tengah maupun zoom, jadi apa
+     yang sedang dilihat tetap di tempat yang sama. */
+  function gantiJenis(id) {
+    var j = cariJenis(id);
+    if (!peta || j.id === jenisAktif) { return; }
+
+    jenisAktif = j.id;
+    simpanPilihan(j.id);
+    tandaiPemilih();
+    document.getElementById('atribusi').textContent = j.atribusi;
+
+    var pusat = peta.getCenter();
+    var zoom = peta.getZoom();
+    peta.setStyle(bangunGaya(j));
+    peta.once('styledata', function () {
+      peta.jumpTo({ center: pusat, zoom: zoom });
+    });
+    perbaruiKeterangan();
   }
 
   function pasangTombol() {
@@ -128,6 +288,9 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowLeft') { geser(-1); }
       else if (e.key === 'ArrowRight') { geser(1); }
+      else if (e.key >= '1' && e.key <= String(JENIS.length)) {
+        gantiJenis(JENIS[Number(e.key) - 1].id);
+      }
     });
   }
 
@@ -137,9 +300,12 @@
       return;
     }
 
+    jenisAktif = ambilSimpanan();
+    var j = cariJenis(jenisAktif);
+
     peta = new maplibregl.Map({
       container: 'peta',
-      style: gaya(),
+      style: bangunGaya(j),
       center: PUSAT,
       zoom: zoomUntukTinggi(tinggiTerlihat()),
       minZoom: 2,
@@ -153,6 +319,10 @@
 
     peta.touchZoomRotate.disableRotation();
     peta.keyboard.disable(); // panah dipakai untuk geser kiri-kanan
+
+    document.getElementById('atribusi').textContent = j.atribusi;
+    bangunPemilih();
+    tandaiPemilih();
 
     peta.on('load', function () {
       peta.resize();
