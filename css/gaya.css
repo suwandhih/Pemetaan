@@ -809,10 +809,45 @@ body {
   color: var(--terang);
   font-family: inherit;
   font-size: 11.5px;
+  /* Daftar pilihan (dropdown) digambar peramban, bukan oleh halaman.
+     Tanpa ini, Chrome memakai latar putih sedangkan warna teks dari
+     .fa-pilih tetap terang — nama wilayah jadi tidak terbaca. */
+  color-scheme: dark;
+}
+
+/* Warna daftar pilihan dipatok sendiri: latar gelap, teks terang.
+   Sebagian peramban mengabaikan bagian ini dan memakai gayanya sendiri. */
+.fa-pilih option,
+.fa-pilih optgroup {
+  background-color: #182029;
+  color: #e8eef5;
+}
+
+.fa-pilih option:checked {
+  background-color: #1f6feb;
+  color: #ffffff;
 }
 
 .fa-pilih:disabled {
   opacity: 0.55;
+}
+
+/* Kolom "fa-input" yang berupa <select> (Kategori, dan lain-lain) perlu
+   perlakuan sama seperti .fa-pilih: daftarnya digambar peramban dengan
+   latar putih, jadi warna teks wajib dipatok. */
+select.fa-input {
+  color-scheme: dark;
+}
+
+select.fa-input option,
+select.fa-input optgroup {
+  background-color: #182029;
+  color: #e8eef5;
+}
+
+select.fa-input option:checked {
+  background-color: #1f6feb;
+  color: #ffffff;
 }
 
 .fa-baris2 {

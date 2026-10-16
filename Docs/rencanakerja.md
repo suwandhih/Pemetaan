@@ -1068,3 +1068,43 @@ otomatis masuk Neon. Data baru dari HP langsung tampil di PC.
 ### Kunci database (diperlukan sekali per perangkat)
 
 `PMA-f2b1dd4810764520bce0a413`
+
+---
+
+## Perbaikan tampilan — daftar pilihan wilayah tidak terbaca (perintah 2026-10-16)
+
+### Keluhan pemilik proyek
+
+"Daftar pilihan provinsi, kab/kota, kecamatan, desa tidak bisa dilihat.
+Kalau latar daftar putih, teksnya jangan warna cerah — habis tenggelam."
+
+### Sebab
+
+Daftar pilihan (`<select>`) digambar oleh peramban, bukan oleh halaman.
+Chrome memakai **latar putih** untuk daftarnya, sedangkan warna teks
+diambil dari aturan `.fa-pilih` yaitu **terang** (`#e8eef5`) — jadi nama
+wilayah putih di atas latar putih, tidak terbaca.
+
+Bukti dari gambar yang dikirim: tulisan "KEPULAUAN RIAU", "MALUKU",
+"SULAWESI BARAT" dan seterusnya tampak samar.
+
+### Perbaikan
+
+| Berkas | Perubahan |
+|---|---|
+| `css/gaya.css` | `.fa-pilih` dan `select.fa-input` diberi `color-scheme: dark`; `option`/`optgroup` dipatok latar `#182029` teks `#e8eef5`; opsi terpilih `#1f6feb` teks putih |
+| `index.html` | Penanda versi naik ke `?v=20261016-08` |
+
+`color-scheme: dark` memberi tahu peramban bahwa kendali ini bertema
+gelap, sehingga daftarnya digambar gelap. Aturan `option` dipasang
+sebagai jaring pengaman untuk peramban yang mengabaikannya.
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| `color-scheme` pada 4 pemilih wilayah | ✅ `dark` |
+| Warna `option` wilayah | ✅ teks `rgb(232,238,245)` di atas latar `rgb(24,32,41)` |
+| `color-scheme` pada pemilih Kategori | ✅ `dark`, opsi terpilih `rgb(31,111,235)` |
+| Pilihan bertingkat masih bekerja | ✅ pilih BALI → 9 kabupaten; pilih BANGKALAN → penduduk 1.042.031 jiwa |
+| Tangkapan layar form | ✅ nama wilayah terbaca jelas |
