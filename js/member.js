@@ -910,124 +910,199 @@
     };
 
     if (!peta.getSource('anggota')) {
-      peta.addSource('anggota', { type: 'geojson', data: fc });
+          /* `cluster` = anti-tumpuk dari MapLibre. Titik-titik yang berdekatan
+             pada satu tingkat zoom digabung menjadi satu bulatan berisi jumlah
+             anggota, lalu pecah sendiri saat peta diperbesar. Ini yang menjaga
+             tampilan tetap terbaca walau anggotanya ribuan. */
+          peta.addSource('anggota', {
+            type: 'geojson',
+            data: fc,
+            cluster: true,
+            clusterRadius: 62,
+            clusterMaxZoom: 16
+          });
 
-          /* Bentuk penanda: titik kecil di lokasi, garis putus-putus ke atas,
-             lalu bulatan berisi kode anggota.
-             Alasannya (perintah 16 Okt 2026): bulatan yang menempel langsung di
-             titik lokasi menutupi nama tempat dari peta dasar ("Bandung",
-             "Surabaya"). Dengan naik ke atas dan hanya titik kecil di bawahnya,
-             lokasi tetap terbaca sedangkan anggota tetap kelihatan.
+          /* ---------- bentuk penanda ----------
+             Titik lokasi → garis putus-putus → bulatan berisi kode anggota.
+             Bulatan dinaikkan supaya tidak menutupi nama tempat dari peta dasar.
+             Seluruh pergeseran memakai satuan PIXEL (circle-translate dan
+             text-offset), jadi besarnya tetap sama di semua tingkat zoom —
+             tidak mengecil saat peta diperbesar. */
+          var JARAK = -34;                 /* pusat bulatan, 34 px di atas lokasi */
+          var PUTUS = [-5, -11, -17, -23]; /* titik-titik garis putus-putus */
+          var TANPA_TUMPUK = ['!', ['has', 'point_count']];
 
-             Catatan MapLibre: `circle-translate` dan `text-offset` tidak bisa
-             berbeda per anggota (bukan paint data-driven), jadi dipakai satu
-             jarak tetap untuk semua. `text-offset` memakai satuan em = ukuran
-             huruf, jadi -2,7 em x 10 px = 27 px, sama dengan bulatannya. */
-          var JARAK = -27;
-
+          /* 1. Titik kecil tepat di lokasi. Diberi cincin terang supaya terlihat
+                di atas citra gelap maupun peta terang. */
           peta.addLayer({
             id: 'anggota-titik',
             type: 'circle',
             source: 'anggota',
+            filter: TANPA_TUMPUK,
             paint: {
-              'circle-radius': 3,
+              'circle-radius': 3.5,
               'circle-color': ['get', 'warna'],
-              'circle-stroke-color': '#0b0f14',
+              'circle-stroke-color': '#ffffff',
               'circle-stroke-width': 1.5
             }
           });
 
-          /* Garis putus-putus: dua titik kecil sebagai penyambung. */
+          /* 2. Klaster (anti-tumpuk) — jumlah anggota di satu wilayah.
+                Diberi perlakuan sama seperti penanda tunggal: titik kecil di
+                lokasi, bulatan angka diangkat ke atas. Dengan begitu nama
+                tempat tidak tertutup dan bentuknya konsisten. */
           peta.addLayer({
-            id: 'anggota-putus-1',
+            id: 'anggota-tumpuk-titik',
             type: 'circle',
             source: 'anggota',
+            filter: ['has', 'point_count'],
             paint: {
-              'circle-radius': 1.6,
-              'circle-color': ['get', 'warna'],
-              'circle-translate': [0, -10],
-              'circle-opacity': 0.85
+              'circle-radius': 3.5,
+              'circle-color': '#1f6feb',
+              'circle-stroke-color': '#ffffff',
+              'circle-stroke-width': 1.5
             }
           });
 
-          peta.addLayer({
-            id: 'anggota-putus-2',
-            type: 'circle',
-            source: 'anggota',
-            paint: {
-              'circle-radius': 1.6,
-              'circle-color': ['get', 'warna'],
-              'circle-translate': [0, -18],
-              'circle-opacity': 0.85
-            }
+          [-11, -21].forEach(function (j, i) {
+            peta.addLayer({
+              id: 'anggota-tumpuk-putus-' + (i + 1),
+              type: 'circle',
+              source: 'anggota',
+              filter: ['has', 'point_count'],
+              paint: {
+                'circle-radius': 2.2,
+                'circle-color': '#ffffff',
+                'circle-stroke-color': '#1f6feb',
+                'circle-stroke-width': 1.6,
+                'circle-translate': [0, j]
+              }
+            });
           });
 
-          /* Bulatan kode: latar terang, cincin warna kategori — supaya terbaca
-             di atas citra satelit gelap maupun peta terang. */
           peta.addLayer({
-            id: 'anggota-lingkaran',
+            id: 'anggota-tumpuk',
             type: 'circle',
             source: 'anggota',
+            filter: ['has', 'point_count'],
             paint: {
-              'circle-radius': 9.5,
-              'circle-color': '#f2f7fc',
-              'circle-stroke-color': ['get', 'warna'],
+              'circle-color': '#1f6feb',
+              'circle-stroke-color': '#ffffff',
               'circle-stroke-width': 2.5,
+              'circle-radius': ['step', ['get', 'point_count'], 13, 10, 16, 50, 20],
               'circle-translate': [0, JARAK]
             }
           });
 
-          /* Huruf/kode di dalam bulatan. Butuh `glyphs` di gaya peta — sudah
-             ditambahkan di js/inti.js (diuji 16 Okt 2026). */
+          peta.addLayer({
+            id: 'anggota-tumpuk-angka',
+            type: 'symbol',
+            source: 'anggota',
+            filter: ['has', 'point_count'],
+            layout: {
+              'text-field': ['get', 'point_count_abbreviated'],
+              'text-size': 11,
+              'text-font': ['Open Sans Bold'],
+              'text-offset': [0, JARAK / 10],
+              'text-allow-overlap': true,
+              'text-ignore-placement': true
+            },
+            paint: { 'text-color': '#ffffff' }
+          });
+
+          /* 3. Garis putus-putus penghubung. Dibuat beberapa titik supaya
+                bentuknya jelas dan langsung dimengerti. */
+          PUTUS.forEach(function (j, i) {
+            peta.addLayer({
+              id: 'anggota-putus-' + (i + 1),
+              type: 'circle',
+              source: 'anggota',
+              filter: TANPA_TUMPUK,
+              paint: {
+                'circle-radius': 2.2,
+                'circle-color': '#ffffff',
+                'circle-stroke-color': ['get', 'warna'],
+                'circle-stroke-width': 1.6,
+                'circle-translate': [0, j]
+              }
+            });
+          });
+
+          /* 4. Bulatan kode: latar terang, cincin warna kategori. */
+          peta.addLayer({
+            id: 'anggota-lingkaran',
+            type: 'circle',
+            source: 'anggota',
+            filter: TANPA_TUMPUK,
+            paint: {
+              'circle-radius': 10,
+              'circle-color': '#f2f7fc',
+              'circle-stroke-color': ['get', 'warna'],
+              'circle-stroke-width': 3,
+              'circle-translate': [0, JARAK]
+            }
+          });
+
+          /* 5. Kode anggota di dalam bulatan. Butuh `glyphs` di gaya peta —
+                sudah ditambahkan di js/inti.js (diuji 16 Okt 2026).
+                `text-allow-overlap` dibiarkan `true` supaya kode tidak pernah
+                hilang, dan `text-ignore-placement` supaya label peta dasar
+                tetap boleh digambar (bulatannya sudah naik, jadi tidak
+                bertabrakan dengan nama tempat). */
           peta.addLayer({
             id: 'anggota-huruf',
             type: 'symbol',
             source: 'anggota',
+            filter: TANPA_TUMPUK,
             layout: {
               'text-field': ['get', 'inisial'],
               'text-size': 10,
               'text-font': ['Open Sans Bold'],
-              'text-offset': [0, JARAK / 10]
+              'text-offset': [0, JARAK / 10],
+              'text-allow-overlap': true,
+              'text-ignore-placement': true
             },
             paint: { 'text-color': '#0b0f14' }
           });
 
-          /* Nama tempat dari peta dasar digambar menyatu dengan ubin, jadi tidak
-           bisa dipindahkan. Supaya bulatan anggota tidak menimpa nama tempat,
-           dipakai pengaturan tumpang-tindih MapLibre: tempat yang sudah dipakai
-           penanda ditandai `hasOffscreen`, sehingga label peta dasar tidak
-           digambar di situ — yang paling penting nama tempat tetap terbaca. */
+          /* ---------- sentuhan ---------- */
 
-          var LAPISAN_ANGGOTA = ['anggota-titik', 'anggota-putus-1', 'anggota-putus-2',
-            'anggota-lingkaran', 'anggota-huruf'];
+          /* Bulatan tumpukan: sekali ketuk → peta mendekat sampai anggotanya
+             terpisah satu per satu. */
+          peta.on('click', 'anggota-tumpuk', function (e) {
+            var f = peta.queryRenderedFeatures(e.point, { layers: ['anggota-tumpuk'] })[0];
+            if (!f) { return; }
+            var sumber = peta.getSource('anggota');
+            var id = f.properties.cluster_id;
+            var titik = f.geometry.coordinates;
+            Promise.resolve(sumber.getClusterExpansionZoom(id)).then(function (z) {
+              peta.easeTo({ center: titik, zoom: z + 0.3 });
+            }).catch(function () {
+              peta.easeTo({ center: titik, zoom: peta.getZoom() + 2 });
+            });
+          });
 
-                /* Lapisan `anggota-huruf` dibiarkan mengikuti aturan tumpang-tindih
-             MapLibre. Karena dibuat paling akhir, ia diproses lebih dulu —
-             tempat yang dipakai penanda ditandai `hasOffscreen`, sehingga label
-             peta dasar yang datang kemudian tidak ikut digambar di tempat itu.
-
-             Tanpa `text-allow-overlap`, nama tempat (mis. "Bandung") tetap
-             terbaca dan penandanya bergeser. */
-                peta.setLayoutProperty('anggota-huruf', 'text-allow-overlap', false);
-                peta.setLayoutProperty('anggota-huruf', 'text-ignore-placement', false);
-
-          LAPISAN_ANGGOTA.forEach(function (id) {
+          ['anggota-titik', 'anggota-lingkaran', 'anggota-huruf'].forEach(function (id) {
             peta.on('click', id, function (e) {
               if (e.features && e.features.length) { kartuAnggota(e.features[0].properties.id); }
             });
-            peta.on('mouseenter', id, function () {
-              peta.getCanvas().style.cursor = 'pointer';
-            });
-            peta.on('mouseleave', id, function () {
-              peta.getCanvas().style.cursor = '';
-            });
           });
+
+          ['anggota-tumpuk', 'anggota-tumpuk-titik', 'anggota-titik', 'anggota-lingkaran', 'anggota-huruf']
+            .forEach(function (id) {
+              peta.on('mouseenter', id, function () {
+                peta.getCanvas().style.cursor = 'pointer';
+              });
+              peta.on('mouseleave', id, function () {
+                peta.getCanvas().style.cursor = '';
+              });
+            });
         } else {
           peta.getSource('anggota').setData(fc);
         }
       }
 
-  /* ---------- label peta dasar ---------- */
+  /* ---------- pindah peta ke satu anggota ---------- */
 
     function kartuAnggota(id) {
       var a = null;

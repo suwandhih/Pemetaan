@@ -1291,3 +1291,74 @@ Saat menguji, citra di sekitar Bandung tampak **berwarna merah**. Ternyata
 itu **lapisan tematik kepadatan penduduk** (merah = kepadatan tinggi),
 bukan kerusakan. Setelah pilihan warna dikembalikan ke "Tanpa warna",
 citra tampil normal.
+
+---
+
+## Anti-tumpuk penanda + garis penghubung lebih jelas (perintah 2026-10-16)
+
+### Permintaan pemilik proyek
+
+1. "Sekarang saja dibuat anti tumpuk — karena masalah ini akan terjadi
+   pada saat data banyak masuk."
+2. "Garis terlalu kecil — perlu terlihat dan dimengerti user."
+
+### 1. Anti-tumpuk (klaster)
+
+Sumber data penanda diberi `cluster: true`:
+
+| Pengaturan | Nilai | Arti |
+|---|---|---|
+| `cluster` | `true` | titik berdekatan digabung otomatis |
+| `clusterRadius` | 62 px | jarak maksimum untuk dianggap berdekatan |
+| `clusterMaxZoom` | 16 | di atas zoom ini tidak ada penggabungan lagi |
+
+Tampilan klaster dibuat **sama bentuknya** dengan penanda tunggal —
+titik kecil di lokasi, garis putus-putus, lalu bulatan biru berisi jumlah
+anggota. Dengan begitu pemakai melihat satu bentuk yang konsisten.
+
+Ukuran bulatan klaster mengikuti jumlah: 13 px (< 10 anggota), 16 px
+(≥ 10), 20 px (≥ 50).
+
+**Ketukan pada bulatan klaster** → peta mendekat sendiri sampai anggotanya
+terpisah satu per satu (`getClusterExpansionZoom`).
+
+### 2. Garis penghubung
+
+| Sebelum | Sesudah |
+|---|---|
+| 2 titik, radius 1,6 px | **4 titik**, radius **2,2 px** |
+| isi warna kategori (samar) | **inti putih + cincin warna 1,6 px** |
+| jarak 10 & 18 px, bulatan 27 px | jarak 5, 11, 17, 23 px, bulatan **34 px** |
+| bulatan radius 9,5 px, cincin 2,5 px | bulatan radius **10 px**, cincin **3 px** |
+
+Alasan diganti inti putih + cincin: garis berwarna tipis di atas citra
+satelit yang ramai jadi tenggelam. Putih membuatnya menonjol di peta
+gelap maupun terang.
+
+Seluruh pergeseran memakai satuan **pixel** (`circle-translate`,
+`text-offset`), jadi ukurannya **tetap sama di semua tingkat zoom** —
+tidak mengecil saat peta diperbesar.
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+Diuji dengan 15 anggota buatan: 12 buah berdesakan dalam 0,012° di
+Bandung, 3 buah berdesakan di Surabaya.
+
+| Uji | Hasil |
+|---|---|
+| Lapisan terpasang | ✅ `anggota-titik`, `anggota-tumpuk`, `anggota-tumpuk-titik`, `anggota-tumpuk-putus-1`, `anggota-tumpuk-putus-2`, `anggota-tumpuk-angka`, `anggota-putus-1..4`, `anggota-lingkaran`, `anggota-huruf` |
+| z5 (jauh) | ✅ 12 anggota → **1 klaster "12"**; 3 anggota → **1 klaster "3"** |
+| z13 (dekat) | ✅ klaster pecah jadi beberapa klaster kecil (2, 2, 3, 2, 2, 2) — tidak ada yang bertumpuk |
+| Bentuk klaster | ✅ titik + garis putus-putus + bulatan biru "12", sama seperti penanda tunggal |
+| Penanda tunggal | ✅ bentuk tetap: titik, 4 titik garis, bulatan **OB** |
+| Nama tempat | ✅ "Bandung", "Semarang", "Surabaya", "Cirebon" tetap terbaca |
+| Galat halaman | ✅ 0 |
+| Data uji dibersihkan | ✅ tinggal 1 anggota milik pemilik proyek |
+
+### Catatan
+
+Jumlah anggota tidak dibatasi — klaster inilah yang menjaga tampilan tetap
+terbaca walau anggotanya ribuan. Yang perlu diperhatikan hanya kecepatan
+unduh data awalnya (satu permintaan `ambilSemua`); bila nanti jumlah
+anggota sudah sangat besar, data bisa diambil bertahap menurut wilayah
+yang sedang terlihat.
