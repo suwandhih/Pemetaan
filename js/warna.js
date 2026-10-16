@@ -478,10 +478,15 @@
     if (!lapisanAda) { siapkanLapisan(); }
     if (!peta.getSource('wilayah')) { return; }
 
-    var fc = keGeoJSON(daftar, banyakKolom(p.tingkat));
-    window.__pemetaanFC = fc;
-    window.__pemetaanPadat = pakaiPadat;
-    disorot = null;
+      /* Kartu keterangan lama ditutup — kalau tidak, pesan "Perbesar dulu"
+         dari percobaan sebelumnya tetap terlihat padahal tingkat barunya
+         sudah berhasil dimuat (ditemukan saat uji live 16 Okt 2026). */
+      if (elKartu) { elKartu.hidden = true; }
+
+      var fc = keGeoJSON(daftar, banyakKolom(p.tingkat));
+      window.__pemetaanFC = fc;
+      window.__pemetaanPadat = pakaiPadat;
+      disorot = null;
 
     var sumber = 'Sumber: Dukcapil Kemendagri';
     if (p.tingkat === 'kecamatan') { sumber += ' \u00B7 ' + fc.features.length + ' kecamatan'; }
