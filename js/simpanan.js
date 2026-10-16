@@ -148,7 +148,9 @@ const Simpanan = (function () {
     function panggil(isi) {
     var paket = {};
     for (var k in isi) { if (Object.prototype.hasOwnProperty.call(isi, k)) { paket[k] = isi[k]; } }
-    if (paket.aksi !== 'ambilSemua' && paket.aksi !== 'cek') { paket.kunci = KUNCI; }
+      /* Seluruh permintaan memakai kunci — termasuk membaca. Data anggota
+         bersifat internal, jadi tidak boleh terbuka untuk umum. */
+      paket.kunci = KUNCI;
 
     var pembatal = null;
     var batas = new Promise(function (_, gagal) {
@@ -310,12 +312,15 @@ const Simpanan = (function () {
   function ambilSemua() {
     if (muatSekali) { return muatSekali; }
     muatSekali = dariLokal().then(function (lokal) {
-      if (!MENYALA) {
-        anggota = lokal.anggota;
-        kategori = lokal.kategori;
-        return lokal;
-      }
-      return panggil({ aksi: 'ambilSemua' }).then(function (h) {
+        /* Bila kunci belum diisi di perangkat ini, jangan pakai isi peramban:
+           bisa jadi itu sisa data perangkat ini saja, bukan isi database.
+           Menampilkannya membuat pemakai mengira data sudah sama padahal belum. */
+        if (!MENYALA || !adaKunci()) {
+          anggota = MENYALA ? [] : lokal.anggota;
+          kategori = MENYALA ? [] : lokal.kategori;
+          return { anggota: anggota, kategori: kategori, pengaturan: {} };
+        }
+        return panggil({ aksi: 'ambilSemua' }).then(function (h) {
         daring = true;
         anggota = h.anggota || [];
         kategori = h.kategori || [];

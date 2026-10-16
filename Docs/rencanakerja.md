@@ -1020,3 +1020,51 @@ Database: Neon `pemetaan` · cabang `production` · PostgreSQL 18.6 · region Si
 | Baca di peramban ini | ✅ **kedua anggota tampil**, pengelompokan per provinsi benar |
 | Penanda di peta | ✅ 2 penanda terpasang |
 | Data uji dibersihkan | ✅ `jumlah: 0` |
+
+---
+
+## Perbaikan Orderan 7 — penjelasan "data lama tidak otomatis pindah" (perintah 2026-10-16)
+
+### Pertanyaan pemilik proyek
+
+"Setiap data disimpan pasti otomatis ke Neon, dan tampil di PC dan HP
+pasti sama isi datanya — benar?"
+
+### Jawaban
+
+**Benar, sejak sekarang.** Setiap kali tombol **Simpan** ditekan, data
+langsung dikirim ke Neon. Tidak ada lagi data yang hanya tersimpan di
+satu perangkat.
+
+Yang dimaksud kalimat "data lama tidak otomatis pindah" hanya berlaku
+untuk data yang **sudah tersimpan SEBELUM kunci dimasukkan** di
+perangkat itu. Contoh: anggota yang pernah diisi dari HP pada orderan 17.
+Data itu ada di peramban HP, belum pernah dikirim ke Neon, jadi tidak
+muncul di PC.
+
+Setelah kunci dimasukkan (sekali per perangkat), seluruh data baru
+otomatis masuk Neon. Data baru dari HP langsung tampil di PC.
+
+### Perbaikan yang dikerjakan
+
+| No | Masalah | Perbaikan |
+|---|---|---|
+| 1 | Isi peramban lama ikut ditampilkan sebelum kunci diisi, sehingga pemakai mengira data sudah sama padahal belum | Sebelum kunci diisi, daftar **sengaja dikosongkan** + diberi keterangan "Setelah kode database diisi di atas, daftar anggota akan dimuat dari database" |
+| 2 | Worker masih mengizinkan **membaca** tanpa kunci — siapa pun yang tahu alamatnya bisa melihat data anggota | Kunci aplikasi kini **wajib untuk semua permintaan**, termasuk membaca |
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Sebelum kunci diisi | ✅ daftar kosong + keterangan "akan dimuat dari database", tidak menampilkan sisa data peramban |
+| Sesudah kunci diisi | ✅ dimuat dari database, `0 anggota` (database memang kosong) |
+| Simpan lewat form aplikasi | ✅ langsung muncul di database (dicek terpisah: `Uji Sinkron` \\| BADUNG) |
+| Muat ulang halaman | ✅ data tetap tampil dari database |
+| Worker tanpa kunci | ✅ ditolak **401** |
+| Worker kunci salah | ✅ ditolak **401** |
+| Worker kunci benar | ✅ **200**, 1 anggota |
+| Data uji dibersihkan | ✅ `sisa: 0` |
+
+### Kunci database (diperlukan sekali per perangkat)
+
+`PMA-f2b1dd4810764520bce0a413`

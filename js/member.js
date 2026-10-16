@@ -219,6 +219,15 @@
     if (!elDaftar) { return; }
     elDaftar.innerHTML = '';
 
+      var kunci = Simpanan.keadaan ? Simpanan.keadaan() : { punyaKunci: true, menyala: false };
+      if (kunci.menyala && !kunci.punyaKunci) {
+        if (elJumlah) { elJumlah.textContent = ''; }
+        elDaftar.innerHTML = '<p class="anggota-kosong">Setelah <b>kode database</b> ' +
+          'diisi di atas, daftar anggota akan dimuat dari database \u2014 isinya ' +
+          'sama dengan yang di PC atau HP lain.</p>';
+        return;
+      }
+
     var punya = anggota.filter(function (a) { return kodeUntukTingkat(a, tingkat); }).length;
     if (elJumlah) {
       elJumlah.textContent = punya === anggota.length

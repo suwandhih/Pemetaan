@@ -16,8 +16,9 @@
         UPDATE/DELETE. Tidak bisa menghapus tabel atau mengubah struktur.
      3. Permintaan hanya diterima dari asal (Origin) yang terdaftar
         di DAFTAR_ASAL.
-     4. Wajib menyertakan kunci aplikasi (secret KUNCI) di setiap
-        permintaan tulis.
+        4. SETIAP permintaan — termasuk membaca — wajib menyertakan kunci
+           aplikasi (secret KUNCI). Kunci tidak ikut tersimpan di kode
+           situs, jadi hanya orang yang tahu kuncinya bisa membuka data.
 
    CARA PAKAI
      Permintaan: POST, isi JSON { aksi, kunci, ... }
@@ -137,15 +138,11 @@ export default {
     const aksi = teks(isi.aksi, 40);
     const sql = neon(env.DATABASE_URL);
 
-    /* Aksi baca tidak perlu kunci — datanya memang untuk ditampilkan.
-       Aksi tulis WAJIB memakai kunci supaya orang lain tidak bisa
-       merusak data anggota. */
-    const AKSI_BACA = ['ambilSemua', 'cek'];
-    if (AKSI_BACA.indexOf(aksi) < 0) {
-      if (!env.KUNCI || teks(isi.kunci, 200) !== env.KUNCI) {
-        return balas({ ok: false, pesan: 'Kunci aplikasi salah.' }, asalDikenal, 401);
-      }
-    }
+    /* Semua aksi wajib memakai kunci aplikasi. Data anggota bersifat internal,
+       jadi tidak boleh bisa dibaca orang lain walau alamat Worker diketahui. */
+        if (!env.KUNCI || teks(isi.kunci, 200) !== env.KUNCI) {
+          return balas({ ok: false, pesan: 'Kunci aplikasi salah.' }, asalDikenal, 401);
+        }
 
     try {
       if (aksi === 'cek') {
