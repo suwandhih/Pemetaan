@@ -22,7 +22,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 4 | UI peta memakai citra satelit; harus terlihat gunung, danau, sungai, rumah, jalan, dan nama jalan | BARU | 45–60 mnt | — |
 | 5 | Detail peta setara `suwandhih.github.io/petadunia/app/index.html`; citra satelit memakai versi terbaru (data lama sudah banyak berubah, hampir tidak bisa dipakai) | **SUDAH TERPENUHI** — perlu verifikasi ulang | 10 mnt | — |
 | 6 | Tahap awal: peta dan tampilan sudah bisa diakses di PC maupun HP; konsep dasar UI, penempatan data, dan isian data | BARU | 90–150 mnt | — |
-| 7 | Setelan database: aktifkan Neon Data API, buat tabel, pasang RLS, sambungkan aplikasi ke database | BARU | 60–90 mnt | — |
+| 7 | Setelan database: aktifkan Neon Data API, buat tabel, pasang RLS, sambungkan aplikasi ke database | **TERPASANG & TERUJI** ✅ — data sama di PC dan HP lewat Worker `pemetaan-api` (bukan Data API, sebab Data API mewajibkan pendaftaran akun publik) · rincian di bawah | 60–90 mnt | 2026-10-16 |
 | 8 | Setelan GitHub: siapkan repo, cabang, GitHub Pages, dan cara unggah perubahan | MENUNGGU KONFIRMASI — repo + remote + push ✅ · **GitHub Pages ✅ aktif** | 30–45 mnt | — |
 | 9 | `aturan.md` diganti nama menjadi **`agents.md`** — berisi aturan + catatan agar asisten diingatkan setiap mulai proyek | MENUNGGU KONFIRMASI | 5 mnt | — |
 | 10 | Pastikan `rencanakerja.md` berfungsi sebagai **daftar orderan**: yang belum selesai dan yang sudah selesai | BARU | 5 mnt | — |
@@ -903,3 +903,108 @@ yang sudah ditetapkan di sana.
 | 2 | Sumber data resmi mana yang dipakai (BPS manual / BPS API / PODES)? | Menentukan perlu-tidaknya tabel pemetaan kode wilayah |
 | 3 | Siapa yang boleh mengirim data, dan perlukah moderasi? | Menentukan rancangan jalur tulis & keamanan |
 | 4 | Bagaimana membedakan data resmi vs data kontribusi pengguna? | Menentukan tingkat kepercayaan tampilan |
+
+---
+
+## Rincian Orderan 7 — Database Neon: data sama di PC dan HP (perintah 2026-10-16)
+
+### Keadaan sebelum dikerjakan
+
+Data anggota (orderan 17) hanya tersimpan di peramban masing-masing.
+Akibatnya anggota yang diisi dari PC **tidak muncul** di HP, dan sebaliknya.
+
+### Yang dikerjakan
+
+| Butir | Isi | Status |
+|---|---|---|
+| 7a | Tabel database: `anggota`, `kategori`, `pengaturan` | ✅ |
+| 7b | Peran database khusus `pemetaan_api` (hanya baca/tulis data, **tidak bisa** menghapus tabel) | ✅ |
+| 7c | Worker Cloudflare `pemetaan-api` sebagai perantara — sandi database tidak pernah dikirim ke peramban | ✅ |
+| 7d | Aplikasi disambungkan ke Worker (`js/simpanan.js`) **tanpa mengubah nama fungsi** | ✅ |
+| 7e | Cadangan luring (IndexedDB) + antrean kirim ulang otomatis | ✅ |
+| 7f | Penanda keadaan sambungan di panel anggota | ✅ |
+| 7g | **Kode database** dimasukkan sekali per perangkat (PC & HP) — tidak ditanam di berkas publik | ✅ |
+| 7h | Uji: tulis dari PC → baca dari peramban lain (mewakili HP) | ✅ |
+
+### Catatan penting: Data API Neon TIDAK dipakai
+
+Rencana semula memakai **Neon Data API**. Setelah ditelusuri, Data API
+memerlukan **Neon Auth** (pendaftaran akun lewat web) sehingga
+"**Anyone on the web can sign up for your app**" — tidak cocok untuk
+data anggota yang bersifat internal.
+
+Jalur yang dipakai: **Worker Cloudflare** (`pemetaan-api`) yang menyimpan
+connection string Neon sebagai *secret*. Sandi tidak ada di berkas situs.
+
+### Berkas yang dibuat (orderan 7)
+
+| Berkas | Isi |
+|---|---|
+| `cloudflare/worker.js` | Worker perantara ke Neon. Aksi: `cek`, `ambilSemua`, `simpanAnggota`, `hapusAnggota`, `kosongkan`, `simpanKategori`, `hapusKategori`, `simpanAtur` |
+| `cloudflare/wrangler.toml` | Konfigurasi Worker (`name = pemetaan-api`) |
+| `cloudflare/package.json` | Pendaftaran pustaka `@neondatabase/serverless` |
+| `alat/neon-siapkan.js` | Pembuat tabel + peran `pemetaan_api` (sekali pakai) |
+| `js/simpanan.js` | **DIUBAH** — dari IndexedDB saja menjadi: Neon (utama) + IndexedDB (cadangan luring) + antrean |
+| `js/member.js` | **DIUBAH** — penanda keadaan sambungan + isian kode database |
+| `index.html` | **DIUBAH** — `#anggota-sambung`, `#anggota-kunci` |
+| `css/gaya.css` | **DIUBAH** — gaya penanda sambungan + isian kode |
+
+### Susunan tabel di Neon
+
+| Tabel | Isi |
+|---|---|
+| `anggota` | 16 kolom: `id` (kunci), `nama`, `kategori`, `inisial`, `rincian` (jsonb), `lon`, `lat`, `kode_provinsi`, `kode_kabkota`, `kode_kecamatan`, `kode_desa`, `provinsi`, `kabkota`, `kecamatan`, `desa`, `dibuat`, `diubah` |
+| `kategori` | `nama` (kunci) |
+| `pengaturan` | `nama` (kunci), `nilai` |
+
+Alamat Worker: `https://pemetaan-api.suwandhih.workers.dev`
+Database: Neon `pemetaan` · cabang `production` · PostgreSQL 18.6 · region Singapura.
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Sambungan ke Neon | ✅ PostgreSQL 18.6 · pengguna `neondb_owner` · basis data `neondb` |
+| Pembuatan tabel | ✅ `anggota, kategori, pengaturan` + 6 kategori awal |
+| Pembuatan peran | ✅ `pemetaan_api` ada |
+| Worker — baca (`cek`) | ✅ `{"ok":true,"pesan":"tersambung","jumlah":0}` |
+| Worker — asal tidak dikenal | ✅ ditolak **403** (`Asal tidak diizinkan`) |
+| Worker — tulis tanpa kunci | ✅ ditolak **401** (`Kunci aplikasi salah`) |
+| Worker — tulis kunci salah | ✅ ditolak **401** |
+| Worker — tulis kunci benar | ✅ **200** + data tersimpan |
+| Worker — keterangan (`rincian`) | ✅ tersimpan sebagai daftar objek `{label, nilai}`, tidak jadi teks |
+| Peran `pemetaan_api` — hapus tabel | ✅ **ditolak** — `must be owner of table kategori` |
+| Peran `pemetaan_api` — buat tabel | ✅ **ditolak** — `permission denied for schema public` |
+| Aplikasi — pemuatan pertama | ✅ tampil `Tersambung — data sama di HP dan PC` |
+| Aplikasi — simpan anggota lewat form | ✅ masuk database (dicek lewat Worker terpisah) |
+| Aplikasi — ubah anggota | ✅ perubahan tersimpan, `diubah` bertambah |
+| Aplikasi — hapus anggota | ✅ hilang dari database (`jumlah` 0) |
+| Aplikasi — ganti tingkat pengelompokan | ✅ tersimpan di tabel `pengaturan` (`anggota_tingkat = provinsi`) |
+| Aplikasi — penyimpanan peramban dikosongkan | ✅ data **tetap muncul** (berarti diambil dari Neon, bukan peramban) |
+| Aplikasi — kunci belum diisi | ✅ tulisan `Belum tersambung — kode database belum diisi` + isian kunci tampil |
+| Aplikasi — kunci diisi | ✅ `Tersambung. 1 anggota di database.` + isian kunci tersembunyi |
+| Penanda peta | ✅ sumber `anggota` berisi 2 fitur, lapisan `anggota-lingkaran` & `anggota-huruf` |
+| Galat konsol | ✅ 0 |
+
+### Bug yang ditemukan & diperbaiki
+
+| No | Bug | Sebab | Perbaikan |
+|---|---|---|---|
+| 1 | Keterangan anggota tampil `[object Object]` | Worker mengubah keterangan jadi teks; aslinya daftar `{label, nilai}` | `senarai()` di Worker menyimpan bentuk aslinya |
+| 2 | Panel anggota kosong tanpa galat | `indexedDB.open` tertahan (ada tab lain memegang database), tidak pernah dipanggil `selesai()` | Batas waktu 4 detik + tangani `onblocked` |
+| 3 | Tingkat pengelompokan tidak kembali saat pindah perangkat | `ambilAtur()` membaca penyimpanan peramban sebelum data database selesai dimuat | `ambilAtur()` menunggu `ambilSemua()` selesai |
+| 4 | Kunci aplikasi tadinya ada di berkas publik | — | Kunci dipindah ke isian sekali-pakai per perangkat |
+
+### Hal yang perlu diketahui pemilik proyek
+
+- **Kode database** (diperlukan di PC dan HP):
+  `PMA-f2b1dd4810764520bce0a413`
+  Masukkan satu kali lewat panel **☰ Anggota** → isian "Kode database".
+  Setelah itu tidak perlu diisi lagi di perangkat tersebut.
+- Sandi database Neon **tidak dapat dibaca** dari konsol (tersimpan di
+  secure vault). Untuk keperluan pemeliharaan, sandi dapat direset dari
+  Neon Console → **Roles → Reset password**, lalu secret `DATABASE_URL`
+  Worker diganti dengan `npx wrangler secret put DATABASE_URL`.
+- Data yang sudah ada di HP/PC **tidak otomatis pindah**. Setelah kode
+  dimasukkan, data lama di peramban akan terlihat sampai data dari
+  database dimuat, lalu yang tampil adalah isi database.

@@ -46,6 +46,11 @@
   var elTingkat = document.getElementById('anggota-tingkat');
   var elForm = document.getElementById('form-anggota');
   var elJumlah = document.getElementById('anggota-jumlah');
+  var elSambung = document.getElementById('anggota-sambung');
+  var elKunci = document.getElementById('anggota-kunci');
+  var elKunciIsian = document.getElementById('anggota-kunci-isian');
+  var elKunciSimpan = document.getElementById('anggota-kunci-simpan');
+  var elKunciPesan = document.getElementById('anggota-kunci-pesan');
 
   /* ---------- bantu ---------- */
 
@@ -121,8 +126,73 @@
       gambarTingkat();
       gambarDaftar();
       isiPilihKategori();
-    });
-  }
+        gambarSambung('tersambung');
+      }).catch(function (e) {
+        gambarSambung('luring', e && e.message);
+        throw e;
+      });
+    }
+
+    /* Penanda keadaan sambungan (orderan 7). Dipakai supaya pemakai tahu
+       datanya sudah masuk database bersama atau masih ditahan di HP. */
+    function gambarSambung(keadaan, pesan) {
+      if (!elSambung) { return; }
+      elSambung.className = keadaan;
+      var k = (Simpanan.keadaan ? Simpanan.keadaan() : { menunggu: 0, punyaKunci: true });
+
+      if (keadaan !== 'mati' && !k.punyaKunci) {
+        elSambung.textContent = 'Belum tersambung \u2014 kode database belum diisi';
+        elSambung.className = 'luring';
+        if (elKunci) { elKunci.hidden = false; }
+        return;
+      }
+      if (elKunci) { elKunci.hidden = true; }
+
+      if (keadaan === 'mati') {
+        elSambung.textContent = 'Penyimpanan hanya di perangkat ini';
+        return;
+      }
+      if (keadaan === 'tersambung') {
+        elSambung.textContent = k.menunggu
+          ? 'Tersambung \u00B7 ' + k.menunggu + ' perubahan belum terkirim'
+          : 'Tersambung \u2014 data sama di HP dan PC';
+        if (k.menunggu) { elSambung.className = 'penyambung'; }
+        return;
+      }
+      elSambung.textContent = 'Sedang luring \u2014 data ditahan di perangkat ini' +
+        (pesan ? ' (' + pesan + ')' : '');
+    }
+
+    /* ---------- kode database (sekali per perangkat) ---------- */
+
+    function siapkanKunci() {
+      if (!elKunciSimpan) { return; }
+      elKunciSimpan.addEventListener('click', function () {
+        var isi = (elKunciIsian.value || '').trim();
+        if (isi.length < 6) {
+          elKunciPesan.hidden = false;
+          elKunciPesan.textContent = 'Kode terlalu pendek. Periksa lagi.';
+          return;
+        }
+        elKunciSimpan.disabled = true;
+        elKunciPesan.hidden = false;
+        elKunciPesan.textContent = 'Sedang menyambung\u2026';
+        Simpanan.simpanKunci(isi).then(function (h) {
+          elKunciPesan.textContent = 'Tersambung. ' + h.jumlah + ' anggota di database.';
+          elKunciIsian.value = '';
+          return muat();
+        }).then(function () {
+          return Simpanan.cobaSambungUlang();
+        }).then(function () {
+          gambarPenanda();
+          elKunciSimpan.disabled = false;
+        }).catch(function (e) {
+          elKunciPesan.textContent = 'Gagal: ' + (e && e.message ? e.message : e);
+          elKunciSimpan.disabled = false;
+          Simpanan.lupakanKunci();
+        });
+      });
+    }
 
   /* ---------- panel ---------- */
 
@@ -807,6 +877,7 @@
 
     siapkanForm();
     bangunPemilih();
+        siapkanKunci();
 
     document.getElementById('tombol-anggota').addEventListener('click', function () {
       if (elPanel.hidden) { bukaPanel(); } else { tutupPanel(); }
@@ -834,8 +905,9 @@
       muat: muat,
       gambarPenanda: gambarPenanda,
       bukaPanel: bukaPanel,
-      bukaForm: bukaForm
-    };
+          bukaForm: bukaForm,
+          gambarSambung: gambarSambung
+        };
   }
 
   var coba = 0;

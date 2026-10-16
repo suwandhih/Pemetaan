@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261016-04">
-<link rel="stylesheet" href="css/gaya.css?v=20261016-04">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261016-06">
+<link rel="stylesheet" href="css/gaya.css?v=20261016-06">
 </head>
 <body>
 
@@ -53,7 +53,21 @@
             <button id="anggota-tutup" type="button" aria-label="Tutup daftar anggota">&#10005;</button>
           </div>
           <div id="anggota-tingkat" role="group" aria-label="Kelompokkan menurut"></div>
-          <div id="anggota-daftar"></div>
+                    <div id="anggota-sambung" title="Keadaan sambungan ke database"></div>
+                    <div id="anggota-kunci" hidden>
+                      <p class="anggota-kunci-catatan">
+                        Masukkan KODE DATABASE sekali di perangkat ini (PC dan HP).
+                        Setelah itu data anggota tersimpan bersama dan sama di kedua
+                        perangkat.
+                      </p>
+                      <div class="anggota-kunci-baris">
+                        <input class="fa-input" id="anggota-kunci-isian" type="password"
+                               placeholder="Kode database" autocomplete="off" />
+                        <button class="anggota-kunci-simpan" id="anggota-kunci-simpan" type="button">Simpan</button>
+                      </div>
+                      <p class="fa-catatan fa-peringatan" id="anggota-kunci-pesan" hidden></p>
+                    </div>
+                    <div id="anggota-daftar"></div>
         </aside>
 
         <!-- Orderan 17: form isian anggota (lembar bawah, peta tetap terlihat) -->
@@ -107,12 +121,12 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261016-04"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261016-04"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261016-04"></script>
-<script src="js/inti.js?v=20261016-04"></script>
-<script src="js/warna.js?v=20261016-04"></script>
-<script src="js/simpanan.js?v=20261016-04"></script>
-<script src="js/member.js?v=20261016-04"></script>
+<script src="js/lib/maplibre-gl.js?v=20261016-06"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261016-06"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261016-06"></script>
+<script src="js/inti.js?v=20261016-06"></script>
+<script src="js/warna.js?v=20261016-06"></script>
+<script src="js/simpanan.js?v=20261016-06"></script>
+<script src="js/member.js?v=20261016-06"></script>
 </body>
 </html>

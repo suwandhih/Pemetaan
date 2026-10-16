@@ -525,6 +525,75 @@ body {
   padding: 8px 10px calc(var(--tinggi-bilah) + 12px);
 }
 
+/* Penanda keadaan sambungan ke database (orderan 7).
+   Hijau = data tersimpan di Neon, sama di HP dan PC.
+   Kuning = sedang luring, data ditahan di peramban dulu. */
+#anggota-sambung {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--garis);
+  font-size: 10.5px;
+  line-height: 1.3;
+  opacity: 0.75;
+}
+
+#anggota-sambung::before {
+  content: '';
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #8b949e;
+}
+
+#anggota-sambung.penyambung::before { background: #d29922; }
+#anggota-sambung.tersambung::before { background: #3fb950; }
+#anggota-sambung.luring::before { background: #d29922; }
+#anggota-sambung.mati::before { background: #8b949e; }
+
+/* Isian kode database — muncul hanya bila kode belum pernah dimasukkan
+   di perangkat ini (orderan 7). */
+#anggota-kunci {
+  padding: 10px;
+  border-bottom: 1px solid var(--garis);
+  background: rgba(88, 166, 255, 0.06);
+}
+
+.anggota-kunci-catatan {
+  margin: 0 0 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+.anggota-kunci-baris {
+  display: flex;
+  gap: 6px;
+}
+
+.anggota-kunci-baris .fa-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.anggota-kunci-simpan {
+  flex: none;
+  padding: 0 14px;
+  border: 1px solid #58a6ff;
+  border-radius: 8px;
+  background: rgba(88, 166, 255, 0.24);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.anggota-kunci-simpan[disabled] { opacity: 0.5; }
+
 .anggota-kosong {
   margin: 24px 8px;
   font-size: 12.5px;

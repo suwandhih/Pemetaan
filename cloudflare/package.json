@@ -1,0 +1,16 @@
+{
+  "name": "pemetaan-api",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Worker perantara Pemetaan ke database Neon",
+  "scripts": {
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0"
+  },
+  "devDependencies": {
+    "pg": "^8.23.1",
+    "wrangler": "^4"
+  }
+}
