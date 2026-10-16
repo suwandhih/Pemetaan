@@ -125,6 +125,22 @@ berkas gaya (style JSON) dari luar.
 | `index.html` | Tombol `#tombol-jenis` + wadah daftar `#pemilih-peta` |
 | `css/gaya.css` | Gaya tombol jenis peta + daftar pilihan melayang |
 
+### Bukti uji di situs live (2026-10-16)
+
+Situs: <https://suwandhih.github.io/Pemetaan/> — commit `3afd461`, status
+GitHub Pages `built`.
+
+| Uji | Hasil |
+|---|---|
+| Berkas live | ✅ `index.html` · `css/gaya.css` · `js/inti.js` — HTTP 200 semua |
+| Peta tampil saat dibuka | ✅ Citra Satelit · 20 ubin Esri termuat · `Sulawesi` |
+| Ganti ke Peta Jalan | ✅ tombol jadi "🗺️ Peta Jalan" · keterangan "Peta: © OpenStreetMap contributors" |
+| Ganti ke Peta Gelap | ✅ tombol jadi "🌙 Peta Gelap" · keterangan "… · CARTO" |
+| Ganti ke Peta Medan | ✅ tombol jadi "⛰️ Peta Medan" · keterangan "Medan: Esri, USGS, NOAA" |
+| Kembali ke Citra Satelit | ✅ tombol jadi "🛰️ Citra Satelit" · keterangan "Citra: Esri, Maxar…" |
+| Posisi tidak bergeser | ✅ tetap `118,0° BT · -2,5° · z4,6` di keempat jenis |
+| Galat di situs live | ✅ **0 galat konsol**, 0 permintaan gagal |
+
 Catatan hubungan antar-orderan:
 
 * Orderan 1–5 berisi **syarat** dari aplikasi yang akan dibangun.
