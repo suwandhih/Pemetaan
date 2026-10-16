@@ -1421,3 +1421,30 @@ dipasang ulang setiap kali `gambarPenanda()` selesai.
 | Tampilan di peta | ✅ penanda **ON** terlihat di Bandung saat menyala |
 | Galat halaman | ✅ 0 |
 | Data uji | ✅ dibersihkan, pengaturan dikembalikan ke `anggota_tampil = 1` |
+
+---
+
+## Pindahkan tombol tampil/sembunyi anggota ke bilah atas halaman peta (perintah 2026-10-16)
+
+### Permintaan pemilik proyek
+
+"Sebenarnya tadinya bermaksud tombol hide/unhide mudah dijangkau —
+artinya ada di home atau page peta. Saya kurang setuju harus klik 2x
+untuk on/off, kurang standar."
+
+### Perubahan
+
+| Berkas | Perubahan |
+|---|---|
+| `index.html` | Tombol `#anggota-tampil` (`👁 Anggota`) dipindahkan dari dalam `#panel-anggota` langsung ke `#bilah-atas` (kanan atas halaman peta). Penanda versi naik ke `?v=20261016-14` |
+| `css/gaya.css` | `#anggota-tampil` diberi `margin-left: auto`, tinggi 28 px seragam dengan tombol bilah atas lainnya, biru terang saat aktif dan redup + teks dicoret saat nonaktif |
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Letak tombol | ✅ langsung di `#bilah-atas` sebelah kanan (`👁 Anggota`, lebar 84 px, `potong: false`) |
+| Lebar 3 tombol di bilah atas | ✅ 108 px + 122 px + 84 px = 314 px dari 428 px (masih ada ruang kosong, tidak berhimpitan) |
+| Klik 1x dari halaman peta → OFF | ✅ `aria-pressed="false"`, penanda `OB` langsung hilang (`visibility: none`), tombol redup & dicoret |
+| Klik 1x lagi → ON | ✅ `aria-pressed="true"`, penanda `OB` langsung muncul kembali (`visibility: visible`) |
+| Galat halaman | ✅ 0 |

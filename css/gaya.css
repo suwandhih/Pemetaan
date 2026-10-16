@@ -508,25 +508,40 @@ body {
   cursor: pointer;
 }
 
-/* Tombol tampil/sembunyi penanda anggota di peta.
+/* Tombol tampil/sembunyi penanda anggota langsung di bilah atas peta.
    Terang = penanda tampil, redup = penanda disembunyikan. */
 #anggota-tampil {
-  width: 30px;
-  height: 26px;
-  border: 1px solid rgba(88, 166, 255, 0.5);
-  border-radius: 7px;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 9px;
+  border: 1px solid rgba(88, 166, 255, 0.55);
+  border-radius: 8px;
   background: rgba(88, 166, 255, 0.22);
   color: var(--terang);
-  font-size: 13px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
   line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
   touch-action: manipulation;
 }
 
+#anggota-tampil:active {
+  background: rgba(88, 166, 255, 0.35);
+}
+
 #anggota-tampil[aria-pressed="false"] {
-  border-color: rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.05);
-  opacity: 0.5;
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  opacity: 0.55;
+}
+
+#anggota-tampil[aria-pressed="false"] #tampil-nama {
+  text-decoration: line-through;
 }
 
 /* Tombol tingkat pengelompokan */
