@@ -292,7 +292,13 @@
   function perbaruiKeterangan() {
     var c = peta.getCenter();
     var z = peta.getZoom();
-    elWilayah.textContent = namaWilayah(c.lng, c.lat);
+    var nama = namaWilayah(c.lng, c.lat);
+    /* Wilayah yang tidak dikenali cukup ditulis singkat — bilah atas
+       hanya selebar HP, dan tulisan panjang menutupi tombol. */
+    if (elWilayah) {
+      elWilayah.textContent = nama === 'Perairan / negara tetangga' ? 'Perairan' : nama;
+      elWilayah.title = nama;
+    }
     elPosisi.textContent = angka(c.lng, 1) + '\u00B0 BT \u00B7 ' +
       angka(c.lat, 1) + '\u00B0 \u00B7 z' + angka(z, 1);
   }

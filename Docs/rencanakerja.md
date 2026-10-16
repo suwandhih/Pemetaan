@@ -1165,3 +1165,44 @@ Tambahan:
 | Simpan anggota 4 tingkat | ✅ tersimpan lengkap di Neon: `51` / `51.03` / `51.03.03` / `51.03.03.2005` — BALI / BADUNG / ABIANSEMAL / ANGANTAKA |
 | Pengelompokan tingkat desa | ✅ grup **ANGANTAKA · ABIANSEMAL** |
 | Data uji dibersihkan | ✅ `jumlah: 0` |
+
+---
+
+## Perbaikan tata letak bilah (perintah 2026-10-16)
+
+### Pertanyaan & permintaan pemilik proyek
+
+1. "Di gambar, saya lingkar merah — tulisan `Perairan / negara tetangga` itu apa?"
+2. "Menu anggota dipindahkan ke atas, karena judulnya terpotong jadi `☰ Ang`."
+3. "Di atas masih ada ruang bila tulisan atas kanan dihilangkan."
+
+### Jawaban pertanyaan 1
+
+Itu **nama wilayah yang sedang dilihat**, bukan cacat. Peta mencari nama
+wilayah menurut titik tengah layar; karena Indonesia dan negara tetangga
+saja belum mencakup seluruh dunia, titik tengah yang jatuh di luar
+wilayah yang dikenal ditulis "Perairan / negara tetangga".
+
+Buktinya ada di `js/inti.js` fungsi `namaWilayah()` — daftar wilayah
+mencakup Indonesia + negara tetangga saja, sisanya dianggap perairan.
+
+### Perubahan
+
+| No | Permintaan | Yang dikerjakan |
+|---|---|---|
+| 1 | Tulisan panjang di atas kanan | Nama wilayah **dihilangkan** dari bilah atas. Fungsi masih ada (dipakai peta tematik), jadi tidak ada yang rusak |
+| 2 | Menu Anggota dipindahkan ke atas | Tombol **☰ Anggota** dipindah dari ujung **kanan** bilah bawah ke ujung **kiri** — tutupnya (✕) ada di kiri, jadi konsisten |
+| 3 | Tulisan `☰ Ang` terpotong | Sebabnya lebar tetap 44 px dari aturan umum `#bilah-bawah button`. Dipakai `width: auto` khusus tombol ini → kini **81 px**, tulisan utuh |
+
+Tambahan: nama wilayah yang panjang (mis. "Kalimantan Barat") kini
+dipotong dengan "…" bila tidak muat, tidak lagi menekan tombol peta.
+
+### Bukti uji (2026-10-16, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Tulisan `Perairan / negara tetangga` | ✅ hilang dari bilah atas (unsur `#wilayah` sudah tidak ada) |
+| Bilah atas | ✅ hanya 2 tombol: `Citra Satelit` (117 px) + `Tanpa warna` (122 px) — ada ruang sisa |
+| Posisi tombol Anggota | ✅ ujung **kiri** bilah bawah |
+| Tulisan tombol | ✅ `☰ Anggota` utuh, lebar **81 px**, `potong: false` |
+| Galat halaman | ✅ **0** (sempat muncul galat `elWilayah` null, sudah diperbaiki dengan pemeriksaan) |
