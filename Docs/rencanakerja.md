@@ -1762,6 +1762,32 @@ ada dua aksi sekaligus. Setelah form ditutup, klik peta kembali membuka kartu.
 Keterangan tombol (tooltip) menyebut jenis yang **akan muncul** bila ditekan:
 `Ganti ke Map (sekarang: Satelit)`.
 
+### 4. Revisi susunan bilah atas (perintah 2026-10-17)
+
+> "Tombol [anggota][👁] dipindah ke [anggota][👁][🛰️Satelit][Populasi 👁] —
+> karena form anggota ada di sebelah kiri, jadi lebih enak langsung di bawahnya."
+
+| Sebelum | Sesudah |
+|---|---|
+| `[Satelit] [Populasi 👁]` … `[Anggota][👁]` (di kanan) | `[Anggota][👁] [Satelit] [Populasi 👁]` (dari kiri) |
+
+`#grup-anggota` tidak lagi memakai `margin-left: auto`, sehingga letaknya di
+paling kiri — **sejajar dengan kolom form anggota** di bawahnya saat kolom itu
+terbuka di PC.
+
+### Bukti uji (2026-10-17, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Urutan tombol di HP 390 px | ✅ `Anggota` (kiri 10) · `👁` (81) · `Satelit` (119) · `Populasi 👁` (202) |
+| Urutan tombol di PC 1152 px | ✅ sama — `Anggota` (10) · `👁` (81) · `Satelit` (119) · `Populasi 👁` (202) |
+| Muat satu baris tanpa terpotong | ✅ `potong: false` di HP maupun PC |
+| Sejajar dengan kolom anggota (PC) | ✅ bilah kiri 380 px · grup anggota kiri 390 px |
+| Tombol `👁` masih bekerja | ✅ OFF → `aria-pressed="false"` + penanda `none` · ON → `true` + `visible` |
+| Tombol `Satelit` masih bekerja | ✅ klik → `Map` · klik lagi → `Satelit` |
+| Menu `Populasi 👁` | ✅ terbuka di kiri 8 px, 4 tingkat lengkap |
+| Galat halaman | ✅ 0 galat |
+
 ### Bug yang ditemukan & diperbaiki
 
 | # | Bug | Sebab | Perbaikan |
