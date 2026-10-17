@@ -2543,3 +2543,133 @@ muat.
 - Di HP panduan menutupi bilah atas, jadi tombol bilah atas tidak bisa
   diklik selama panduan terbuka. Ini **disengaja** — pemakai berpindah fitur
   lewat daftar "Panduan fitur lain" di bawah panduan.
+
+
+## Panduan pemakaian interaktif — tautan di dalam kalimat (perintah 2026-10-17)
+
+Pemilik proyek: *"saya mau revisi cara menyajikan .. dibawah ini dari sisi
+kalimat ok tapi interatif membuat lebih jelas saya memberikan tanda <abcd>
+kurung ini artinya link jika di klik akan bereaksi pada peta atau sesuatu..
+apakah konsep panduan interatif akan membebani aplikasi? jika tidak terlalu ..
+saya ingin panduan seperti ini.. user lebih mudah mengerti cara kerja"*.
+
+### Jawaban atas pertanyaan "apakah membebani aplikasi?"
+
+**Tidak.** Ukuran `js/panduan.js` bertambah dari 17,4 KB menjadi 25,9 KB
+(+8,5 KB), dimuat **sekali** saat aplikasi dibuka. Saat aplikasi berjalan
+biasa: **nol** kerja tambahan — tidak ada animasi berjalan terus, tidak ada
+pemeriksaan berkala, tidak ada permintaan jaringan, tidak ada pustaka baru.
+Kerja hanya muncul saat tautan diketuk, dan selesai dalam 1-2 detik. Yang
+bertambah hanya beberapa pendengar klik (satu per tautan) dan 80 baris CSS.
+
+### Keputusan pemilik proyek (ditanyakan sebelum dikerjakan)
+
+| Pertanyaan | Jawaban |
+|---|---|
+| Di HP, saat tautan gerak peta diketuk | **Panduan menyingkir sebentar** lalu kembali sendiri |
+| Tombol Simpan / Hapus | **Disorot berkedip saja**, tidak diklik (aman) |
+
+### Cara kerja
+
+Kata kunci di dalam kalimat panduan ditulis dengan tanda `[[kata|aksi]]`.
+Saat digambar, tanda itu menjadi **tautan** berwarna biru bergaris bawah
+putus-putus. Saat diketuk, tautan **benar-benar menjalankan** yang dimaksud —
+peta bergerak, tombol ditekan. Jadi pemakai tidak hanya membaca, tapi melihat
+sendiri caranya.
+
+**Tiga jenis aksi:**
+
+| Jenis | Yang terjadi | Contoh |
+|---|---|---|
+| **Gerak peta** | Peta diperagakan bergerak / membesar, lalu kembali | `seret`, `cubit` |
+| **Tekan tombol** | Tombol itu benar-benar ditekan | `tekan:#tombol-jenis`, `tekan:#geser-kanan`, `tingkat:kecamatan`, `populasi:provinsi`, `agama:islam` |
+| **Sorot saja** | Tombol / kolom dikedipkan, **tidak** ditekan | `sorot:#fa-simpan`, `wilayah:provinsi` |
+
+**Daftar aksi lengkap:**
+
+| Aksi | Yang dijalankan |
+|---|---|
+| `seret` | Peta digeser kiri lalu kembali — seperti diseret satu jari / mouse |
+| `cubit` | Peta diperbesar 1 tingkat lalu kembali — seperti dicubit / digulir roda |
+| `tekan:#id` | Tombol `#id` benar-benar diklik |
+| `sorot:#id` | Tombol / kolom `#id` dikedipkan 1,75 detik, tidak diklik |
+| `tingkat:provinsi` | Tombol tingkat di daftar anggota diklik (mengelompokkan daftar) |
+| `wilayah:provinsi` | Kolom pilihan wilayah di form dikedipkan |
+| `populasi:provinsi` | Daftar Populasi dibuka, lalu tingkat itu dipilih |
+| `agama:islam` | Daftar Agama dibuka, lalu agama itu dipilih |
+| `agama-tingkat:kabkota` | Daftar Agama dibuka, lalu tingkat itu dipilih |
+
+**Jumlah tautan per panduan** (diukur 17 Okt 2026):
+
+| Panduan | Tautan |
+|---|---|
+| Peta & navigasi | 8 |
+| Daftar anggota | 8 |
+| Tambah / ubah anggota | 12 |
+| Kelola kategori | 5 |
+| Peta suku bangsa | 3 |
+| Peta penduduk | 6 |
+| Peta agama | 13 |
+| Cari | 2 |
+| Rincian wilayah | 3 |
+
+### Perilaku di PC dan di HP
+
+| Keadaan | PC (>= 900 px) | HP (< 900 px) |
+|---|---|---|
+| Panduan terbuka | Kolom kanan 380 px, peta tetap terlihat | Menutupi seluruh layar |
+| Tautan gerak peta diketuk | Peta langsung terlihat bergerak, panduan tetap terbuka | Panduan **turun ke bawah** 1,8 detik supaya peta terlihat, lalu naik lagi sendiri |
+| Tautan tekan tombol | Panduan tetap terbuka, hasilnya terlihat di sebelah kiri | Panduan **ditutup** supaya hasilnya terlihat |
+| Tautan sorot | Tombol dikedipkan, panduan tetap terbuka | Sama |
+
+### Berkas yang diubah
+
+| Berkas | Perubahan |
+|---|---|
+| `js/panduan.js` | **Ditulis ulang.** `langkah[]` kini memuat tanda `[[kata|aksi]]`; fungsi baru `urai()`, `tulis()`, `jalankan()`, `gerakPeta()`, `tekan()`, `sorot()`, `bukaDaftar()`, `singkir()`, `kilat()`, `periksaUlang()`; `blok()` memakai `tulis()` bukan `textContent` |
+| `css/gaya.css` | Gaya `.panduan-tautan`, `.panduan-tautan-mati`, `#panduan.panduan-singkir`, `.panduan-sorot` + 2 `@keyframes` |
+| `index.html` | Penanda versi `?v=20261017-18` -> `?v=20261017-19` (13 tempat) |
+
+### Hal yang perlu diperhatikan
+
+- **Tombol yang mengubah data sengaja hanya dikedipkan.** Kalau `Simpan`
+  benar-benar diklik dari panduan, data anggota bisa tersimpan tanpa sengaja.
+  Jadi `Simpan`, `Hapus`, `Batal`, `+ Tambah`, `Edit`, `Del` memakai `sorot:`,
+  bukan `tekan:`.
+- **Daftar Populasi punya perilaku klik-pilih/klik-mati.** Kalau peta Populasi
+  sedang menyala, klik tombol = mematikan, bukan membuka daftar. Karena itu
+  `bukaDaftar()` memeriksa dulu apakah daftarnya sudah terbuka; kalau belum,
+  tombol diklik dan diperiksa lagi setelah 90 ms, lalu diklik sekali lagi bila
+  perlu.
+- **`jamKunci` (1,6 detik)** mencegah panduan berpindah sendiri selama
+  `bukaDaftar()` berjalan — daftar terbuka lalu tertutup lagi, dan tanpa kunci
+  itu panduan akan melompat ke panduan lain.
+- **`periksaUlang()`** dipanggil 140 ms setelah tautan `tekan:` dijalankan,
+  supaya panduan ikut menyesuaikan bila tombol itu mengubah keadaan
+  (mis. `+ Anggota` membuka form -> panduan berganti ke "Tambah / ubah
+  anggota").
+- **Tautan yang tombolnya sedang tidak tampil** (mis. `Matikan peta agama`
+  saat daftar Agama tertutup) berkedip sebentar lewat `.panduan-tautan-mati`,
+  jadi pemakai tahu tautannya memang bekerja — bukan diam saja.
+- **`#panduan` diberi `transition: transform 260ms`** untuk gerak menyingkir.
+  Saat menyingkir, `pointer-events: none` dipasang supaya klik jatuh ke peta.
+
+### Bukti uji (Playwright, 17 Okt 2026)
+
+**54 uji lulus, 0 gagal, 0 galat konsol.**
+
+| Rangkaian | Jumlah | Isi |
+|---|---|---|
+| PC 1440x900 | 26 | Panduan jadi kolom kanan 380 px; 8 tautan tergambar; tidak ada sisa tanda `[[ ]]`; tautan Satelit benar-benar mengganti jenis peta; tautan geser-kanan benar-benar menggeser peta; tautan seret membuat peta bergerak; tautan cubit memperbesar peta; di PC panduan **tidak** menyingkir; pindah panduan lewat daftar; panduan otomatis jadi panduan form saat form dibuka; tautan Simpan **hanya dikedipkan** dan form tetap terbuka; tautan Provinsi menyorot kolom pilihan; tautan + Anggota membuka form; tautan Kecamatan mengelompokkan daftar; tautan Provinsi menyalakan peta penduduk; tautan Islam menyalakan peta agama; tautan Kabupaten/Kota mengganti tingkat agama; tautan Suku membuka panel suku; tautan Cari membuka kotak pencarian; tautan X menutup pencarian; setiap panduan punya tautan |
+| HP 390x844 | 11 | Panduan menutupi layar; tautan seret membuat panduan **turun ke bawah** (top > 700 px) lalu **naik lagi sendiri**; tautan tekan menutup panduan; tautan Provinsi menyalakan peta penduduk; tautan Kristen menyalakan peta agama; tautan Simpan hanya dikedipkan dan form tetap terbuka |
+| 8 lebar layar (320-1280 px) | 16 | Panduan selalu muat di dalam bingkai, 0 galat |
+| Kasus tepi | 3 | Tautan `Matikan peta agama` benar-benar mematikan (agama aktif -> false) dan panduan berganti ke "Peta & navigasi"; tautan `Matikan peta suku` benar-benar mematikan; tautan X pada kartu menutup kartu dan panduan berganti |
+
+### Catatan
+
+- Tanda `[[ ]]` dipilih karena **tidak bentrok** dengan tanda lain di dalam
+  kalimat panduan (tanda kurung biasa, tanda kutip, tanda pisah).
+- Penguraian memakai satu pola regex `POLA` yang di-`lastIndex = 0` setiap
+  kali dipakai, supaya tidak ada keadaan tersisa antar pemanggilan.
+- Tautan dibuat sebagai `<button>` (bukan `<a>`), jadi bisa difokus dengan
+  Tab dan ditekan dengan Enter — tetap bisa dipakai tanpa mouse.

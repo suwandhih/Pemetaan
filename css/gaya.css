@@ -2083,6 +2083,86 @@ select.fa-input option:checked {
   opacity: 0.78;
 }
 
+/* ------------------------------------------------------------
+   Tautan di dalam kalimat panduan
+   ------------------------------------------------------------
+   Kata kunci di dalam tanda [[ ]] menjadi tautan yang bisa diketuk dan
+   langsung memperagakan yang dimaksud — peta benar-benar bergerak, tombol
+   benar-benar ditekan. Warnanya dibedakan dari teks biasa supaya jelas
+   bahwa bagian itu bisa diketuk.
+   ------------------------------------------------------------ */
+.panduan-tautan {
+  display: inline;
+  margin: 0;
+  padding: 0 1px;
+  border: 0;
+  border-bottom: 1px dashed #63c2de;
+  border-radius: 0;
+  background: none;
+  color: #7fd4ee;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  line-height: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.panduan-tautan:hover {
+  color: #a8e4f6;
+  border-bottom-style: solid;
+}
+
+.panduan-tautan:active {
+  background: rgba(99, 194, 222, 0.22);
+}
+
+/* Tautan yang tidak bisa dijalankan (mis. tombolnya sedang tidak tampil)
+   berkedip sebentar supaya pemakai tahu tautannya memang bekerja. */
+.panduan-tautan-mati {
+  animation: panduan-kedip 0.45s ease 2;
+}
+
+@keyframes panduan-kedip {
+  0%, 100% { background: none; }
+  50% { background: rgba(99, 194, 222, 0.35); }
+}
+
+/* ------------------------------------------------------------
+   Panduan menyingkir sebentar (HP)
+   ------------------------------------------------------------
+   Di HP panduan menutupi seluruh layar. Saat tautan gerak peta diketuk,
+   panduan turun ke bawah supaya peta terlihat bergerak, lalu naik lagi
+   sendiri. Di PC peta sudah terlihat, jadi tidak dipakai.
+   ------------------------------------------------------------ */
+#panduan {
+  transition: transform 260ms ease;
+}
+
+#panduan.panduan-singkir {
+  transform: translateY(100%);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   Sasaran yang sedang ditunjukkan
+   ------------------------------------------------------------
+   Tombol atau kolom yang disebut di panduan dikedipkan supaya pemakai
+   tahu persis yang mana. Dipakai untuk tombol yang mengubah data
+   (Simpan, Hapus) — ditunjukkan, tapi tidak ditekan.
+   ------------------------------------------------------------ */
+.panduan-sorot {
+  animation: panduan-sorot 0.55s ease 3;
+  outline: 2px solid #63c2de;
+  outline-offset: 2px;
+}
+
+@keyframes panduan-sorot {
+  0%, 100% { outline-color: #63c2de; }
+  50% { outline-color: rgba(99, 194, 222, 0.15); }
+}
+
 /* ============================================================
    Orderan 18 — peta di atas, form isian di bawah (HP)
    ------------------------------------------------------------
