@@ -357,35 +357,86 @@
   function keWilayah(h) {
     if (!peta) { return; }
     var tingkat = h.tingkat || tingkatDariKode(h.kode);
-    var daftar = (tingkat === 'desa') ? window[KUNCI_DESA] : window[KUNCI_WILAYAH];
-    if (!daftar) { return; }
+    var kolom = { provinsi: 1, kabkota: 2, kecamatan: 3, desa: 4 }[tingkat];
+    if (!kolom) { return; }
 
-    /* Kotak batas wilayah dihitung dari poligon resmi — diambil dari data
-       batas yang sudah ada, bukan dari indeks (indeks tidak memuat poligon). */
+    /* Poligon kecamatan & desa hanya tersedia setelah berkas bagiannya
+       dimuat (kecamatan per provinsi, desa per kabupaten/kota). Indeks
+       pencarian memuat SEMUA nama, jadi hasil pencarian bisa menunjuk
+       wilayah yang poligonnya belum ada di perangkat ini.
+       Diukur 17 Okt 2026: tanpa pemuatan ini, mencari "meruya selatan"
+       menemukan hasilnya tetapi peta tidak bergerak sama sekali. */
+    var d = cariPoligon(tingkat, h.kode, kolom);
+    if (d) { terbangKePoligon(d, tingkat, h.kode); return; }
+
+    var bagian = bagianUntuk(tingkat, h.kode);
+    if (!bagian || typeof window.PD_MUAT_BAGIAN !== 'function') {
+      pesanHasil('Batas wilayah ini belum bisa dimuat.');
+      return;
+    }
+
+    pesanHasil('Memuat batas wilayah\u2026');
+    window.PD_MUAT_BAGIAN(bagian.kunci, bagian.nama)
+      .then(function () {
+        var d2 = cariPoligon(tingkat, h.kode, kolom);
+        if (!d2) {
+          pesanHasil('Batas wilayah ini tidak tersedia.');
+          return;
+        }
+        terbangKePoligon(d2, tingkat, h.kode);
+      })
+      .catch(function () {
+        pesanHasil('Batas wilayah ini gagal dimuat (butuh internet).');
+      });
+  }
+
+  /* Bagian berkas yang memuat poligon wilayah ini.
+     Kecamatan dipecah per provinsi (2 angka), desa per kab/kota (4 angka).
+     `kunci` memakai singkatan KEC/DESA — itulah nama berkas sebenarnya
+     (kec-51.js, desa-5103.js); `nama` adalah bagiannya. */
+  function bagianUntuk(tingkat, kode) {
+    var b = kode.split('.');
+    if (tingkat === 'kecamatan') { return { kunci: 'KEC', nama: b[0] }; }
+    if (tingkat === 'desa') { return { kunci: 'DESA', nama: b[0] + b[1] }; }
+    return null;
+  }
+
+  function cariPoligon(tingkat, kode, kolom) {
     var poligon = (typeof PD_ANGGOTA !== 'undefined' && PD_ANGGOTA.daftarPoligon)
       ? PD_ANGGOTA.daftarPoligon(tingkat) : null;
-    if (!poligon) { return; }
-
-    var kolom = { provinsi: 1, kabkota: 2, kecamatan: 3, desa: 4 }[tingkat];
-    var d = null;
+    if (!poligon) { return null; }
     for (var i = 0; i < poligon.length; i++) {
-      if (kodeDariPoligon(poligon[i], kolom) === h.kode) { d = poligon[i]; break; }
+      if (kodeDariPoligon(poligon[i], kolom) === kode) { return poligon[i]; }
     }
-    if (!d) { return; }
+    return null;
+  }
 
+  function terbangKePoligon(d, tingkat, kode) {
     var k = kotakDari(d.g);
-    if (!k) { return; }
+    if (!k) { pesanHasil('Batas wilayah ini tidak terbaca.'); return; }
     var lngTepi = Math.max((k[2] - k[0]) * 0.06, 0.004);
     var latTepi = Math.max((k[3] - k[1]) * 0.06, 0.004);
     peta.fitBounds(
       [[k[0] - lngTepi, k[1] - latTepi], [k[2] + lngTepi, k[3] + latTepi]],
       { padding: 0, duration: 900, maxZoom: 15 }
     );
-
     if (typeof PD_ANGGOTA !== 'undefined' && PD_ANGGOTA.sorotWilayah) {
-      PD_ANGGOTA.sorotWilayah(tingkat, h.kode);
+      PD_ANGGOTA.sorotWilayah(tingkat, kode);
     }
     tutup();
+  }
+
+  /* Memberi tahu pemakai bila batas wilayah tidak bisa diambil — supaya
+     ketukan tidak terasa seperti tidak ada reaksi. */
+  function pesanHasil(teks) {
+    if (!elHasil) { return; }
+    var p = elHasil.querySelector('.cari-pesan-sementara');
+    if (!p) {
+      p = document.createElement('p');
+      p.className = 'cari-pesan cari-pesan-sementara';
+      elHasil.insertBefore(p, elHasil.firstChild);
+    }
+    p.textContent = teks;
   }
 
   function keAnggota(a) {
