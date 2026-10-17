@@ -278,10 +278,13 @@
 
   /* ---------- lapisan peta ---------- */
 
-  function siapkanLapisan() {
+  /* `paksa` dipakai js/agama.js: lapisan ini dipakai bersama, dan penanda
+     `lapisanAda` di sini masih bernilai true setelah peta dasar diganti
+     sehingga lapisan tidak dibuat ulang padahal sudah hilang. */
+  function siapkanLapisan(paksa) {
     if (!peta) { return; }
     if (peta.getSource('wilayah')) { lapisanAda = true; return; }
-    if (lapisanAda) { return; }
+    if (lapisanAda && !paksa) { return; }
 
     peta.addSource('wilayah', {
       type: 'geojson',
@@ -329,6 +332,10 @@
     });
 
     peta.on('click', 'wilayah-isi', function (e) {
+      /* Peta Agama (orderan 21) memakai lapisan yang sama. Saat peta Agama
+         menyala, kartu Populasi tidak boleh ikut terbuka. */
+      if (window.PD_AGAMA && window.PD_AGAMA.aktif && window.PD_AGAMA.aktif()) { return; }
+      if (aktif === 'tanpa') { return; }
       if (e.features && e.features.length) { bukaKartu(e.features[0].properties); }
     });
   }
@@ -387,6 +394,12 @@
   function ganti(id) {
     var p = PETA[id];
     if (!p || id === aktif) { return; }
+
+    /* Peta agama (orderan 21) memakai lapisan peta yang sama — dimatikan
+       dulu supaya keduanya tidak saling menimpa. */
+    if (window.PD_AGAMA && window.PD_AGAMA.aktif && window.PD_AGAMA.aktif()) {
+      window.PD_AGAMA.matikan();
+    }
 
     if (!p.tingkat) {
       aktif = 'tanpa';
@@ -541,6 +554,11 @@
     if (!elWarna) { return; }
     elWarna.hidden = !buka;
     elTombol.setAttribute('aria-expanded', buka ? 'true' : 'false');
+    if (buka) {
+      /* Dua daftar melayang tidak boleh terbuka bersamaan — letaknya sama. */
+      var a = document.getElementById('pemilih-agama');
+      if (a) { a.hidden = true; }
+    }
   }
 
   function bangun() {
@@ -630,7 +648,7 @@
     if (awal !== 'tanpa') { ganti(awal); } else { kosongkan(); }
   }
 
-  window.PD_WARNA = { ganti: ganti, PETA: PETA };
+  window.PD_WARNA = { ganti: ganti, PETA: PETA, siapkanLapisan: siapkanLapisan };
 
   var coba = 0;
   (function ulang() {

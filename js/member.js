@@ -479,6 +479,8 @@
   var elFJudul, elFTingkat, elFPratinjau, elFHapus, elFPenduduk;
   var elFPin = null, elFPinTengah = null;
   var elPendudukForm = null;
+  var elFAgama = null;
+  var agamaToken = 0;
 
   function siapkanForm() {
     elFNama = document.getElementById('fa-nama');
@@ -492,6 +494,18 @@
       elFHapus = document.getElementById('fa-hapus');
       elPendudukForm = document.getElementById('fa-penduduk');
       elFPenduduk = elPendudukForm;
+      elFAgama = document.getElementById('fa-agama');
+      if (elFAgama) {
+        /* Orderan 21: ketuk satu agama di daftar → peta diwarnai menurut
+           agama itu. Tingkatnya mengikuti wilayah terdalam yang terisi. */
+        elFAgama.addEventListener('click', function (e) {
+          var b = e.target.closest ? e.target.closest('.agama-baris[data-agama]') : null;
+          if (!b || !window.PD_AGAMA) { return; }
+          var t = tingkatTerdalam();
+          if (!t) { return; }
+          window.PD_AGAMA.ganti(t, b.dataset.agama);
+        });
+      }
       elFPin = document.getElementById('fa-pin');
       elFPinTengah = document.getElementById('fa-pin-tengah');
       if (elFPinTengah) {
@@ -872,15 +886,26 @@
     if (!sedangUbah) { pinKeTitikTengah(); }
   }
 
-  /* Jumlah penduduk wilayah terpilih — data Dukcapil (orderan 16).
-     Sumbernya selalu ditulis, tidak dikarang. */
-  function tampilkanPenduduk() {
-    if (!elPendudukForm) { return; }
+  /* Tingkat terdalam yang sudah terisi di form. Dipakai bersama oleh blok
+     penduduk dan blok agama. */
+  function tingkatTerdalam() {
     var dipakai = null;
     ['desa', 'kecamatan', 'kabkota', 'provinsi'].forEach(function (t) {
       if (!dipakai && wilayah[t]) { dipakai = t; }
     });
-    if (!dipakai) { elPendudukForm.hidden = true; return; }
+    return dipakai;
+  }
+
+  /* Jumlah penduduk wilayah terpilih — data Dukcapil (orderan 16).
+     Sumbernya selalu ditulis, tidak dikarang. */
+  function tampilkanPenduduk() {
+    if (!elPendudukForm) { return; }
+    var dipakai = tingkatTerdalam();
+    if (!dipakai) {
+      elPendudukForm.hidden = true;
+      tampilkanAgama(null, null);
+      return;
+    }
 
     var kolom = kolomTingkat(dipakai);
     var d = cariDariKode(daftarTingkat(dipakai), wilayah[dipakai], kolom);
@@ -889,6 +914,7 @@
       elPendudukForm.textContent = 'Jumlah penduduk wilayah ini belum dimuat ' +
         'di peramban. Buka peta tematik tingkat ini dulu, lalu coba lagi. ' +
         '(Sumber: Dukcapil Kemendagri)';
+      tampilkanAgama(dipakai, wilayah[dipakai]);
       return;
     }
     var p = pendudukDari(d, kolom);
@@ -904,7 +930,33 @@
       ' \u00B7 luas ' + (luas > 0 ? angka(Math.round(luas)) + ' km\u00B2' : '\u2014') +
       ' \u00B7 kepadatan ' + (padat ? angka(Math.round(padat)) : '\u2014') +
       ' jiwa/km\u00B2 <span style="opacity:.7">(Dukcapil Kemendagri)</span>';
+    tampilkanAgama(dipakai, wilayah[dipakai]);
+  }
+
+  /* Orderan 21: daftar jumlah penduduk menurut agama untuk wilayah terpilih.
+     Datanya berkas terpisah (data/agama/), jadi dimuat saat dibutuhkan.
+     Bila berkasnya belum ada, blok ini disembunyikan — bukan dikosongkan
+     dengan angka karangan. */
+  function tampilkanAgama(tingkat, kode) {
+    if (!elFAgama) { return; }
+    if (!tingkat || !kode || !window.PD_AGAMA) {
+      elFAgama.hidden = true;
+      elFAgama.innerHTML = '';
+      return;
+    }
+    var token = ++agamaToken;
+    window.PD_AGAMA.untukWilayah(tingkat, kode).then(function (a) {
+      /* Wilayah bisa berubah lagi sebelum berkas selesai dimuat. */
+      if (token !== agamaToken) { return; }
+      if (!a) {
+        elFAgama.hidden = true;
+        elFAgama.innerHTML = '';
+        return;
       }
+      elFAgama.innerHTML = window.PD_AGAMA.ringkas(a, tingkat);
+      elFAgama.hidden = false;
+    });
+  }
 
   function cariDariKode(daftar, kode, kolom) {
     if (!daftar || !kode) { return null; }

@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-13">
-<link rel="stylesheet" href="css/gaya.css?v=20261017-13">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-14">
+<link rel="stylesheet" href="css/gaya.css?v=20261017-14">
 </head>
 <body>
 
@@ -30,6 +30,11 @@
       <span id="warna-nama">Populasi</span>
       <span id="warna-ikon">&#128065;</span>
     </button>
+    <button id="tombol-agama" type="button" aria-haspopup="listbox" aria-expanded="false" aria-pressed="false"
+            title="Peta penduduk menurut agama">
+      <span id="agama-nama">Agama</span>
+      <span id="agama-ikon">&#128591;</span>
+    </button>
     <button id="tombol-cari" type="button" aria-label="Cari wilayah, anggota, atau nama jalan"
             title="Cari wilayah, anggota, atau nama jalan">&#9906;</button>
   </header>
@@ -48,6 +53,9 @@
 
     <!-- Orderan 16: peta tematik jumlah penduduk (Dukcapil Kemendagri) -->
     <div id="pemilih-warna" role="listbox" aria-label="Peta penduduk" hidden></div>
+
+    <!-- Orderan 21: peta tematik penduduk menurut agama (Dukcapil Kemendagri) -->
+    <div id="pemilih-agama" role="listbox" aria-label="Peta agama" hidden></div>
 
     <!-- Orderan 16: keterangan angka saat satu wilayah diklik -->
     <div id="kartu" hidden>
@@ -124,6 +132,8 @@
             <input class="fa-input fa-nonaktif" id="fa-wilayah" type="text" readonly
                    placeholder="Belum dipilih" />
             <p class="fa-catatan" id="fa-penduduk" hidden></p>
+            <!-- Orderan 21: jumlah penduduk menurut agama untuk wilayah terpilih -->
+            <div id="fa-agama" hidden></div>
             <p class="fa-catatan" id="fa-pin" hidden></p>
             <button class="fa-tombol fa-tengah" id="fa-pin-tengah" type="button" hidden>&#8634; Titik tengah wilayah</button>
             <p class="fa-catatan fa-peringatan" id="fa-pratinjau" hidden></p>
@@ -165,13 +175,14 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261017-13"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261017-13"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261017-13"></script>
-<script src="js/inti.js?v=20261017-13"></script>
-<script src="js/warna.js?v=20261017-13"></script>
-<script src="js/simpanan.js?v=20261017-13"></script>
-<script src="js/member.js?v=20261017-13"></script>
-<script src="js/cari.js?v=20261017-13"></script>
+<script src="js/lib/maplibre-gl.js?v=20261017-14"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261017-14"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261017-14"></script>
+<script src="js/inti.js?v=20261017-14"></script>
+<script src="js/warna.js?v=20261017-14"></script>
+<script src="js/agama.js?v=20261017-14"></script>
+<script src="js/simpanan.js?v=20261017-14"></script>
+<script src="js/member.js?v=20261017-14"></script>
+<script src="js/cari.js?v=20261017-14"></script>
 </body>
 </html>
