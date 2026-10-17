@@ -7,8 +7,9 @@
      berubah; kode wilayah tidak.
    · Daftar anggota bisa dikelompokkan menurut tingkat pilihan:
      Desa/Kelurahan · Kecamatan · Kabupaten/Kota · Provinsi.
-   · Form berupa LEMBAR BAWAH, bukan panel samping. Bingkai Pemetaan
-     hanya selebar HP (430 px) sehingga panel samping tidak muat.
+   · Form berupa LEMBAR BAWAH di HP. Di PC (layar ≥ 900 px) form dan
+     daftar anggota menjadi kolom di sisi kiri, peta menyusut ke sisa
+     lebar sehingga tetap terlihat penuh (orderan 22).
    · Saat wilayah dipilih, jumlah penduduk wilayah itu langsung tampil
      — memakai data Dukcapil dari orderan 16.
 

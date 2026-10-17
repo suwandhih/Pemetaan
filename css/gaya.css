@@ -1,9 +1,13 @@
 /* Pemetaan — tampilan
-   Syarat 14c/14d: HP tegak, dan di PC lebar peta = lebar HP supaya
-   tampilan di dua perangkat sama. */
+   Syarat 14c: HP tegak (portrait).
+   Orderan 22 (menggantikan 14d): di PC peta memenuhi tinggi layar dan
+   selebar layar — tidak ada ruang kosong di atas/bawah. Daftar anggota &
+   form isian menjadi kolom di sisi kiri supaya peta tetap terlihat penuh
+   saat mengisi data. Di HP tidak ada perubahan. */
 
 :root {
   --lebar-hp: 430px;
+  --lebar-panel: 380px;
   --tinggi-bilah: 40px;
   --gelap: #0b0f14;
   --terang: #e8eef5;
@@ -28,7 +32,9 @@ body {
   align-items: stretch;
 }
 
-/* Lebar bingkai = lebar HP, di HP maupun di PC (syarat 14d) */
+/* Di HP lebar bingkai dibatasi selebar HP (430 px) supaya peta tidak
+   mengecil; sisa lebar itulah yang di-scroll kiri-kanan. Di PC batas ini
+   dilepas oleh aturan @media di akhir berkas (orderan 22). */
 #bingkai {
   position: relative;
   width: min(100%, var(--lebar-hp));
@@ -1159,4 +1165,64 @@ select.fa-input option:checked {
   font-size: 13px;
   line-height: 1.6;
   background: var(--gelap);
+}
+
+/* ============================================================
+   Orderan 22 — tampilan PC (layar lebar)
+   ------------------------------------------------------------
+   Ambang 900 px: di bawah itu dianggap HP, dan tampilan HP TIDAK berubah
+   sama sekali (peta tetap selebar 430 px, sisa lebar di-scroll kiri-kanan).
+   Di atas 900 px dianggap PC:
+     · peta memenuhi tinggi & lebar layar — tidak ada ruang kosong;
+     · daftar anggota & form isian menjadi kolom di sisi kiri, peta
+       menyusut ke sisa lebar sehingga tetap terlihat penuh (tidak
+       tertutup kolom). MapLibre menyesuaikan ukurannya sendiri.
+   Diletakkan di akhir berkas supaya menang atas aturan dasar di atas.
+   ============================================================ */
+@media (min-width: 900px) {
+  #bingkai {
+    width: 100%;
+    max-width: none;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  #panel-anggota,
+  #form-anggota {
+    left: 0;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: var(--lebar-panel);
+    max-height: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-right: 1px solid #1e2833;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Selama kolom kiri terbuka, peta, bilah, dan keterangan digeser ke
+     kanannya. Saat kolom tertutup, semuanya kembali selebar layar. */
+  #bingkai:has(#panel-anggota:not([hidden])) #peta,
+  #bingkai:has(#form-anggota:not([hidden])) #peta {
+    left: var(--lebar-panel);
+  }
+
+  #bingkai:has(#panel-anggota:not([hidden])) #bilah-atas,
+  #bingkai:has(#panel-anggota:not([hidden])) #bilah-bawah,
+  #bingkai:has(#form-anggota:not([hidden])) #bilah-atas,
+  #bingkai:has(#form-anggota:not([hidden])) #bilah-bawah {
+    left: var(--lebar-panel);
+  }
+
+  #bingkai:has(#panel-anggota:not([hidden])) #pemilih-peta,
+  #bingkai:has(#panel-anggota:not([hidden])) #pemilih-warna,
+  #bingkai:has(#panel-anggota:not([hidden])) #kartu,
+  #bingkai:has(#panel-anggota:not([hidden])) #derajat,
+  #bingkai:has(#form-anggota:not([hidden])) #pemilih-peta,
+  #bingkai:has(#form-anggota:not([hidden])) #pemilih-warna,
+  #bingkai:has(#form-anggota:not([hidden])) #kartu,
+  #bingkai:has(#form-anggota:not([hidden])) #derajat {
+    left: calc(var(--lebar-panel) + 8px);
+  }
 }
