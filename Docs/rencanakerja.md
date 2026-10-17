@@ -2133,3 +2133,135 @@ Diuji di peramban pada `http://127.0.0.1:8899` (server lokal) dan
 - Perbandingan dengan tingkat atas dan catatan desa berpenduduk sedikit
   **belum** dikerjakan (ide tambahan yang belum diputuskan pemilik proyek).
 
+
+---
+
+## Orderan 20 — Titik lokasi suku bangsa (perintah 2026-10-17)
+
+### Perintah pemilik proyek
+
+1. Titik-titik lokasi suku dari `c:\data\datapeta` — **cara penyajiannya
+   kurang bagus**, supaya diolah dan disajikan menurut konsep Pemetaan,
+   **jangan meniru cara DataPeta**.
+2. Jumlah beragama per provinsi/kab-kota/kecamatan/desa — sudah dikerjakan
+   sebagai orderan 21.
+
+### Keputusan yang diambil (ditanyakan lebih dulu)
+
+| Pertanyaan | Jawaban pemilik proyek |
+|---|---|
+| Cara menggambar sebaran | **Garis + titik tengah** — garis merah keliling semua provinsi kawasan, satu titik penanda di tengah kawasan |
+| Kawasan yang bukan nama provinsi | **Tulis apa adanya** di kartu |
+| Warna wilayah | **Tanpa warna** — cukup garis merah berkedip + titik penanda |
+
+### Kenapa tidak meniru DataPeta
+
+Di DataPeta tiap suku ditaruh di **ibu kota provinsi asalnya**, sehingga suku
+Jawa jatuh di Semarang padahal BPS sendiri mencatat Jawa tersebar di 8
+provinsi. Di Pemetaan yang digambar adalah **kawasan utama yang disebut BPS**:
+seluruh provinsi di dalamnya diberi garis merah berkedip, dan satu titik
+penanda ditaruh di titik tengah kawasan itu.
+
+### Berkas baru
+
+- `js/suku.js` — modul peta suku. Berisi data 28 suku BPS SP2010, peta
+  kawasan → kode provinsi, lapisan `suku-sorot` (garis merah berkedip),
+  `suku-titik` (bulatan putih + cincin merah), `suku-nama` (label nama suku),
+  kartu rincian, daftar melayang, simpanan `peta_suku`, ekspor `window.PD_SUKU`.
+
+### Berkas yang diubah
+
+- `index.html` — tombol `#tombol-suku` (teks "Suku", ikon 🧬) setelah tombol
+  Agama; daftar `#pemilih-suku` setelah `#pemilih-agama`;
+  `<script src="js/suku.js">` setelah `js/agama.js`; penanda versi
+  `?v=20261017-14` → `?v=20261017-15` (11 tempat).
+- `css/gaya.css` — gaya `#tombol-suku`, `#pemilih-suku`, `.suku-*`;
+  `#pemilih-suku` ikut digeser di PC & dibatasi tingginya di HP; bilah atas
+  dirapatkan lagi di `@media (max-width: 400px)` (tombol Suku jadi ikon saja);
+  kartu rincian di HP dengan form terbuka dibatasi tingginya.
+- `js/warna.js` — `ganti()` mematikan peta Suku lebih dulu; `bukaTutup()`
+  menutup `#pemilih-suku`; ekspor ditambah `aktif()`.
+- `js/agama.js` — `ganti()` mematikan peta Suku lebih dulu; `bukaTutup()`
+  menutup `#pemilih-suku`.
+
+### Cara pakai
+
+1. Ketuk `[Suku 🧬]` di bilah atas → muncul daftar 28 suku BPS SP2010,
+   diurutkan dari yang terbanyak, lengkap dengan jumlah jiwa, persentase
+   terhadap penduduk Indonesia, dan bar proporsi.
+2. Ketuk satu suku → peta terbang ke kawasan utamanya, seluruh provinsi di
+   dalamnya diberi **garis merah berkedip**, dan **satu titik penanda**
+   ditaruh di titik tengah kawasan.
+3. Kartu rincian muncul: jumlah jiwa, persentase, jumlah provinsi disorot,
+   dan daftar kawasan utama apa adanya seperti BPS menuliskannya.
+4. Tombol `Matikan peta suku` di dalam daftar untuk mematikan.
+5. Pilihan terakhir diingat (localStorage `peta_suku`).
+
+### Bukti uji (2026-10-17, dijalankan sendiri)
+
+Diuji di peramban (Chrome) pada `http://127.0.0.1:8899` (server lokal).
+
+| Uji | Hasil |
+|---|---|
+| Tombol Suku muncul di sebelah Agama | ✅ |
+| Daftar 28 suku, urut dari terbanyak | ✅ Jawa 97.094.536 · 41% |
+| Jawa → 8 provinsi disorot | ✅ `12,18,31,32,33,34,35,36` |
+| Garis merah berkedip | ✅ opacity 1 ↔ 0,35 tiap 700 ms |
+| Titik penanda di tengah kawasan | ✅ 106,6625 · −2,2410 |
+| Label nama suku di peta | ✅ font `Open Sans Bold` tersedia |
+| Kartu rincian Jawa | ✅ 97.094.536 jiwa · 41% · 8 provinsi · 8 baris kawasan |
+| Suku gabungan (Asal Sulawesi) | ✅ 6 provinsi + catatan "kelompok gabungan" |
+| Kawasan non-provinsi (Tionghoa) | ✅ "Pulau Sumatra · digambar sebagai 10 provinsi" |
+| **Seluruh 28 suku diuji satu per satu** | ✅ semua punya garis, titik, kartu, baris kawasan |
+| Matikan peta suku | ✅ garis & titik kosong, kartu tertutup |
+| Populasi ↔ Suku saling mematikan | ✅ |
+| Agama ↔ Suku saling mematikan | ✅ |
+| Ganti peta dasar (Satelit ↔ Map) | ✅ lapisan & titik dipasang ulang |
+| Simpanan & muat ulang | ✅ suku terakhir kembali menyala |
+| Bilah atas PC 1280 px | ✅ tidak meluber |
+| Bilah atas HP 390 px | ✅ tidak meluber, tombol Suku jadi ikon 30 px |
+| Kartu di HP 390 px | ✅ tidak meluber keluar layar |
+| Kartu di HP 360 px + form terbuka | ✅ tidak menutupi bilah atas, bisa digeser |
+| Keterangan warna Populasi kembali setelah daftar ditutup | ✅ |
+| Galat konsol | ✅ 0 (hanya favicon 404 dari server uji lokal) |
+
+### Bug yang ditemukan & diperbaiki saat uji
+
+1. **Kotak batas (bounding box) salah hitung.** Pada `kotakDari()`, batas
+   atas `k[3]` ditulis `k[1]` sehingga titik tengah kawasan meleset jauh
+   (Jawa jatuh di 106,66 · −2,24 = perairan Kalimantan, bukan Jawa).
+   Diperbaiki jadi `k[3]`.
+2. **Kartu rincian menutupi bilah tombol** di HP sempit dengan form terbuka.
+   Diukur 17 Okt 2026 pada layar 360×640: kartu 377 px sedangkan ruang di
+   atasnya hanya 208 px, sehingga kartu meluber ke atas dan tombol Suku tidak
+   bisa diklik. Diperbaiki: tinggi kartu dibatasi setinggi area peta yang
+   tersisa (`max-height`), sisanya bisa digeser.
+3. **Titik penanda hilang setelah peta dasar diganti.** Garis merahnya
+   kembali tetapi titiknya tidak, karena hanya `suku-sorot` yang dipasang
+   ulang. Diperbaiki: `suku-titik` juga dipasang ulang.
+4. **Keterangan warna Populasi tidak kembali** setelah daftar suku ditutup
+   (di `js/suku.js` keterangan disembunyikan tanpa dicatat). Diperbaiki
+   dengan penanda `derajatDitutupSementara` seperti di `js/agama.js`.
+
+### Catatan
+
+- **Titik & wilayah adalah perkiraan.** BPS tidak menerbitkan koordinat suku;
+  yang diterbitkan hanya daftar kawasan utama. Titik di sini = titik tengah
+  kotak batas seluruh kawasan, bukan lokasi persis. Hal ini ditulis di kartu
+  supaya tidak menyesatkan.
+- Persentase dihitung dari **penduduk Indonesia SP2010 (237.641.326)**, bukan
+  dari jumlah 28 suku (236.565.607 = 99,55%), supaya tidak dilebih-lebihkan.
+- Beberapa nama kawasan memakai **wilayah tahun 2010**, karena itulah yang
+  dicatat BPS: "Kalimantan Timur" 2010 = hari ini 64 + 65 (Kaltara memisah
+  2012); "Papua" 2010 = 91 + 93 + 94 + 95 (memisah 2022); "Papua Barat" 2010
+  = 92 + 96 (Papua Barat Daya memisah 2022).
+- 9 kawasan yang bukan nama provinsi (mis. "Sulawesi", "Pulau Madura",
+  "Perkotaan di DKI Jakarta") **tetap digambar** sebagai provinsi yang
+  memuatnya — bukan dikarang, karena "Sulawesi" memang berisi 6 provinsi dan
+  "Pulau Madura" memang bagian Jawa Timur. Di kartu tiap baris diberi catatan
+  `kawasan · digambar sebagai N provinsi` supaya jelas. **Perlu dikonfirmasi
+  ke pemilik proyek** apakah cara ini diterima, atau kawasan seperti itu
+  harus benar-benar tidak digambar.
+- 9 suku bertanda **gabungan** (mis. "Asal Sulawesi", "Asal NTT") — BPS
+  mencatatnya sebagai kelompok gabungan, bukan satu suku tunggal. Tanda
+  "gabungan" ditampilkan di daftar dan dijelaskan di kartu.

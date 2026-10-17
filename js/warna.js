@@ -400,6 +400,10 @@
     if (window.PD_AGAMA && window.PD_AGAMA.aktif && window.PD_AGAMA.aktif()) {
       window.PD_AGAMA.matikan();
     }
+    /* Peta suku (orderan 20) juga memakai #kartu yang sama. */
+    if (window.PD_SUKU && window.PD_SUKU.aktif && window.PD_SUKU.aktif()) {
+      window.PD_SUKU.matikan();
+    }
 
     if (!p.tingkat) {
       aktif = 'tanpa';
@@ -558,6 +562,8 @@
       /* Dua daftar melayang tidak boleh terbuka bersamaan — letaknya sama. */
       var a = document.getElementById('pemilih-agama');
       if (a) { a.hidden = true; }
+      var s = document.getElementById('pemilih-suku');
+      if (s) { s.hidden = true; }
     }
   }
 
@@ -648,7 +654,8 @@
     if (awal !== 'tanpa') { ganti(awal); } else { kosongkan(); }
   }
 
-  window.PD_WARNA = { ganti: ganti, PETA: PETA, siapkanLapisan: siapkanLapisan };
+  window.PD_WARNA = { ganti: ganti, PETA: PETA, siapkanLapisan: siapkanLapisan,
+    aktif: function () { return aktif; } };
 
   var coba = 0;
   (function ulang() {

@@ -432,6 +432,196 @@ button.agama-baris:hover {
   display: none;
 }
 
+/* ============================================================
+   Orderan 20 — titik lokasi suku bangsa
+   ------------------------------------------------------------
+   Tombol [Suku 🧬] berdiri sendiri di sebelah tombol Agama. Daftar
+   melayangnya memakai tempat yang sama dengan daftar Populasi & Agama,
+   jadi hanya satu yang terbuka (diatur di js/suku.js).
+   ============================================================ */
+
+#tombol-suku {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-suku:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#tombol-suku[aria-expanded="true"],
+#tombol-suku[aria-pressed="true"] {
+  border-color: #63c2de;
+  background: rgba(99, 194, 222, 0.24);
+}
+
+#tombol-suku[aria-pressed="false"] #suku-ikon {
+  opacity: 0.55;
+}
+
+#suku-nama-tombol {
+  font-weight: 600;
+}
+
+#pemilih-suku {
+  position: absolute;
+  top: calc(var(--tinggi-bilah) + 4px);
+  left: 8px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 200px;
+  max-width: calc(100% - 16px);
+  max-height: calc(100% - var(--tinggi-bilah) - 16px);
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  background: rgba(11, 15, 20, 0.96);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+#pemilih-suku[hidden] {
+  display: none;
+}
+
+.suku-sumber {
+  padding: 0 9px 4px;
+  font-size: 10.5px;
+  opacity: 0.6;
+}
+
+/* Satu baris suku: nama + tanda "gabungan", angka jiwa & persentase,
+   lalu bar proporsi terhadap suku terbanyak (Jawa). */
+.suku-baris {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: 'nama angka' 'bar bar';
+  gap: 2px 8px;
+  width: 100%;
+  padding: 5px 7px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11.5px;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.suku-baris:active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.suku-baris:hover {
+  border-color: rgba(99, 194, 222, 0.5);
+}
+
+.suku-baris.nyala {
+  border-color: #63c2de;
+  background: rgba(99, 194, 222, 0.22);
+}
+
+.suku-nama {
+  grid-area: nama;
+  font-weight: 600;
+}
+
+.suku-tanda {
+  margin-left: 5px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 9.5px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.suku-angka {
+  grid-area: angka;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.suku-bar {
+  grid-area: bar;
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.suku-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #63c2de;
+}
+
+.suku-petunjuk {
+  padding: 2px 9px 4px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  opacity: 0.65;
+}
+
+/* Blok "kawasan utama" di kartu rincian. */
+.suku-kepala {
+  margin-top: 10px;
+}
+
+.suku-kawasan {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.suku-kawasan-baris {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 11.5px;
+}
+
+.suku-kawasan-nama {
+  font-weight: 600;
+}
+
+.suku-kawasan-catatan {
+  opacity: 0.65;
+  font-size: 10.5px;
+  text-align: right;
+}
+
+.suku-catatan {
+  margin-top: 8px;
+}
+
 /* Keterangan angka saat satu wilayah diklik */
 #kartu {
   position: absolute;
@@ -566,6 +756,7 @@ button.agama-baris:hover {
   #tombol-jenis,
   #tombol-warna,
   #tombol-agama,
+  #tombol-suku,
   #tombol-anggota {
     padding: 0 7px;
   }
@@ -589,6 +780,18 @@ button.agama-baris:hover {
   }
 
   #tombol-agama {
+    width: 30px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  /* Orderan 20: tombol Suku juga menjadi ikon saja — enam tombol
+     bertulisan penuh tidak muat di layar 400 px. */
+  #suku-nama-tombol {
+    display: none;
+  }
+
+  #tombol-suku {
     width: 30px;
     padding: 0;
     justify-content: center;
@@ -1628,13 +1831,22 @@ select.fa-input option:checked {
 
   #bingkai:has(#form-anggota:not([hidden])) #kartu {
     bottom: calc(55% + var(--tinggi-bilah) + 40px);
+    /* Kartu rincian suku (orderan 20) lebih tinggi daripada kartu Populasi
+       karena memuat daftar kawasan utama. Diukur 17 Okt 2026 pada layar
+       360x640: kartu 377 px sedangkan ruang di atasnya hanya 208 px,
+       sehingga kartu meluber ke atas dan menutupi bilah tombol. Karena itu
+       tingginya dibatasi setinggi area peta yang tersisa, sisanya digeser.
+       Sisa ruang = 100% − 55% (form) − 2 × bilah (atas & bawah) − 44 px. */
+    max-height: calc(45% - var(--tinggi-bilah) * 2 - 44px);
+    overflow-y: auto;
   }
 
   /* Daftar melayang (Populasi & Agama) dibatasi setinggi area peta yang
      tersisa, supaya tidak menutupi keterangan warna di bawahnya. Keduanya
      memakai tempat yang sama, jadi aturannya harus sama juga. */
   #bingkai:has(#form-anggota:not([hidden])) #pemilih-warna,
-  #bingkai:has(#form-anggota:not([hidden])) #pemilih-agama {
+  #bingkai:has(#form-anggota:not([hidden])) #pemilih-agama,
+  #bingkai:has(#form-anggota:not([hidden])) #pemilih-suku {
     max-height: calc(45% - var(--tinggi-bilah) - 12px);
     overflow-y: auto;
   }
@@ -1691,10 +1903,12 @@ select.fa-input option:checked {
 
   #bingkai:has(#panel-anggota:not([hidden])) #pemilih-warna,
   #bingkai:has(#panel-anggota:not([hidden])) #pemilih-agama,
+  #bingkai:has(#panel-anggota:not([hidden])) #pemilih-suku,
   #bingkai:has(#panel-anggota:not([hidden])) #kartu,
   #bingkai:has(#panel-anggota:not([hidden])) #derajat,
   #bingkai:has(#form-anggota:not([hidden])) #pemilih-warna,
   #bingkai:has(#form-anggota:not([hidden])) #pemilih-agama,
+  #bingkai:has(#form-anggota:not([hidden])) #pemilih-suku,
   #bingkai:has(#form-anggota:not([hidden])) #kartu,
   #bingkai:has(#form-anggota:not([hidden])) #derajat {
     left: calc(var(--lebar-panel) + 8px);

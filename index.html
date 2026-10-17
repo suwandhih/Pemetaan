@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-14">
-<link rel="stylesheet" href="css/gaya.css?v=20261017-14">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-15">
+<link rel="stylesheet" href="css/gaya.css?v=20261017-15">
 </head>
 <body>
 
@@ -35,6 +35,11 @@
       <span id="agama-nama">Agama</span>
       <span id="agama-ikon">&#128591;</span>
     </button>
+    <button id="tombol-suku" type="button" aria-haspopup="listbox" aria-expanded="false" aria-pressed="false"
+            title="Titik lokasi suku bangsa">
+      <span id="suku-nama-tombol">Suku</span>
+      <span id="suku-ikon">&#129516;</span>
+    </button>
     <button id="tombol-cari" type="button" aria-label="Cari wilayah, anggota, atau nama jalan"
             title="Cari wilayah, anggota, atau nama jalan">&#9906;</button>
   </header>
@@ -56,6 +61,9 @@
 
     <!-- Orderan 21: peta tematik penduduk menurut agama (Dukcapil Kemendagri) -->
     <div id="pemilih-agama" role="listbox" aria-label="Peta agama" hidden></div>
+
+    <!-- Orderan 20: titik lokasi suku bangsa (BPS Sensus Penduduk 2010) -->
+    <div id="pemilih-suku" role="listbox" aria-label="Peta suku" hidden></div>
 
     <!-- Orderan 16: keterangan angka saat satu wilayah diklik -->
     <div id="kartu" hidden>
@@ -175,14 +183,15 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261017-14"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261017-14"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261017-14"></script>
-<script src="js/inti.js?v=20261017-14"></script>
-<script src="js/warna.js?v=20261017-14"></script>
-<script src="js/agama.js?v=20261017-14"></script>
-<script src="js/simpanan.js?v=20261017-14"></script>
-<script src="js/member.js?v=20261017-14"></script>
-<script src="js/cari.js?v=20261017-14"></script>
+<script src="js/lib/maplibre-gl.js?v=20261017-15"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261017-15"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261017-15"></script>
+<script src="js/inti.js?v=20261017-15"></script>
+<script src="js/warna.js?v=20261017-15"></script>
+<script src="js/agama.js?v=20261017-15"></script>
+<script src="js/suku.js?v=20261017-15"></script>
+<script src="js/simpanan.js?v=20261017-15"></script>
+<script src="js/member.js?v=20261017-15"></script>
+<script src="js/cari.js?v=20261017-15"></script>
 </body>
 </html>

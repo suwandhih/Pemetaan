@@ -644,6 +644,10 @@
     /* Peta Populasi memakai lapisan yang sama — dimatikan dulu supaya tidak
        saling menimpa. */
     if (window.PD_WARNA && window.PD_WARNA.ganti) { window.PD_WARNA.ganti('tanpa'); }
+    /* Peta suku (orderan 20) memakai #kartu yang sama — dimatikan dulu. */
+    if (window.PD_SUKU && window.PD_SUKU.aktif && window.PD_SUKU.aktif()) {
+      window.PD_SUKU.matikan();
+    }
 
     aktif = { tingkat: tingkat, agama: agamaId };
     agamaTerpilih = agamaId;
@@ -691,6 +695,8 @@
       /* Dua daftar melayang tidak boleh terbuka bersamaan — letaknya sama. */
       var w = document.getElementById('pemilih-warna');
       if (w) { w.hidden = true; }
+      var s = document.getElementById('pemilih-suku');
+      if (s) { s.hidden = true; }
       /* Di HP sempit dengan form terbuka, area peta hanya ±280 px — daftar
          ini dan keterangan warna tidak muat bersama (diukur 17 Okt 2026:
          daftar 44–273 px, keterangan 55–237 px). Keterangan disembunyikan
