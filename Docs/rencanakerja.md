@@ -2265,3 +2265,86 @@ Diuji di peramban (Chrome) pada `http://127.0.0.1:8899` (server lokal).
 - 9 suku bertanda **gabungan** (mis. "Asal Sulawesi", "Asal NTT") — BPS
   mencatatnya sebagai kelompok gabungan, bukan satu suku tunggal. Tanda
   "gabungan" ditampilkan di daftar dan dijelaskan di kartu.
+
+---
+
+### Revisi kartu rincian di PC (2026-10-17)
+
+Pemilik proyek: *"blok data terlalu besar bisa dibuat lebih bagus? kalau di
+versi HP mau tidak mau seperti itu karena lebar, kalau versi PC terlalu
+besar"*.
+
+Yang diubah — **hanya di PC** (`@media (min-width: 900px)`):
+
+- Lebar kartu dibatasi **560 px** (sebelumnya selebar layar).
+- Tabel rincian disusun **dua pasang per baris** (`display: grid` +
+  `display: contents` pada `tbody` dan `tr`).
+- Daftar kawasan utama suku & daftar 7 agama disusun **dua kolom**.
+
+Hasil ukur (layar 1440x800):
+
+| Kartu | Sebelum | Sesudah |
+|---|---|---|
+| Suku Jawa (8 kawasan) | 1440x345 | 560x256 |
+| Populasi (7 baris) | 1440x189 | 560x129 |
+| Agama (7 baris) | 1440x376 | 560x268 |
+
+HP 390 px **tidak diubah**: kartu Jawa tetap 374x377.
+
+Bug: `display: contents` pada `tr` saja tidak cukup — peramban menyisipkan
+`<tbody>` sendiri, sehingga seluruh tabel menjadi satu sel kisi dan label
+menempel pada angkanya. Diperbaiki dengan menembuskan `tbody` juga.
+
+---
+
+### Revisi panel Suku seperti panel Anggota (2026-10-17)
+
+Pemilik proyek: *"suku > di tempatkan seperti anggota.. jadi peta masih mudah
+dilihat pada saat fly.. tidak terganggu dengan box hitam"*.
+
+**Yang diubah:**
+
+- Daftar suku yang tadinya **daftar melayang** (`#pemilih-suku`) menjadi
+  **panel** (`#panel-suku`) dengan susunan meniru `#panel-anggota`:
+  kepala (judul + jumlah + tombol tutup ✕), baris sumber, blok rincian,
+  daftar yang bisa digeser, dan kaki (petunjuk + tombol `Matikan peta suku`).
+- **Rincian suku dipindah dari `#kartu` ke dalam panel** (`#suku-rincian`).
+  Inilah yang menghilangkan "box hitam" di atas peta saat peta terbang.
+- Di PC panel menjadi **kolom kiri 380 px** — peta menyusut ke sisa lebar
+  (1060 px pada layar 1440 px) dan **tetap terlihat penuh** saat terbang.
+- Di PC panel **tetap terbuka** setelah suku diketuk, jadi pemakai bisa
+  mengetuk suku satu per satu sambil melihat peta terbang. Di HP panel
+  menutupi seluruh layar, jadi **ditutup otomatis** supaya peta terlihat.
+- Panel Suku, panel Anggota, dan form isian **saling mematikan** — ketiganya
+  memakai kolom kiri yang sama di PC.
+- Kartu Populasi & Agama di PC tetap ringkas (560 px, tabel 2 pasang per
+  baris, daftar 2 kolom) — aturan tabel kisi kini dibatasi `#kartu` saja
+  supaya tabel di panel suku (380 px) tetap satu kolom.
+
+**Bukti uji (2026-10-17, dijalankan sendiri, Chrome):**
+
+| Uji | Hasil |
+|---|---|
+| Panel terbuka, peta terlihat penuh | ✅ peta 1060 px di layar 1440 px |
+| Ketuk suku → panel tetap terbuka (PC) | ✅ |
+| Ketuk suku → panel tertutup (HP) | ✅ |
+| **Kartu hitam di atas peta** | ✅ tidak ada lagi |
+| Rincian tampil di panel | ✅ Jawa 8 baris kawasan |
+| Ganti suku tanpa menutup panel | ✅ Jawa → Tionghoa |
+| **Seluruh 28 suku diuji** | ✅ semua: garis, titik, rincian, kawasan, tanpa kartu hitam |
+| Titik penanda di dalam area peta | ✅ 28/28, di kanan panel |
+| Panel Anggota ↔ panel Suku | ✅ saling mematikan |
+| Form isian ↔ panel Suku | ✅ saling mematikan |
+| Populasi & Agama tetap jalan | ✅ |
+| Simpanan & muat ulang | ✅ |
+| Ukuran panel 360/390/1024/1440 px | ✅ tidak ada yang meluber |
+| Galat konsol | ✅ 0 |
+
+**Bug yang ditemukan & diperbaiki saat uji:**
+
+1. **Panel Anggota & panel Suku terbuka bersamaan** dan saling menutupi —
+   daftar suku tidak bisa diklik (tertutup panel Anggota). Diperbaiki:
+   keduanya saling mematikan, begitu juga dengan form isian.
+2. **Tabel rincian di panel berdesakan** karena aturan kisi `#kartu` ikut
+   berlaku di panel 380 px. Diperbaiki: aturan kisi dibatasi `#kartu`,
+   tabel di panel suku dikembalikan satu kolom.

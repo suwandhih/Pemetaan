@@ -562,8 +562,8 @@
       /* Dua daftar melayang tidak boleh terbuka bersamaan — letaknya sama. */
       var a = document.getElementById('pemilih-agama');
       if (a) { a.hidden = true; }
-      var s = document.getElementById('pemilih-suku');
-      if (s) { s.hidden = true; }
+      /* Panel Suku (orderan 20) memakai kolom kiri yang sama di PC. */
+      if (window.PD_SUKU && window.PD_SUKU.tutupPanel) { window.PD_SUKU.tutupPanel(); }
     }
   }
 

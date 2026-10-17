@@ -169,9 +169,8 @@
   var derajatDitutupSementara = false;
   var peta = null;
 
-  var elPemilih = document.getElementById('pemilih-suku');
+  var elPemilih = document.getElementById('panel-suku');
   var elTombol = document.getElementById('tombol-suku');
-  var elKartu = document.getElementById('kartu');
 
   /* ---------- bantu ---------- */
 
@@ -384,18 +383,27 @@
       );
     }
 
-    bukaKartu(i);
+    isiRincian(i);
   }
+  /* ---------- rincian suku ---------- */
 
-  /* ---------- kartu rincian ---------- */
-
-  function bukaKartu(i) {
-    if (!elKartu) { return; }
+  /* Rincian ditulis di dalam panel (bukan di #kartu) supaya peta tidak
+     tertutup kotak hitam saat terbang — permintaan pemilik proyek
+     2026-10-17. Di HP panelnya menutupi layar, jadi rinciannya tetap
+     terbaca penuh. */
+  function isiRincian(i) {
+    var el = document.getElementById('suku-rincian');
+    if (!el) { return; }
+    if (i === null || i === undefined || !SUKU[i]) {
+      el.hidden = true;
+      el.innerHTML = '';
+      return;
+    }
     var s = SUKU[i];
     var kode = kodeSuku(s);
     var bagian = s.jiwa * 100 / TOTAL_SP2010;
 
-    var isi = '<p class="kartu-judul">' + s.nama + '</p>';
+    var isi = '<p class="suku-rincian-judul">' + s.nama + '</p>';
     isi += '<table class="kartu-tabel">' +
       '<tr><td>Jumlah jiwa</td><td>' + angka(s.jiwa) + ' jiwa</td></tr>' +
       '<tr><td>Penduduk Indonesia</td><td>' + persen(bagian) + '</td></tr>' +
@@ -432,8 +440,9 @@
       'wilayah adalah <strong>perkiraan</strong>: BPS tidak menerbitkan koordinat ' +
       'suku, jadi titik ditaruh di titik tengah kawasan utama.</p>';
 
-    document.getElementById('kartu-isian').innerHTML = isi;
-    elKartu.hidden = false;
+    el.innerHTML = isi;
+    el.hidden = false;
+    el.scrollTop = 0;
   }
 
   /* ---------- menyalakan / mematikan ---------- */
@@ -463,7 +472,7 @@
       } catch (e) { /* lewat */ }
     }
     hentikanKedip();
-    if (elKartu) { elKartu.hidden = true; }
+    isiRincian(null);
   }
 
   function matikan() {
@@ -489,6 +498,16 @@
     simpan();
     tandai();
     gambar(i);
+
+    /* Di PC panel daftar tetap terbuka supaya pemakai bisa mengetuk suku
+       satu per satu sambil melihat peta terbang — peta masih terlihat penuh
+       di sisa lebar. Di HP panel menutupi seluruh layar, jadi harus ditutup
+       supaya peta terlihat. */
+    if (!lebarLayarPC()) { bukaTutup(false); }
+  }
+
+  function lebarLayarPC() {
+    return window.matchMedia('(min-width: 900px)').matches;
   }
 
   /* ---------- tombol & daftar ---------- */
@@ -515,6 +534,7 @@
   function bukaTutup(buka) {
     if (!elPemilih) { return; }
     elPemilih.hidden = !buka;
+    elPemilih.setAttribute('aria-hidden', buka ? 'false' : 'true');
     elTombol.setAttribute('aria-expanded', buka ? 'true' : 'false');
     if (!buka) {
       /* Keterangan warna Populasi yang disembunyikan sementara dikembalikan
@@ -529,12 +549,21 @@
       }
       return;
     }
-    /* Tiga daftar melayang memakai tempat yang sama — hanya satu boleh
+    /* Dua daftar melayang memakai tempat yang sama — hanya satu boleh
        terbuka. Keterangan warna Populasi juga disembunyikan sementara. */
     var w = document.getElementById('pemilih-warna');
     if (w) { w.hidden = true; }
     var a = document.getElementById('pemilih-agama');
     if (a) { a.hidden = true; }
+    /* Panel Anggota & form isian juga memakai kolom kiri yang sama di PC —
+       ditutup supaya tidak saling menutupi (diuji 17 Okt 2026: keduanya
+       terbuka bersamaan membuat daftar suku tidak bisa diklik). */
+    if (window.PD_ANGGOTA && window.PD_ANGGOTA.tutupPanel) {
+      window.PD_ANGGOTA.tutupPanel();
+    }
+    if (window.PD_ANGGOTA && window.PD_ANGGOTA.tutupForm) {
+      window.PD_ANGGOTA.tutupForm();
+    }
     var d = document.getElementById('derajat');
     if (d && !d.hidden) {
       d.hidden = true;
@@ -544,17 +573,9 @@
 
   function bangun() {
     if (!elPemilih || !elTombol) { return; }
-    elPemilih.innerHTML = '';
-
-    var kepala = document.createElement('div');
-    kepala.className = 'agama-kepala';
-    kepala.textContent = 'Suku bangsa';
-    elPemilih.appendChild(kepala);
-
-    var sumber = document.createElement('div');
-    sumber.className = 'suku-sumber';
-    sumber.textContent = 'BPS \u00B7 Sensus Penduduk 2010 \u00B7 28 kelompok';
-    elPemilih.appendChild(sumber);
+    var elDaftar = document.getElementById('suku-daftar');
+    if (!elDaftar) { return; }
+    elDaftar.innerHTML = '';
 
     var terbesar = SUKU[0].jiwa;
     for (var i = 0; i < SUKU.length; i++) {
@@ -573,37 +594,30 @@
         '<span class="suku-bar"><i style="width:' +
         (s.jiwa * 100 / terbesar).toFixed(2) + '%"></i></span>';
       b.addEventListener('click', (function (n) {
-        return function () { bukaTutup(false); ganti(n); };
+        return function () { ganti(n); };
       })(i));
-      elPemilih.appendChild(b);
+      elDaftar.appendChild(b);
     }
 
-    var pisah = document.createElement('div');
-    pisah.className = 'agama-pisah';
-    elPemilih.appendChild(pisah);
+    var jumlah = document.getElementById('suku-jumlah');
+    if (jumlah) { jumlah.textContent = SUKU.length + ' suku'; }
 
-    var petunjuk = document.createElement('div');
-    petunjuk.className = 'suku-petunjuk';
-    petunjuk.textContent = 'Ketuk satu suku \u2014 peta terbang ke kawasan ' +
-      'utamanya, provinsi di dalamnya diberi garis merah berkedip, dan satu ' +
-      'titik penanda ditaruh di titik tengah kawasan.';
-    elPemilih.appendChild(petunjuk);
-
-    var mati = document.createElement('button');
-    mati.type = 'button';
-    mati.className = 'agama-mati';
-    mati.id = 'suku-mati';
-    mati.textContent = 'Matikan peta suku';
-    mati.addEventListener('click', function () {
-      bukaTutup(false);
-      matikan();
-      simpan();
-    });
-    elPemilih.appendChild(mati);
+    var mati = document.getElementById('suku-mati');
+    if (mati) {
+      mati.addEventListener('click', function () {
+        matikan();
+        simpan();
+      });
+    }
 
     elTombol.addEventListener('click', function () {
       bukaTutup(elPemilih.hidden);
     });
+
+    var tutup = document.getElementById('suku-tutup');
+    if (tutup) {
+      tutup.addEventListener('click', function () { bukaTutup(false); });
+    }
 
     document.addEventListener('click', function (e) {
       if (elPemilih.hidden) { return; }
@@ -616,6 +630,7 @@
     ganti: ganti,
     matikan: matikan,
     aktif: function () { return aktif !== null; },
+    tutupPanel: function () { bukaTutup(false); },
     SUKU: SUKU
   };
 

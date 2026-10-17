@@ -1795,6 +1795,9 @@
 
   function bukaPanel() {
     bukaModeKategori(false);
+    /* Panel Suku (orderan 20) memakai kolom kiri yang sama di PC —
+       ditutup supaya tidak saling menutupi. */
+    if (window.PD_SUKU && window.PD_SUKU.tutupPanel) { window.PD_SUKU.tutupPanel(); }
     elPanel.hidden = false;
     elPanel.setAttribute('aria-hidden', 'false');
   }
@@ -1877,6 +1880,8 @@
       gambarPenanda: gambarPenanda,
       bukaPanel: bukaPanel,
           bukaForm: bukaForm,
+          tutupPanel: tutupPanel,
+          tutupForm: tutupForm,
           gambarSambung: gambarSambung,
           terapkanTampil: terapkanTampil,
           /* Dipakai modul pencarian (js/cari.js) — orderan 19. */

@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-15">
-<link rel="stylesheet" href="css/gaya.css?v=20261017-15">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-17">
+<link rel="stylesheet" href="css/gaya.css?v=20261017-17">
 </head>
 <body>
 
@@ -62,8 +62,27 @@
     <!-- Orderan 21: peta tematik penduduk menurut agama (Dukcapil Kemendagri) -->
     <div id="pemilih-agama" role="listbox" aria-label="Peta agama" hidden></div>
 
-    <!-- Orderan 20: titik lokasi suku bangsa (BPS Sensus Penduduk 2010) -->
-    <div id="pemilih-suku" role="listbox" aria-label="Peta suku" hidden></div>
+    <!-- Orderan 20: titik lokasi suku bangsa (BPS Sensus Penduduk 2010).
+         Disusun seperti panel Anggota — di PC jadi kolom kiri sehingga peta
+         tetap terlihat penuh saat terbang, tidak tertutup kotak hitam. -->
+    <aside id="panel-suku" hidden aria-hidden="true" aria-label="Peta suku bangsa">
+      <div id="suku-kepala">
+        <h2 id="suku-judul">Suku bangsa</h2>
+        <span id="suku-jumlah"></span>
+        <button id="suku-tutup" type="button" aria-label="Tutup daftar suku">&#10005;</button>
+      </div>
+      <div id="suku-sumber">BPS &middot; Sensus Penduduk 2010 &middot; 28 kelompok</div>
+      <div id="suku-rincian" hidden></div>
+      <div id="suku-isi">
+        <div id="suku-daftar"></div>
+      </div>
+      <div id="suku-kaki">
+        <p id="suku-petunjuk">Ketuk satu suku &mdash; peta terbang ke kawasan
+          utamanya, provinsi di dalamnya diberi garis merah berkedip, dan satu
+          titik penanda ditaruh di titik tengah kawasan.</p>
+        <button id="suku-mati" type="button" hidden>Matikan peta suku</button>
+      </div>
+    </aside>
 
     <!-- Orderan 16: keterangan angka saat satu wilayah diklik -->
     <div id="kartu" hidden>
@@ -183,15 +202,15 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261017-15"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261017-15"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261017-15"></script>
-<script src="js/inti.js?v=20261017-15"></script>
-<script src="js/warna.js?v=20261017-15"></script>
-<script src="js/agama.js?v=20261017-15"></script>
-<script src="js/suku.js?v=20261017-15"></script>
-<script src="js/simpanan.js?v=20261017-15"></script>
-<script src="js/member.js?v=20261017-15"></script>
-<script src="js/cari.js?v=20261017-15"></script>
+<script src="js/lib/maplibre-gl.js?v=20261017-17"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261017-17"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261017-17"></script>
+<script src="js/inti.js?v=20261017-17"></script>
+<script src="js/warna.js?v=20261017-17"></script>
+<script src="js/agama.js?v=20261017-17"></script>
+<script src="js/suku.js?v=20261017-17"></script>
+<script src="js/simpanan.js?v=20261017-17"></script>
+<script src="js/member.js?v=20261017-17"></script>
+<script src="js/cari.js?v=20261017-17"></script>
 </body>
 </html>
