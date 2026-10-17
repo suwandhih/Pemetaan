@@ -1704,6 +1704,100 @@ di satu tempat: blok `@media (max-width: 899px)` di `css/gaya.css`.
 
 ---
 
+## Orderan 18 lanjutan — pin lokasi, garis merah, tombol peta bergantian (perintah 2026-10-17)
+
+### Perintah pemilik proyek
+
+> "1. Lokasi member bisa di posisi lebih akurat oleh user — jadi setelah user
+> isi provinsi dll sampai pada lokasi member, user bisa pointing 📌 letak
+> yayasan / rumah sakit / sekolah lebih akurat. User tinggal klik di peta
+> lokasi member atau alamat member. Icon 📌 tampil, user sesuaikan tempat yg
+> tepat.
+> 2. Peta otomatis terbang sesuai perintah dari isian wilayah, sambil peta fly
+> area provinsi dll diberi garis merah ikuti / keliling area provinsi, garis
+> jangan terlalu tebal, diberi blinking."
+
+Revisi tambahan: *"Tombol satelit dan map hanya ada 2 pilihan, jadi lebih baik
+satu tombol untuk satelit atau map — klik 1x satelit, klik lagi map."*
+
+### 1. Pin lokasi yang bisa ditentukan user
+
+| Hal | Keadaan |
+|---|---|
+| Muncul | Setelah wilayah dipilih — pin di titik tengah wilayah |
+| Pindah | **Ketuk peta** di tempat yang tepat, atau **tahan & tarik** pin-nya |
+| Keterangan di form | `Titik lokasi: 115,24310° BT · -8,58285° — ketuk peta untuk memindahkan pin` |
+| Tombol `↺ Titik tengah wilayah` | Mengembalikan pin ke titik tengah wilayah |
+| Yang disimpan | **Koordinat pin**, bukan lagi titik tengah wilayah |
+| Saat mengubah anggota lama | Pin mulai dari lokasi anggota itu, tetap bisa digeser |
+| Kalau user tidak menyentuh peta | Pin tetap di titik tengah wilayah (perilaku lama tidak hilang) |
+
+Bentuk pin: bulatan putih radius 7 px + cincin merah 3 px — menonjol di citra
+satelit gelap maupun di peta jalan yang terang.
+
+**Satu hal yang dijaga:** selama form anggota terbuka, klik peta **hanya**
+menaruh pin — kartu keterangan wilayah (orderan 16) tidak dibuka, supaya tidak
+ada dua aksi sekaligus. Setelah form ditutup, klik peta kembali membuka kartu.
+
+### 2. Garis merah keliling wilayah + blinking
+
+| Hal | Nilai |
+|---|---|
+| Bentuk | Garis mengelilingi batas wilayah, mengikuti poligon resmi Dukcapil |
+| Warna | `#ff3b30` (merah) |
+| Tebal | **1,8 px** — tipis, tidak menutupi peta |
+| Blinking | Opacity **1,0 ↔ 0,35** tiap **700 ms** |
+| Muncul | Bersamaan dengan peta terbang |
+| Hilang | Saat form ditutup, atau diganti saat pindah tingkat wilayah |
+| Lapisan | `anggota-sorot-wilayah` — terpisah dari peta tematik penduduk, jadi tetap muncul walau peta tematik mati |
+
+### 3. Revisi tombol jenis peta
+
+| Sebelum | Sesudah |
+|---|---|
+| Tombol `Satelit ▾` membuka daftar 2 pilihan | **Satu tombol bergantian** — 1× klik `Satelit` → `Map`, klik lagi → `Satelit` |
+| Ada panah `▾` dan daftar melayang | Panah & daftar dihapus |
+| Pintasan papan tuts `1`–`4` | Pintasan `1` atau `2` — keduanya mengganti ke jenis lain |
+
+Keterangan tombol (tooltip) menyebut jenis yang **akan muncul** bila ditekan:
+`Ganti ke Map (sekarang: Satelit)`.
+
+### Bug yang ditemukan & diperbaiki
+
+| # | Bug | Sebab | Perbaikan |
+|---|---|---|---|
+| 1 | Pin **tertinggal di peta** setelah form ditutup | `pasangPin(false)` menggambar ulang pin, sedangkan `titikPin` belum dikosongkan | `titikPin = null` dipindah ke **sebelum** `pasangPin(false)` |
+
+### Bukti uji (2026-10-17, dijalankan sendiri)
+
+Diuji lewat server lokal `python -m http.server` di `127.0.0.1:8777`.
+
+| Uji | Hasil |
+|---|---|
+| Tombol jenis peta | ✅ teks `🛰️ Satelit` · title `Ganti ke Map (sekarang: Satelit)` · **tidak ada panah** · tidak ada daftar melayang |
+| Klik 1× | ✅ jadi `Map` · atribusi `Peta: © OpenStreetMap contributors` · title `Ganti ke Satelit (sekarang: Map)` |
+| Klik 2× | ✅ kembali `Satelit` · atribusi `Citra: Esri, Maxar, Earthstar Geographics` |
+| Lapisan garis merah | ✅ `anggota-sorot-wilayah` ada · warna `#ff3b30` · lebar **1,8** |
+| Isi garis | ✅ 1 fitur `MultiPolygon` (batas wilayah terpilih) |
+| Blinking | ✅ opacity bergantian **0,35 → 1** (diukur 2 kali) |
+| Lapisan pin | ✅ `anggota-pin` ada |
+| Keterangan pin di form | ✅ `Titik lokasi: 115,16800° BT · -8,54400°` |
+| Ketuk peta → pin pindah | ✅ `115,16800° · -8,54400°` → `115,16800° · -8,54191°` |
+| Tombol `↺ Titik tengah wilayah` | ✅ kembali ke `115,16800° · -8,54400°` |
+| Pin di tingkat desa | ✅ `115,24310° BT · -8,58285°` (titik tengah Desa ANGANTAKA) |
+| Simpan dengan pin digeser | ✅ tersimpan di koordinat pin (`115,24002° · -8,58428°`) |
+| Setelah Simpan | ✅ form tertutup · pin **0 fitur** · garis sorot **0 fitur** · peta kembali `[0,0,312,675]` |
+| PC 1152×720 | ✅ form `[0,0,380,720]` · peta `[380,0,772,720]` · garis sorot 1 fitur · pin tampil |
+| PC, pilih KOTA SEMARANG | ✅ peta → `110,386° · -7,0245°` · garis merah keliling terlihat di tangkapan layar |
+| Galat halaman & konsol | ✅ **0 galat** |
+
+### Catatan
+
+Kedipan dijalankan hanya selama ada wilayah yang disorot (`mulaiKedip` /
+`hentikanKedip`), supaya tidak membebani peramban tanpa guna.
+
+---
+
 ## Bahan Orderan 20 & 21 — hasil pelajaran `c:\data\datapeta` (2026-10-17)
 
 ### Yang ada di DataPeta
