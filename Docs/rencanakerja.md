@@ -33,7 +33,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 15 | **Fitur citra satelit atau peta** — peta memakai citra satelit, tetapi bisa juga dalam bentuk peta (contoh acuan: `petadunia`) | MENUNGGU KONFIRMASI | 30–45 mnt | — |
 | 16 | **Data jumlah penduduk berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan, disajikan seperti `DataPeta`; sumber Dukcapil Kemendagri | MENUNGGU KONFIRMASI | 90–150 mnt | — |
 | 17 | **User input data anggota** — tambah/ubah/hapus data per lokasi; pengelompokan bisa per desa, kecamatan, kabupaten, atau provinsi; konsep diambil dari `DataPeta` lalu disesuaikan | MENUNGGU KONFIRMASI | 90–120 mnt | — |
-| 18 | **Form Tambah Anggota + Peta interaktif di bawah form** — saat pilih provinsi peta otomatis fokus ke provinsi; pilih kab/kota fokus lebih dalam ke kab/kota; pilih kecamatan fokus ke kecamatan; pilih desa/kelurahan fokus ke desa/kelurahan | BARU (dicatat untuk besok) | 30–45 mnt | — |
+| 18 | **Form Tambah Anggota + Peta interaktif di bawah form** — saat pilih provinsi peta otomatis fokus ke provinsi; pilih kab/kota fokus lebih dalam ke kab/kota; pilih kecamatan fokus ke kecamatan; pilih desa/kelurahan fokus ke desa/kelurahan | **SELESAI DIKERJAKAN** — menunggu keputusan pemilik proyek | 30–45 mnt | — |
 | 19 | **Fitur Cari `[⌕]`** — pencarian lokasi/wilayah atau nama anggota/yayasan | BARU (dicatat untuk besok) | 30–45 mnt | — |
 | 20 | **Titik lokasi suku-suku** — data dari `c:\data\datapeta` dipelajari & **diolah ulang**, disajikan menurut konsep Pemetaan (bukan meniru cara saji DataPeta) | BARU (perintah 2026-10-17) | 60–90 mnt | — |
 | 21 | **Jumlah beragama berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan; data dari `c:\data\datapeta` dipelajari, **angka diolah & disajikan** menurut konsep Pemetaan | BARU (perintah 2026-10-17) | 90–120 mnt | — |
@@ -1626,6 +1626,81 @@ Diuji lewat server lokal `python -m http.server` di `127.0.0.1:8777`.
 Ambang 900 px dipilih karena tablet tegak (768 px) masih terasa sempit untuk
 kolom 380 px + peta. Kalau nanti pemilik proyek ingin tablet juga memakai
 tampilan PC, angkanya tinggal diubah di satu tempat (`@media (min-width: 900px)`).
+
+---
+
+## Orderan 18 — Peta interaktif mengikuti isian form (perintah 2026-10-17)
+
+### Perintah pemilik proyek
+
+> "PC form sama seperti + anggota full. Jika provinsi di isi peta besar geser
+> ke point provinsi yg di isi, sama juga kab/kota, kecamatan, desa/kelurahan —
+> peta otomatis geser ke lokasi sesuai lokasi di geser. Sedang di HP peta di
+> atas 45%, dan sisa dibawah adalah form isian. Sama cara kerjanya: peta diatas
+> mengarahkan lokasi sesuai isian dari form dibawah."
+
+### Yang dibuat
+
+| Berkas | Perubahan |
+|---|---|
+| `css/gaya.css` | `#form-anggota` di HP: `height: 55%` (dulu `max-height: 82%`). Blok `@media (max-width: 899px)`: saat form terbuka, `#peta` diberi `bottom: 55%` sehingga menyusut ke 45% atas; bilah bawah, atribusi, derajat, dan kartu ikut naik. Blok PC diberi `height: auto` supaya form tetap kolom penuh |
+| `js/member.js` | Fungsi baru `terbangKe()`, `terbangKeWilayah()`, `terbangKeTerdalam()`; dipanggil dari `bacaWilayah()`, dari `pastikanTingkat()` (setelah berkas kecamatan/desa selesai dimuat), dan saat form dibuka/ditutup |
+| `js/inti.js` | `peta.on('load')` tidak lagi menarik kamera ke titik awal bila kamera sudah diarahkan modul lain |
+| `index.html` | Penanda versi naik ke `?v=20261017-06` |
+
+### Cara kerjanya
+
+| Keadaan | HP (< 900 px) | PC (≥ 900 px) |
+|---|---|---|
+| Form tertutup | Peta penuh 100% | Peta penuh (kolom tertutup) |
+| Form terbuka | **Peta 45% atas · form 55% bawah** | Form kolom 380 px kiri · peta 772 px kanan |
+| Pilih provinsi | Peta terbang ke seluruh provinsi | idem |
+| Pilih kab/kota | Peta masuk lebih dalam | idem |
+| Pilih kecamatan | Lebih dalam lagi | idem |
+| Pilih desa/kelurahan | Paling dalam | idem |
+| Form ditutup | Peta kembali penuh | Peta kembali penuh |
+
+Peta **benar-benar menyusut** (lebarnya tidak diubah, tingginya yang dipangkas),
+jadi MapLibre menghitung ulang ukurannya dan titik tengah peta = titik tengah
+area yang terlihat. Wilayah yang dipilih tidak tersembunyi di balik form.
+
+Batas wilayah diambil dari **poligon resmi Dukcapil yang sudah ada** di proyek
+(`data/wilayah-warna/*.js`) — tidak ada data baru, tidak ada unduhan tambahan.
+
+### Bug yang ditemukan & diperbaiki
+
+| # | Bug | Sebab | Perbaikan |
+|---|---|---|---|
+| 1 | Peta terbang lalu **ditarik kembali** ke titik awal | `peta.on('load')` di `js/inti.js` selalu menjalankan `jumpTo(PUSAT)` — dan `load` menyala **setelah** form memilih provinsi | `jumpTo` hanya dijalankan bila kamera masih di titik awal |
+| 2 | Peta **tidak bergerak sama sekali** | `peta.resize()` dipanggil di tengah animasi `fitBounds` → animasinya dibatalkan | `resize()` dipanggil **sekali** sebelum `fitBounds` |
+| 3 | Peta tetap tidak bergerak saat diuji | `requestAnimationFrame` tidak menyala di tab yang tidak terlihat (`visibilityState: hidden`) | Diganti `setTimeout(…, 0)` |
+| 4 | Form memilih provinsi **KEPULAUAN BANGKA BELITUNG** terus | `isiDariPeta()` memilih provinsi **pertama** yang bersentuhan layar; pada zoom awal hampir semua provinsi bersentuhan | Dipilih provinsi yang **titik tengahnya paling dekat** dengan titik tengah peta |
+
+### Bukti uji (2026-10-17, dijalankan sendiri)
+
+Diuji lewat server lokal `python -m http.server` di `127.0.0.1:8777`.
+
+| Uji | Hasil |
+|---|---|
+| HP 390×844, form terbuka | ✅ form `[0,304,312,371]` (55%) · peta `[0,0,312,304]` (45%) · kanvas **312×304** |
+| HP, form ditutup | ✅ peta kembali `[0,0,312,675]` · kanvas 312×675 |
+| HP, pilih BALI | ✅ peta → `115,072° · -8,455° · z7,26` |
+| HP, pilih BADUNG | ✅ peta → `115,168° · -8,544° · z8,28` (lebih dalam) |
+| HP, pilih ABIANSEMAL | ✅ peta → `115,221° · -8,529° · z10,32` |
+| HP, pilih ANGANTAKA | ✅ peta → `115,243° · -8,583° · z12,84` (paling dalam) |
+| HP, provinsi terpilih otomatis | ✅ **SULAWESI BARAT** (terdekat dari titik tengah peta, bukan lagi Bangka Belitung) |
+| PC 1152×720, form terbuka | ✅ form `[0,0,380,720]` · peta `[380,0,772,720]` · kanvas 772×720 |
+| PC, form ditutup | ✅ peta `[0,0,1152,720]` · kanvas 1152×720 |
+| PC, pilih JAWA TENGAH | ✅ peta → `110,125° · -6,971° · z7,27` |
+| PC, provinsi terpilih otomatis | ✅ **BALI** (terdekat dari titik tengah peta) |
+| Tangkapan layar HP | ✅ peta 45% atas menampilkan Denpasar/Badung, form 55% bawah |
+| Galat halaman | ✅ 0 galat |
+
+### Catatan
+
+Tinggi 45% / 55% dipatok di CSS (`bottom: 55%` pada `#peta`). Kalau nanti
+pemilik proyek ingin peta lebih tinggi (mis. 50/50), angkanya tinggal diubah
+di satu tempat: blok `@media (max-width: 899px)` di `css/gaya.css`.
 
 ---
 
