@@ -1918,6 +1918,32 @@ OpenStreetMap saat dipakai. Kelengkapan nama jalan bergantung pada data OSM:
 lengkap di kota besar, bisa kosong di desa terpencil. Itu keadaan datanya,
 bukan kerusakan.
 
+### Perbaikan setelah uji pemilik proyek (2026-10-17)
+
+**Laporan:** *"test ke 2 .. cari meruya selatan .. peta tidak 'terbang'."*
+
+**Sebabnya:** hasil desa memang **ditemukan** dari indeks, tetapi **poligon
+desa itu belum dimuat** ke peta. Berkas batas wilayah dimuat bertahap
+(kecamatan per provinsi, desa per kab/kota), jadi desa mana pun yang belum
+pernah dibuka belum punya poligon. Kode lama keluar lebih awal saat poligon
+tidak ditemukan → tidak ada aksi apa pun: peta diam, kotak cari tidak tertutup.
+
+**Perbaikan:** `keWilayah()` di `js/cari.js` sekarang memuat berkas bagian
+poligon lebih dulu lewat `PD_MUAT_BAGIAN()`, menampilkan pesan
+*"Memuat batas wilayah…"*, lalu terbang setelah berkas selesai dimuat.
+Kalau gagal (tanpa internet) ditulis apa adanya: *"Batas wilayah ini gagal
+dimuat (butuh internet)."*
+
+**Bukti uji ulang (2026-10-17, dijalankan sendiri):**
+
+| Uji | Hasil |
+|---|---|
+| Cari `meruya selatan` (desa, poligon belum dimuat) | ✅ peta → `106,733° · -6,207° · z12,61` · sorot **1 fitur** · kotak cari tertutup · `WARNA_DESA_3173` termuat |
+| Cari `semarang utara` (kecamatan, poligon belum dimuat) | ✅ peta → `110,420° · -6,958° · z11,89` · sorot **1 fitur** · kotak tertutup |
+| Cari `bogor` → pilih Kabupaten/Kota | ✅ peta → `106,814° · -6,545° · z7,89` · sorot **1 fitur** · kotak tertutup |
+| Cari `papua` → pilih Provinsi PAPUA BARAT | ✅ peta → `133,450° · -2,524° · z5,71` · sorot **1 fitur** · kotak tertutup |
+| Galat halaman | ✅ 0 galat |
+
 ---
 
 ## Bahan Orderan 20 & 21 — hasil pelajaran `c:\data\datapeta` (2026-10-17)
