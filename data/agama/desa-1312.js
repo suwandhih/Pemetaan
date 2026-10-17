@@ -1,0 +1,6 @@
+/* DATA AGAMA DESA — bagian 1312 (Dukcapil Kemendagri)
+   Sumber: gis.dukcapil.kemendagri.go.id · ArcGIS FeatureServer, tanpa kunci
+   Ambil: 2026-10-17 · tanpa batas wilayah
+   Kolom a: [no_prop, no_kab, no_kec, no_kel, nama_kel, jumlah_penduduk, islam, kristen, katholik, hindu, budha, konghucu, kepercayaan]
+   Dibuat oleh alat/ambil-agama.js — jangan diubah manual. */
+window.AGAMA_DESA = [[13,12,4,2001,"KAJAI",3714,3713,1,0,0,0,0,0],[13,12,5,2001,"KINALI",9679,9569,73,34,0,3,0,0],[13,12,2,2001,"UJUNG GADING",7652,7638,9,5,0,0,0,0],[13,12,1,2001,"AIA BANGIH",29635,28913,654,68,0,0,0,0],[13,12,3,2004,"AUA KUNIANG",5277,5273,1,3,0,0,0,0],[13,12,3,2006,"AIA GADANG",3750,3735,14,1,0,0,0,0],[13,12,6,2001,"MUARO KIAWAI",3299,3224,71,4,0,0,0,0],[13,12,6,2002,"RABI JONGGOR",3877,3877,0,0,0,0,0,0],[13,12,7,2001,"BATAHAN",3985,3924,50,11,0,0,0,0],[13,12,7,2002,"DESA BARU",4611,4611,0,0,0,0,0,0],[13,12,8,2001,"PARIT",8533,8479,52,2,0,0,0,0],[13,12,9,2001,"SUNGAI AUA",8312,7913,366,33,0,0,0,0],[13,12,11,2001,"SASAK",4777,4749,28,0,0,0,0,0],[13,12,4,2002,"TALU",3329,3329,0,0,0,0,0,0],[13,12,10,2001,"KOTO BARU",5664,5548,57,59,0,0,0,0],[13,12,4,2003,"SINURUIK",8008,8008,0,0,0,0,0,0],[13,12,3,2003,"LINGKUANG AUA",11737,11676,42,19,0,0,0,0],[13,12,5,2002,"KATIAGAN",3688,3661,22,5,0,0,0,0],[13,12,10,2002,"KAPA",12692,12687,5,0,0,0,0,0]];
