@@ -35,6 +35,9 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 17 | **User input data anggota** — tambah/ubah/hapus data per lokasi; pengelompokan bisa per desa, kecamatan, kabupaten, atau provinsi; konsep diambil dari `DataPeta` lalu disesuaikan | MENUNGGU KONFIRMASI | 90–120 mnt | — |
 | 18 | **Form Tambah Anggota + Peta interaktif di bawah form** — saat pilih provinsi peta otomatis fokus ke provinsi; pilih kab/kota fokus lebih dalam ke kab/kota; pilih kecamatan fokus ke kecamatan; pilih desa/kelurahan fokus ke desa/kelurahan | BARU (dicatat untuk besok) | 30–45 mnt | — |
 | 19 | **Fitur Cari `[⌕]`** — pencarian lokasi/wilayah atau nama anggota/yayasan | BARU (dicatat untuk besok) | 30–45 mnt | — |
+| 20 | **Titik lokasi suku-suku** — data dari `c:\data\datapeta` dipelajari & **diolah ulang**, disajikan menurut konsep Pemetaan (bukan meniru cara saji DataPeta) | BARU (perintah 2026-10-17) | 60–90 mnt | — |
+| 21 | **Jumlah beragama berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan; data dari `c:\data\datapeta` dipelajari, **angka diolah & disajikan** menurut konsep Pemetaan | BARU (perintah 2026-10-17) | 90–120 mnt | — |
+| 22 | **Ralat orderan 14d — tampilan PC lebar (responsive)**: PC lebar penuh, peta **memenuhi tinggi layar tanpa ruang kosong**; HP tetap seperti sekarang (bila layar HP lebih lebar, peta ikut lebih lebar, tidak mengecil; tidak muat → geser kiri-kanan) | **SELESAI DIKERJAKAN** — menunggu keputusan pemilik proyek | 45–60 mnt | — |
 
 ### Rincian Orderan 14 (perintah 2026-10-16)
 
@@ -43,7 +46,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 14a | Peta Indonesia sebagai **fokus utama**; negara tetangga **tetap tampil** supaya terlihat nyata, bukan kosong | ✅ |
 | 14b | Pulau Indonesia yang **berbatasan langsung** dengan negara lain (Kalimantan–Malaysia, Papua–PNG, Timor, dll.) harus tampak menyatu, tidak terpotong | ✅ |
 | 14c | **Letak peta di HP tegak (portrait)** | ✅ |
-| 14d | **Di PC lebarnya sama dengan lebar HP** — supaya tampilan di 2 perangkat **sama** | ✅ |
+| 14d | ~~**Di PC lebarnya sama dengan lebar HP** — supaya tampilan di 2 perangkat **sama**~~ **DIBATALKAN 2026-10-17** — diganti **orderan 22** (PC lebar penuh, responsive) | ❌ |
 | 14e | **Konsep scroll kiri–kanan** pada peta | ✅ |
 
 ### Berkas yang dibuat (orderan 14)
@@ -1551,7 +1554,6 @@ Pengelola kategori (`#anggota-kategori-panel`) yang bisa dibuka dari
 ---
 
 ## Catatan Rencana Kerja Berikutnya (dicatat 2026-10-16 malam untuk dilanjutkan besok)
-
 1. **Orderan 18 — Form Tambah Anggota + Peta di bawah form isian:**
    - Saat mengisi form `Tambah Anggota`, peta ditempatkan/terlihat di bawah form isian agar berfungsi aktif.
    - Saat pilih **Provinsi** → peta otomatis bergerak & tampil fokus pada provinsi tersebut.
@@ -1561,3 +1563,127 @@ Pengelola kategori (`#anggota-kategori-panel`) yang bisa dibuka dari
 
 2. **Orderan 19 — Fitur Cari `[⌕]`:**
    - Menambahkan fitur pencarian `[⌕]` untuk mencari lokasi/wilayah maupun mencari anggota/yayasan yang sudah diinput.
+
+---
+
+## Orderan 22 — Tampilan PC lebar / responsive (perintah 2026-10-17)
+
+### Ralat dari pemilik proyek
+
+> "Tampilan PC dan HP sama … dalam permintaan ditolak. PC harus lebar dan HP
+> sama seperti sekarang. Jadi katanya dimasukkan sistem responsive. Di PC lebar
+> tidak perlu scroll kiri kanan. HP sama seperti sekarang — hanya jika HP
+> memiliki layar lebih lebar tampilkan lebih lebar, tapi jangan tampil peta jadi
+> kecil; sama atau mirip sekarang ini, kalau tidak muat cara dengan scroll kiri
+> dan kanan."
+
+Keputusan tambahan (2026-10-17): di PC peta **memenuhi tinggi layar** —
+tanpa ruang kosong di atas/bawah. Alasan pemilik proyek: kalau seluruh
+Indonesia dipaksa masuk layar, petanya jadi terlalu kecil dan pengguna tetap
+akan memperbesar; lebih baik peta selalu terlihat penuh.
+
+### Yang berubah
+
+| Berkas | Perubahan |
+|---|---|
+| `css/gaya.css` | Blok `@media (min-width: 900px)` di **akhir berkas** (supaya menang atas aturan dasar): bingkai selebar layar tanpa batas; `#panel-anggota` & `#form-anggota` jadi kolom 380 px di sisi kiri (`--lebar-panel`); peta, bilah atas/bawah, dan keterangan digeser ke kanan selama kolom terbuka memakai `:has()` |
+| `js/member.js` | Catatan kepala berkas disesuaikan (form bukan lagi selalu lembar bawah) |
+| `index.html` | Penanda versi naik ke `?v=20261017-01`; komentar jenis peta disesuaikan (gelap & medan sudah dihapus) |
+
+### Cara kerjanya
+
+| Lebar layar | Yang berlaku |
+|---|---|
+| < 900 px (HP) | **Tidak berubah sama sekali.** Bingkai `min(100%, 430px)`; kalau layar HP lebih lebar dari 430 px, peta tetap 430 px dan sisanya di-scroll kiri-kanan |
+| ≥ 900 px (PC) | Bingkai selebar layar; peta memenuhi tinggi layar; kolom anggota/form di kiri 380 px; peta menyusut ke sisa lebar sehingga **tidak tertutup** kolom |
+
+Peta **tidak** digeser memakai `transform` — lebar `#peta` benar-benar
+menyusut, jadi MapLibre menghitung ulang ukurannya sendiri (ada
+`ResizeObserver` di dalam MapLibre 5.9.0). Akibatnya tidak ada bagian peta
+yang tersembunyi di balik kolom.
+
+### Bukti uji (2026-10-17, dijalankan sendiri)
+
+Diuji lewat server lokal `python -m http.server` di `127.0.0.1:8777`.
+
+| Uji | Hasil |
+|---|---|
+| PC 1152×720, kolom tertutup | ✅ bingkai 1152×720 · peta 1152×720 · kanvas 1152×720 (penuh, tanpa ruang kosong) |
+| PC, panel Anggota dibuka | ✅ panel `[0, 380]` · peta `[380, 772]` · kanvas **772×720** (menyusut, tidak tertutup) |
+| PC, form Tambah Anggota dibuka | ✅ form `[0,0,380,720]` · `max-height: none` · peta `[380, 772]` · kanvas 772×720 |
+| PC, kolom ditutup lagi | ✅ peta kembali `[0, 1152]` · kanvas 1152×720 |
+| Menu `Populasi 👁` saat kolom terbuka | ✅ kiri 388 px (tidak tertutup kolom) |
+| Menu `Satelit ▾` saat kolom terbuka | ✅ kiri 388 px |
+| Bilah atas & bawah saat kolom terbuka | ✅ kiri 380 px (selebar peta) |
+| HP 390×844 | ✅ bingkai 312×675 · kanvas 312×675 (sama seperti sebelumnya) |
+| HP lebar 800×600 | ✅ bingkai 428×480 (tetap dibatasi 430 px, tidak mengecil) |
+| HP, panel Anggota | ✅ menutupi penuh 312×675 (seperti sebelumnya) |
+| HP, form Tambah Anggota | ✅ lembar bawah `[0,122,312,554]` · `max-height: 82%` (seperti sebelumnya) |
+| Galat halaman & konsol | ✅ **0 galat**, 0 peringatan |
+
+### Catatan
+
+Ambang 900 px dipilih karena tablet tegak (768 px) masih terasa sempit untuk
+kolom 380 px + peta. Kalau nanti pemilik proyek ingin tablet juga memakai
+tampilan PC, angkanya tinggal diubah di satu tempat (`@media (min-width: 900px)`).
+
+---
+
+## Bahan Orderan 20 & 21 — hasil pelajaran `c:\data\datapeta` (2026-10-17)
+
+### Yang ada di DataPeta
+
+| Hal | Keadaan |
+|---|---|
+| Suku | `data/suku.js` — **28 suku** dari BPS Sensus 2010: nama · jumlah jiwa · kode provinsi asal · "kawasan utama" (daftar provinsi/pulau dalam bentuk tulisan) |
+| Titik suku | Ditaruh di **ibu kota provinsi asal** saja. Di berkasnya sendiri tertulis: *"Sumber mana pun TIDAK menyediakan koordinat suku"* — jadi titiknya perkiraan |
+| Cara saji suku | Titik + label nama + jumlah; tombol 3 tingkat (Sembunyi → Sedang → Penuh) |
+| Agama | `data/agama.js` — hanya **30 provinsi**, hanya sampai **kabupaten/kota** (412 baris). Diambil dari **PDF BPS provinsi** (60 berkas, ±800 MB di `catat/pdf-agama`). Provinsi 14, 17, 35, 52, 72, 91, 96 **tidak ada**; kecamatan & desa **tidak ada sama sekali** |
+
+### ⭐ Temuan: sumber agama yang jauh lebih baik
+
+Sumber data yang **sudah dipakai Pemetaan** (Dukcapil Kemendagri) ternyata
+**sudah memuat kolom agama**, lengkap sampai desa:
+
+| Tingkat | Jumlah wilayah | Kolom agama |
+|---|---|---|
+| Provinsi | 38 | Islam · Kristen · Katolik · Hindu · Budha · Konghucu · Kepercayaan |
+| Kabupaten/Kota | 514 | idem |
+| Kecamatan | 7.285 | idem |
+| Desa/Kelurahan | 83.489 | idem |
+
+Diuji 2026-10-17 dengan menjumlahkan sendiri seluruh wilayah tiap tingkat:
+
+| Tingkat | Jumlah penduduk | Jumlah 7 agama | Selisih |
+|---|---|---|---|
+| Provinsi | 284.973.643 | 284.915.499 | 58.144 |
+| Kabupaten/Kota | 284.973.643 | 284.915.499 | 58.144 |
+| Kecamatan | 284.856.007 | 284.856.720 | −713 |
+| Desa/Kelurahan | 283.526.641 | 283.526.793 | −152 |
+
+Selisih ≤ 0,02% → kolom agama memang terisi, bukan kosong. Angka provinsi &
+kab/kota **sama persis**, jadi bisa saling membuktikan.
+
+**Akibatnya:** orderan 21 **tidak perlu** memakai PDF BPS seperti DataPeta.
+Cukup satu sumber, empat tingkat, tanpa berkas PDF 800 MB.
+
+### Rencana penyajian (menunggu perintah)
+
+**Orderan 20 — titik lokasi suku.** Titik DataPeta hanya di ibu kota provinsi
+asal, sehingga suku Jawa jatuh di Semarang padahal tersebar di 8 provinsi.
+Rencana: tombol `Suku` di bilah atas → daftar 28 suku diurutkan dari
+terbanyak → ketuk satu suku → peta menyorot **seluruh provinsi** yang disebut
+BPS sebagai kawasan utama suku itu, dan titik penanda ditaruh di **titik
+tengah seluruh kawasan** (bukan ibu kota provinsi asal). Ditulis jelas di
+layar bahwa titik & wilayah = perkiraan dari kawasan utama BPS 2010.
+Sebagian "kawasan utama" bukan nama provinsi (mis. *"Pulau Madura"*,
+*"Sulawesi"*, *"Perkotaan di DKI Jakarta"*) — bagian itu ditangani satu per
+satu, dan yang tidak bisa dipetakan **ditulis apa adanya, tidak dikarang**.
+
+**Orderan 21 — jumlah beragama 4 tingkat.** Tombol `Populasi 👁` menjadi
+`Data 👁` → pilih `Jumlah Penduduk` atau `Agama` → pilih salah satu dari 7
+agama → peta diwarnai menurut **persentase** agama itu (bukan jumlah jiwa,
+supaya tidak sekadar mengulang peta penduduk). Ketuk wilayah → kartu
+menampilkan rincian 7 agama: jumlah jiwa **dan** persentase. Berlaku di 4
+tingkat. Angka agama diambil **tanpa** gambar batas wilayah, jadi tidak perlu
+mengunduh ulang 73 MB batas yang sudah ada; perkiraan tambahan berkas 4–5 MB.
