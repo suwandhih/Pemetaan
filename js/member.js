@@ -184,6 +184,9 @@
           /* Isi lagi setelah berkas siap — kalau tidak, daftar tetap kosong. */
           isiTurunan(tingkat === 'kecamatan' ? 'kabkota' : 'kecamatan');
           bacaWilayah();
+          /* Orderan 18: berkas kecamatan/desa baru selesai dimuat — peta
+             baru sekarang bisa terbang ke wilayah itu. */
+          terbangKeTerdalam();
         });
       return SEDANG_MUAT[kunci];
     }
@@ -854,6 +857,8 @@
     });
     elFWilayah.value = nama.join(' \u203A ');
     tampilkanPenduduk();
+    /* Orderan 18: peta mengikuti wilayah yang dipilih. */
+    terbangKeTerdalam();
   }
 
   /* Jumlah penduduk wilayah terpilih — data Dukcapil (orderan 16).
@@ -906,19 +911,25 @@
   }
 
   /* Mengisi pilihan dari titik tengah peta — supaya tidak perlu menelusuri
-     seluruh Indonesia hanya untuk menambah satu anggota. */
+     seluruh Indonesia hanya untuk menambah satu anggota.
+     Diukur 17 Okt 2026: pada zoom awal seluruh Indonesia terlihat, sehingga
+     hampir semua provinsi bersentuhan dengan layar dan yang terpilih adalah
+     provinsi pertama dalam daftar (KEPULAUAN BANGKA BELITUNG) — bukan yang
+     sedang dilihat pemakai. Karena itu sekarang dipilih provinsi yang
+     TITIK TENGAHNYA paling dekat dengan titik tengah peta. */
   function isiDariPeta() {
     if (!peta || typeof PD === 'undefined') { return; }
-    var kodeProv = null;
     var daftar = daftarTingkat('provinsi');
-    var batas = peta.getBounds();
+    var c = peta.getCenter();
+    var kodeProv = null;
+    var jarakTerdekat = Infinity;
     for (var i = 0; i < daftar.length; i++) {
       var k = kotakDari(daftar[i].g);
       if (!k) { continue; }
-      if (k[2] < batas.getWest() || k[0] > batas.getEast()) { continue; }
-      if (k[3] < batas.getSouth() || k[1] > batas.getNorth()) { continue; }
-      kodeProv = kodeDari(daftar[i], 1);
-      break;
+      var dx = (k[0] + k[2]) / 2 - c.lng;
+      var dy = (k[1] + k[3]) / 2 - c.lat;
+      var j = dx * dx + dy * dy;
+      if (j < jarakTerdekat) { jarakTerdekat = j; kodeProv = kodeDari(daftar[i], 1); }
     }
     if (!kodeProv) { return; }
     var p = pilihEl('provinsi');
@@ -942,6 +953,55 @@
       for (var i = 0; i < x.length; i++) { telusur(x[i]); }
     })(g);
     return k[0] === Infinity ? null : k;
+  }
+
+  /* ---------- Orderan 18: peta mengikuti pilihan wilayah ---------- */
+
+  /* Peta terbang ke batas wilayah yang baru dipilih. Batasnya diambil dari
+     poligon resmi Dukcapil yang sudah ada di proyek — tidak ada data baru.
+
+     `padat` = bagian tinggi layar yang boleh dipakai wilayah (0,8 = 80%).
+     Dipakai supaya wilayah tidak menempel ke tepi bilah atas/bawah. */
+  function terbangKe(daftar, kode, kolom, padat) {
+    if (!peta || !daftar || !kode) { return false; }
+    var d = null;
+    for (var i = 0; i < daftar.length; i++) {
+      if (kodeDari(daftar[i], kolom) === kode) { d = daftar[i]; break; }
+    }
+    if (!d || !d.g) { return false; }
+    var k = kotakDari(d.g);
+    if (!k) { return false; }
+
+    /* Kotak batas wilayah bisa sangat sempit (desa) atau sangat lebar
+       (provinsi kepulauan). Diberi sedikit ruang supaya tidak mepet. */
+    var lngTepi = Math.max((k[2] - k[0]) * 0.06, 0.004);
+    var latTepi = Math.max((k[3] - k[1]) * 0.06, 0.004);
+
+    peta.fitBounds(
+      [[k[0] - lngTepi, k[1] - latTepi], [k[2] + lngTepi, k[3] + latTepi]],
+      { padding: 0, duration: 700, maxZoom: 15 }
+    );
+    return true;
+  }
+
+  /* Batas wilayah untuk satu tingkat, memakai daftar yang sudah dimuat.
+     Kecamatan & desa hanya tersedia setelah berkasnya selesai dimuat —
+     kalau belum, kembalikan false supaya pemanggil bisa mencoba lagi. */
+  function terbangKeWilayah(tingkat) {
+    var kode = wilayah[tingkat];
+    if (!kode) { return false; }
+    return terbangKe(daftarTingkat(tingkat), kode, kolomTingkat(tingkat));
+  }
+
+  /* Tingkat terdalam yang sudah dipilih — itulah yang dipakai sebagai
+     sasaran peta. Kalau desa sudah dipilih, peta tidak perlu kembali ke
+     provinsi. */
+  function terbangKeTerdalam() {
+    var urut = ['desa', 'kecamatan', 'kabkota', 'provinsi'];
+    for (var i = 0; i < urut.length; i++) {
+      if (wilayah[urut[i]] && terbangKeWilayah(urut[i])) { return true; }
+    }
+    return false;
   }
 
   /* ---------- buka / tutup form ---------- */
@@ -1013,6 +1073,18 @@
     elForm.hidden = false;
     tutupPanel();
     elFNama.focus();
+    /* Orderan 18: peta menyusut ke 45% atas (HP) — MapLibre perlu diberi tahu
+       ukuran barunya, lalu peta terbang ke wilayah anggota yang sedang dibuka.
+       Dipakai setTimeout, BUKAN requestAnimationFrame: diukur 17 Okt 2026,
+       rAF tidak menyala bila halaman sedang tidak terlihat (tab di belakang),
+       sehingga peta tidak pernah bergerak. resize() juga hanya sekali —
+       memanggilnya di tengah animasi fitBounds membatalkan animasinya. */
+    if (peta) {
+      setTimeout(function () {
+        peta.resize();
+        terbangKeTerdalam();
+      }, 0);
+    }
   }
 
   function setPilih(t, nilai) {
@@ -1023,6 +1095,10 @@
   function tutupForm() {
     elForm.hidden = true;
     sedangUbah = null;
+    /* Orderan 18: peta kembali memenuhi layar. */
+    if (peta) {
+      setTimeout(function () { peta.resize(); }, 0);
+    }
   }
 
   function bacaRincian(teks) {

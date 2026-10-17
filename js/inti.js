@@ -499,7 +499,17 @@
 
     peta.on('load', function () {
       peta.resize();
-      peta.jumpTo({ center: PUSAT, zoom: zoomUntukTinggi(tinggiTerlihat()) });
+      /* Jangan kembalikan kamera ke titik awal bila modul lain sudah
+         mengarahkan peta ke suatu wilayah sebelum peta selesai dimuat
+         (mis. form anggota orderan 18 memilih provinsi lebih dulu).
+         Diukur 17 Okt 2026: tanpa penjagaan ini, peta yang sudah terbang
+         ke Bali ditarik kembali ke titik awal begitu `load` menyala. */
+      var c = peta.getCenter();
+      var belumDiarahkan = Math.abs(c.lng - PUSAT[0]) < 0.001 &&
+        Math.abs(c.lat - PUSAT[1]) < 0.001;
+      if (belumDiarahkan) {
+        peta.jumpTo({ center: PUSAT, zoom: zoomUntukTinggi(tinggiTerlihat()) });
+      }
       perbaruiKeterangan();
     });
 

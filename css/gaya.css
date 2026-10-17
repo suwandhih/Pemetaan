@@ -935,7 +935,12 @@ body {
   opacity: 0.55;
 }
 
-/* Form isian anggota — lembar bawah supaya peta tetap terlihat & bisa digeser */
+/* Form isian anggota.
+   HP (orderan 18): peta di ATAS 45%, form di BAWAH 55% — supaya peta tetap
+   terlihat dan bisa diperiksa sambil mengisi. Peta benar-benar menyusut
+   (bukan ditutup), jadi wilayah yang dipilih tidak tersembunyi di balik form.
+   PC (orderan 22): form menjadi kolom penuh di sisi kiri — lihat blok
+   @media (min-width: 900px) di akhir berkas. */
 #form-anggota {
   position: absolute;
   left: 0;
@@ -944,7 +949,8 @@ body {
   z-index: 7;
   display: flex;
   flex-direction: column;
-  max-height: 82%;
+  height: 55%;
+  max-height: 55%;
   border-top-left-radius: 14px;
   border-top-right-radius: 14px;
   background: #0e1319;
@@ -1168,6 +1174,37 @@ select.fa-input option:checked {
 }
 
 /* ============================================================
+   Orderan 18 — peta di atas, form isian di bawah (HP)
+   ------------------------------------------------------------
+   Saat form Tambah/Ubah Anggota terbuka di HP, peta menyusut ke 45% atas
+   dan form menempati 55% bawah. Peta benar-benar menyusut (lebarnya tidak
+   diubah, tingginya yang dipangkas), sehingga MapLibre menghitung ulang
+   ukurannya dan titik tengah peta = titik tengah area yang terlihat.
+   Di PC aturan ini tidak berlaku — form tetap kolom penuh di sisi kiri.
+   ============================================================ */
+@media (max-width: 899px) {
+  #bingkai:has(#form-anggota:not([hidden])) #peta {
+    bottom: 55%;
+  }
+
+  /* Bilah bawah (posisi + tombol geser) ikut naik ke atas form, supaya
+     tidak tertutup form. */
+  #bingkai:has(#form-anggota:not([hidden])) #bilah-bawah {
+    bottom: 55%;
+  }
+
+  /* Keterangan yang menempel di bawah peta ikut naik. */
+  #bingkai:has(#form-anggota:not([hidden])) #atribusi,
+  #bingkai:has(#form-anggota:not([hidden])) #derajat {
+    bottom: calc(55% + var(--tinggi-bilah) + 4px);
+  }
+
+  #bingkai:has(#form-anggota:not([hidden])) #kartu {
+    bottom: calc(55% + var(--tinggi-bilah) + 40px);
+  }
+}
+
+/* ============================================================
    Orderan 22 — tampilan PC (layar lebar)
    ------------------------------------------------------------
    Ambang 900 px: di bawah itu dianggap HP, dan tampilan HP TIDAK berubah
@@ -1194,6 +1231,7 @@ select.fa-input option:checked {
     top: 0;
     bottom: 0;
     width: var(--lebar-panel);
+    height: auto;
     max-height: none;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
