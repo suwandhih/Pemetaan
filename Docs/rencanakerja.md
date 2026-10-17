@@ -16,7 +16,7 @@ Aturan pengelolaan:
 > | Ringkasan | Jumlah |
 > |---|---|
 > | Orderan selesai | **22 dari 22** |
-> | Commit | 51 |
+> | Commit | 60 |
 > | Berkas data | 1.110 (85,3 MB) |
 > | Modul JavaScript | 8 (236 KB) |
 > | Rentang waktu | 2026-10-12 → 2026-10-17 |
@@ -48,7 +48,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 9 | `aturan.md` diganti nama menjadi **`agents.md`** — berisi aturan + catatan agar asisten diingatkan setiap mulai proyek | **SELESAI** ✅ | 5 mnt | 2026-10-16 |
 | 10 | Pastikan `rencanakerja.md` berfungsi sebagai **daftar orderan**: yang belum selesai dan yang sudah selesai | **SELESAI** ✅ | 5 mnt | 2026-10-17 |
 | 11 | Buat **`prompt.md`** — konsep proyek, supaya AI lain dapat membuat ulang **persis sama** | **SELESAI** ✅ — `Docs/prompt.md` (22,8 KB, 13 bagian) | 30–45 mnt | 2026-10-17 |
-| 12 | Buat **`CHANGELOG.md`** — catatan semua perkembangan, perbaikan, dan hal baru | **SELESAI** ✅ — `Docs/CHANGELOG.md` (19,2 KB, 51 commit tercatat) | 15–20 mnt | 2026-10-17 |
+| 12 | Buat **`CHANGELOG.md`** — catatan semua perkembangan, perbaikan, dan hal baru | **SELESAI** ✅ — `Docs/CHANGELOG.md` (19,4 KB, 60 commit tercatat) | 15–20 mnt | 2026-10-17 |
 | 13 | Jawab & siapkan: apakah GitHub sudah siap kerja untuk proyek pemetaan | **SELESAI** ✅ — repo publik + Pages aktif + push berjalan | 20–30 mnt | 2026-10-16 |
 | 14 | **Peta Indonesia + negara tetangga** — fokus Indonesia, tetangga tetap tampil supaya tidak kosong; beberapa pulau Indonesia berbatasan langsung dengan negara lain | **SELESAI** ✅ | 45–60 mnt | 2026-10-16 |
 | 15 | **Fitur citra satelit atau peta** — peta memakai citra satelit, tetapi bisa juga dalam bentuk peta (contoh acuan: `petadunia`) | **SELESAI** ✅ — 2 pilihan, satu tombol bergantian | 30–45 mnt | 2026-10-16 |
@@ -426,7 +426,7 @@ Berdasarkan orderan 9–12. **Seluruh berkas sudah ada** (2026-10-17):
 | **`Docs/agents.md`** | asisten (AI) | Aturan main + catatan agar diingatkan setiap mulai | ✅ Ada — nama & isi sudah diperbarui |
 | **`Docs/rencanakerja.md`** | asisten + manusia | Daftar orderan: belum selesai & sudah selesai | ✅ Ada |
 | **`Docs/prompt.md`** | manusia / AI lain | Konsep proyek — supaya dapat dibuat ulang **persis sama** | ✅ Ada — 22,8 KB, 13 bagian |
-| **`Docs/CHANGELOG.md`** | manusia | Catatan semua perkembangan, perbaikan, hal baru | ✅ Ada — 19,2 KB, 51 commit tercatat |
+| **`Docs/CHANGELOG.md`** | manusia | Catatan semua perkembangan, perbaikan, hal baru | ✅ Ada — 19,4 KB, 60 commit tercatat |
 
 ### Isi `Docs/prompt.md` (13 bagian)
 
@@ -448,7 +448,7 @@ Berdasarkan orderan 9–12. **Seluruh berkas sudah ada** (2026-10-17):
 
 ### Isi `Docs/CHANGELOG.md`
 
-Riwayat **51 commit** dikelompokkan per tanggal (terbaru di atas), masing-masing
+Riwayat **60 commit** dikelompokkan per tanggal (terbaru di atas), masing-masing
 menyebut **berkas yang berubah** dan **hash commit** supaya bisa ditelusuri.
 
 | Tanggal | Isi |

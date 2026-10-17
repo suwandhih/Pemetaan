@@ -18,13 +18,15 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 | Hal | Jumlah |
 |---|---|
-| Commit | 51 |
+| Commit | 60 |
 | Orderan selesai | 22 |
 | Berkas data | 1.110 (85,3 MB) |
 | Modul JavaScript | 8 (236 KB) |
 | Baris tampilan (`gaya.css`) | ~2.400 |
 | Rentang waktu | 2026-10-12 → 2026-10-17 |
 
+**Sebaran commit:** 2026-10-12 → 14 commit · 2026-10-16 → 25 commit ·
+2026-10-17 → 21 commit.
 ---
 
 ## 2026-10-17
@@ -453,6 +455,15 @@ Commit: `dfd4e52`, `8c060d4`
 | **Aturan kerja** yang wajib diikuti | [`agents.md`](./agents.md) |
 | **Bukti uji** tiap orderan | [`rencanakerja.md`](./rencanakerja.md) bagian bukti uji |
 | **Riwayat commit** mentah | `git log` |
+
+### Sebaran commit
+
+| Tanggal | Commit | Isi utama |
+|---|---|---|
+| 2026-10-12 | 14 | Inisialisasi repo · aturan kerja 1–9 · fondasi teknologi dikunci · berkas `.md` ke `Docs/` · repo GitHub dibuat |
+| 2026-10-16 | 25 | Orderan 14, 15, 16, 17, 7 · GitHub Pages aktif · kelola kategori · perbaikan penanda & tampilan |
+| 2026-10-17 | 21 | Orderan 22, 18, 19, 21, 20 · panduan pemakaian · panduan interaktif · 3 perbaikan · dokumen lengkap |
+| **Total** | **60** | |
 
 ---
 
