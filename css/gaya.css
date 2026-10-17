@@ -320,65 +320,8 @@ body {
   opacity: 0.6;
 }
 
-/* Daftar jenis peta — melayang menempel di bawah tombol. Lebarnya dibatasi
-   lebar bingkai supaya di HP sempit pun tidak keluar layar. */
-#pemilih-peta {
-  position: absolute;
-  top: calc(var(--tinggi-bilah) + 4px);
-  left: 8px;
-  z-index: 4;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 186px;
-  max-width: calc(100% - 16px);
-  padding: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 10px;
-  background: rgba(11, 15, 20, 0.96);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
-}
-
-#pemilih-peta[hidden] {
-  display: none;
-}
-
-.pilihan-peta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 9px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--terang);
-  font-family: inherit;
-  font-size: 12.5px;
-  line-height: 1.2;
-  text-align: left;
-  white-space: nowrap;
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-.pilihan-peta .pilihan-ket {
-  margin-left: auto;
-  padding-left: 10px;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 10px;
-  opacity: 0.6;
-}
-
-.pilihan-peta:active {
-  background: rgba(255, 255, 255, 0.14);
-}
-
-.pilihan-peta.nyala {
-  background: rgba(88, 166, 255, 0.26);
-  box-shadow: inset 0 0 0 1px rgba(88, 166, 255, 0.5);
-}
+/* Revisi 2026-10-17: daftar jenis peta tidak dipakai lagi — tombolnya
+   bergantian (Satelit ⇄ Map). Aturan #pemilih-peta / .pilihan-peta dihapus. */
 
 #bilah-bawah {
   bottom: 0;
@@ -1115,6 +1058,27 @@ select.fa-input option:checked {
   color: #ffe08a;
 }
 
+/* Orderan 18: tombol "Titik tengah wilayah" di bawah keterangan pin. */
+.fa-tengah {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fa-tengah[hidden] {
+  display: none;
+}
+
 .fa-aksi {
   flex: none;
   display: flex;
@@ -1253,11 +1217,9 @@ select.fa-input option:checked {
     left: var(--lebar-panel);
   }
 
-  #bingkai:has(#panel-anggota:not([hidden])) #pemilih-peta,
   #bingkai:has(#panel-anggota:not([hidden])) #pemilih-warna,
   #bingkai:has(#panel-anggota:not([hidden])) #kartu,
   #bingkai:has(#panel-anggota:not([hidden])) #derajat,
-  #bingkai:has(#form-anggota:not([hidden])) #pemilih-peta,
   #bingkai:has(#form-anggota:not([hidden])) #pemilih-warna,
   #bingkai:has(#form-anggota:not([hidden])) #kartu,
   #bingkai:has(#form-anggota:not([hidden])) #derajat {

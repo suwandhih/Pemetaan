@@ -185,8 +185,9 @@
           isiTurunan(tingkat === 'kecamatan' ? 'kabkota' : 'kecamatan');
           bacaWilayah();
           /* Orderan 18: berkas kecamatan/desa baru selesai dimuat — peta
-             baru sekarang bisa terbang ke wilayah itu. */
+             baru sekarang bisa terbang ke wilayah itu & menggambar garisnya. */
           terbangKeTerdalam();
+          sorotWilayahTerdalam();
         });
       return SEDANG_MUAT[kunci];
     }
@@ -476,6 +477,7 @@
 
   var elFNama, elFInisial, elFKategori, elFRincian, elFWilayah;
   var elFJudul, elFTingkat, elFPratinjau, elFHapus, elFPenduduk;
+  var elFPin = null, elFPinTengah = null;
   var elPendudukForm = null;
 
   function siapkanForm() {
@@ -490,6 +492,11 @@
       elFHapus = document.getElementById('fa-hapus');
       elPendudukForm = document.getElementById('fa-penduduk');
       elFPenduduk = elPendudukForm;
+      elFPin = document.getElementById('fa-pin');
+      elFPinTengah = document.getElementById('fa-pin-tengah');
+      if (elFPinTengah) {
+        elFPinTengah.addEventListener('click', pinKeTitikTengah);
+      }
 
       document.getElementById('fa-tutup').addEventListener('click', tutupForm);
     document.getElementById('fa-batal').addEventListener('click', tutupForm);
@@ -857,8 +864,12 @@
     });
     elFWilayah.value = nama.join(' \u203A ');
     tampilkanPenduduk();
-    /* Orderan 18: peta mengikuti wilayah yang dipilih. */
+    /* Orderan 18: peta mengikuti wilayah yang dipilih + garis kelilingnya.
+       Pin dikembalikan ke titik tengah wilayah baru — kecuali saat mengubah
+       anggota lama, yang titiknya sudah ditentukan sendiri oleh user. */
     terbangKeTerdalam();
+    sorotWilayahTerdalam();
+    if (!sedangUbah) { pinKeTitikTengah(); }
   }
 
   /* Jumlah penduduk wilayah terpilih — data Dukcapil (orderan 16).
@@ -957,12 +968,111 @@
 
   /* ---------- Orderan 18: peta mengikuti pilihan wilayah ---------- */
 
-  /* Peta terbang ke batas wilayah yang baru dipilih. Batasnya diambil dari
-     poligon resmi Dukcapil yang sudah ada di proyek — tidak ada data baru.
+  /* Lapisan garis merah berkeliling wilayah terpilih + kedipan (blinking).
+     Lapisan ini milik modul anggota, terpisah dari peta tematik penduduk,
+     jadi tetap muncul walau peta tematik sedang mati. */
+  var LAPISAN_SOROT = 'anggota-sorot-wilayah';
+  var SUMBER_SOROT = 'anggota-sorot';
+  var kedipJalan = false;
 
-     `padat` = bagian tinggi layar yang boleh dipakai wilayah (0,8 = 80%).
-     Dipakai supaya wilayah tidak menempel ke tepi bilah atas/bawah. */
-  function terbangKe(daftar, kode, kolom, padat) {
+  function siapkanLapisanSorot() {
+    if (!peta || peta.getSource(SUMBER_SOROT)) { return; }
+    peta.addSource(SUMBER_SOROT, {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] }
+    });
+    peta.addLayer({
+      id: LAPISAN_SOROT,
+      type: 'line',
+      source: SUMBER_SOROT,
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': '#ff3b30',
+        'line-width': 1.8,
+        'line-opacity': 1
+      }
+    });
+  }
+
+  /* Kedipan: opacity 1,0 ↔ 0,35 tiap 700 ms. Dijalankan hanya selama ada
+     wilayah yang disorot, supaya tidak membebani peramban tanpa guna. */
+  function mulaiKedip() {
+    if (kedipJalan) { return; }
+    kedipJalan = true;
+    var nyala = true;
+    (function langkah() {
+      if (!kedipJalan) { return; }
+      if (peta && peta.getLayer(LAPISAN_SOROT)) {
+        peta.setPaintProperty(LAPISAN_SOROT, 'line-opacity', nyala ? 1 : 0.35);
+      }
+      nyala = !nyala;
+      setTimeout(langkah, 700);
+    })();
+  }
+
+  function hentikanKedip() {
+    kedipJalan = false;
+    if (peta && peta.getLayer(LAPISAN_SOROT)) {
+      peta.setPaintProperty(LAPISAN_SOROT, 'line-opacity', 1);
+    }
+  }
+
+  /* Menggambar garis keliling wilayah terpilih. `daftar` & `kode` menentukan
+     wilayah mana; `null` menghapus garisnya. */
+  function gambarSorot(daftar, kode, kolom) {
+    if (!peta) { return; }
+    siapkanLapisanSorot();
+    if (!peta.getSource(SUMBER_SOROT)) { return; }
+
+    var fitur = [];
+    if (daftar && kode) {
+      for (var i = 0; i < daftar.length; i++) {
+        if (kodeDari(daftar[i], kolom) !== kode) { continue; }
+        fitur.push({
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'MultiPolygon', coordinates: jadiMulti(daftar[i].g) }
+        });
+        break;
+      }
+    }
+    peta.getSource(SUMBER_SOROT).setData({ type: 'FeatureCollection', features: fitur });
+    if (fitur.length) { mulaiKedip(); } else { hentikanKedip(); }
+  }
+
+  /* Bentuk koordinat Dukcapil ada dua: Polygon (satu cincin) dan MultiPolygon.
+     Keduanya dijadikan MultiPolygon supaya seragam. */
+  function jadiMulti(g) {
+    if (!g || !g.length) { return []; }
+    var pertama = g[0];
+    if (pertama && pertama.length && typeof pertama[0][0] === 'number') {
+      return [g];
+    }
+    return g;
+  }
+
+  /* Garis keliling untuk tingkat terdalam yang sudah dipilih. */
+  function sorotWilayahTerdalam() {
+    var urut = ['desa', 'kecamatan', 'kabkota', 'provinsi'];
+    for (var i = 0; i < urut.length; i++) {
+      var t = urut[i];
+      if (!wilayah[t]) { continue; }
+      var daftar = daftarTingkat(t);
+      var kolom = kolomTingkat(t);
+      for (var j = 0; j < daftar.length; j++) {
+        if (kodeDari(daftar[j], kolom) === wilayah[t]) {
+          gambarSorot(daftar, wilayah[t], kolom);
+          return true;
+        }
+      }
+    }
+    gambarSorot(null, null, 0);
+    return false;
+  }
+
+  /* Peta terbang ke batas wilayah yang baru dipilih. Batasnya diambil dari
+     poligon resmi Dukcapil yang sudah ada di proyek — tidak ada data baru. */
+  function terbangKe(daftar, kode, kolom) {
     if (!peta || !daftar || !kode) { return false; }
     var d = null;
     for (var i = 0; i < daftar.length; i++) {
@@ -1070,9 +1180,18 @@
       ? 'Wilayah dikunci. Yang bisa diubah: nama, kategori, inisial, keterangan.'
       : '';
 
+    /* Orderan 18: pin mulai dari lokasi anggota lama (saat mengubah) atau
+       titik tengah wilayah (saat menambah). */
+    titikPin = (a && typeof a.lon === 'number' && typeof a.lat === 'number')
+      ? { lng: a.lon, lat: a.lat }
+      : null;
+
     elForm.hidden = false;
     tutupPanel();
     elFNama.focus();
+    pasangPin(true);
+    if (elFPinTengah) { elFPinTengah.hidden = false; }
+    if (titikPin) { gambarPin(); perbaruiKeteranganPin(); }
     /* Orderan 18: peta menyusut ke 45% atas (HP) — MapLibre perlu diberi tahu
        ukuran barunya, lalu peta terbang ke wilayah anggota yang sedang dibuka.
        Dipakai setTimeout, BUKAN requestAnimationFrame: diukur 17 Okt 2026,
@@ -1095,7 +1214,15 @@
   function tutupForm() {
     elForm.hidden = true;
     sedangUbah = null;
-    /* Orderan 18: peta kembali memenuhi layar. */
+    /* Orderan 18: pin & garis keliling dimatikan, peta kembali memenuhi layar.
+       titikPin dikosongkan LEBIH DULU — pasangPin(false) menggambar ulang
+       pin, jadi kalau urutannya terbalik pin tetap tertinggal di peta. */
+    titikPin = null;
+    pasangPin(false);
+    hentikanKedip();
+    gambarSorot(null, null, 0);
+    if (elFPin) { elFPin.hidden = true; }
+    if (elFPinTengah) { elFPinTengah.hidden = true; }
     if (peta) {
       setTimeout(function () { peta.resize(); }, 0);
     }
@@ -1130,6 +1257,132 @@
     return { lng: (k[0] + k[2]) / 2, lat: (k[1] + k[3]) / 2 };
   }
 
+  /* ---------- Orderan 18: pin lokasi yang bisa ditentukan user ----------
+     Titik tengah wilayah hanya perkiraan. User bisa menaruh pin 📌 tepat di
+     lokasi yayasan / sekolah / rumah sakit dengan mengetuk peta, atau
+     menggeser pin-nya. Koordinat pin inilah yang disimpan. */
+
+  var LAPISAN_PIN = 'anggota-pin';
+  var SUMBER_PIN = 'anggota-pin';
+  var titikPin = null;      /* { lng, lat } — null = pakai titik tengah wilayah */
+  var pinSiap = false;
+
+  function siapkanPin() {
+    if (!peta || pinSiap) { return; }
+    if (!peta.getSource(SUMBER_PIN)) {
+      peta.addSource(SUMBER_PIN, {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      });
+    }
+    if (!peta.getLayer(LAPISAN_PIN)) {
+      /* Bulatan putih + cincin merah: menonjol di citra satelit gelap maupun
+         di peta jalan yang terang. */
+      peta.addLayer({
+        id: LAPISAN_PIN,
+        type: 'circle',
+        source: SUMBER_PIN,
+        paint: {
+          'circle-radius': 7,
+          'circle-color': '#ffffff',
+          'circle-stroke-color': '#ff3b30',
+          'circle-stroke-width': 3
+        }
+      });
+    }
+    pinSiap = true;
+  }
+
+  function gambarPin() {
+    if (!peta) { return; }
+    siapkanPin();
+    var s = peta.getSource(SUMBER_PIN);
+    if (!s) { return; }
+    s.setData({
+      type: 'FeatureCollection',
+      features: titikPin ? [{
+        type: 'Feature',
+        properties: {},
+        geometry: { type: 'Point', coordinates: [titikPin.lng, titikPin.lat] }
+      }] : []
+    });
+  }
+
+  /* Menaruh pin di titik tengah wilayah terpilih (dipakai saat wilayah
+     berubah atau saat user menekan tombol "Titik tengah wilayah"). */
+  function pinKeTitikTengah() {
+    titikPin = titikWilayah();
+    gambarPin();
+    perbaruiKeteranganPin();
+  }
+
+  function perbaruiKeteranganPin() {
+    if (!elFPin) { return; }
+    if (!titikPin) {
+      elFPin.hidden = true;
+      elFPin.textContent = '';
+      return;
+    }
+    elFPin.hidden = false;
+    elFPin.innerHTML = 'Titik lokasi: <strong>' +
+      titikPin.lng.toFixed(5).replace('.', ',') + '\u00B0 BT \u00B7 ' +
+      titikPin.lat.toFixed(5).replace('.', ',') + '\u00B0</strong>' +
+      ' <span style="opacity:.7">\u2014 ketuk peta untuk memindahkan pin</span>';
+  }
+
+  /* Menyalakan / mematikan penaruhan pin. Hanya menyala selama form anggota
+     terbuka, supaya klik peta di luar form tetap membuka kartu wilayah. */
+  function pasangPin(nyala) {
+    if (!peta) { return; }
+    if (!nyala) {
+      peta.off('click', klikPetaPin);
+      peta.off('mousedown', seretPin);
+      peta.off('touchstart', seretPin);
+      peta.getCanvas().style.cursor = '';
+      gambarPin();
+      return;
+    }
+    siapkanPin();
+    peta.on('click', klikPetaPin);
+    peta.on('mousedown', LAPISAN_PIN, seretPin);
+    peta.on('touchstart', LAPISAN_PIN, seretPin);
+    peta.getCanvas().style.cursor = 'crosshair';
+    gambarPin();
+  }
+
+  function klikPetaPin(e) {
+    if (!e || !e.lngLat) { return; }
+    titikPin = { lng: e.lngLat.lng, lat: e.lngLat.lat };
+    gambarPin();
+    perbaruiKeteranganPin();
+  }
+
+  /* Geser pin: tahan pin lalu tarik. Peta tidak ikut bergeser selama menarik. */
+  function seretPin(e) {
+    if (!e || !e.lngLat) { return; }
+    if (e.preventDefault) { e.preventDefault(); }
+    peta.dragPan.disable();
+    peta.getCanvas().style.cursor = 'grabbing';
+
+    function gerak(ev) {
+      titikPin = { lng: ev.lngLat.lng, lat: ev.lngLat.lat };
+      gambarPin();
+      perbaruiKeteranganPin();
+    }
+    function lepas() {
+      peta.off('mousemove', gerak);
+      peta.off('touchmove', gerak);
+      peta.off('mouseup', lepas);
+      peta.off('touchend', lepas);
+      peta.dragPan.enable();
+      peta.getCanvas().style.cursor = 'crosshair';
+    }
+    peta.on('mousemove', gerak);
+    peta.on('touchmove', gerak);
+    peta.on('mouseup', lepas);
+    peta.on('touchend', lepas);
+  }
+
   function simpanForm() {
     var nama = elFNama.value.trim();
     if (!nama) {
@@ -1157,7 +1410,7 @@
       return;
     }
 
-    var titik = titikWilayah() || (peta ? peta.getCenter() : { lng: 118, lat: -2.5 });
+    var titik = titikPin || titikWilayah() || (peta ? peta.getCenter() : { lng: 118, lat: -2.5 });
     var lama2 = null;
     for (var j = 0; j < anggota.length; j++) {
       if (anggota[j].id === sedangUbah) { lama2 = anggota[j]; }

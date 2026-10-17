@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-06">
-<link rel="stylesheet" href="css/gaya.css?v=20261017-06">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-08">
+<link rel="stylesheet" href="css/gaya.css?v=20261017-08">
 </head>
 <body>
 
@@ -17,10 +17,9 @@
   <div id="peta"></div>
 
   <header id="bilah-atas">
-    <button id="tombol-jenis" type="button" aria-haspopup="listbox" aria-expanded="false">
+    <button id="tombol-jenis" type="button" title="Ganti jenis peta">
       <span id="jenis-ikon">&#128752;</span>
       <span id="jenis-nama">Satelit</span>
-      <span class="panah">&#9662;</span>
     </button>
     <button id="tombol-warna" type="button" aria-haspopup="listbox" aria-expanded="false" aria-pressed="false">
       <span id="warna-nama">Populasi</span>
@@ -32,9 +31,6 @@
               title="Tampilkan / sembunyikan penanda anggota di peta">&#128065;</button>
     </div>
   </header>
-
-    <!-- Orderan 15: daftar jenis peta (satelit / jalan) -->
-    <div id="pemilih-peta" role="listbox" aria-label="Jenis peta" hidden></div>
 
     <!-- Orderan 16: peta tematik jumlah penduduk (Dukcapil Kemendagri) -->
     <div id="pemilih-warna" role="listbox" aria-label="Peta penduduk" hidden></div>
@@ -103,6 +99,8 @@
             <input class="fa-input fa-nonaktif" id="fa-wilayah" type="text" readonly
                    placeholder="Belum dipilih" />
             <p class="fa-catatan" id="fa-penduduk" hidden></p>
+            <p class="fa-catatan" id="fa-pin" hidden></p>
+            <button class="fa-tombol fa-tengah" id="fa-pin-tengah" type="button" hidden>&#8634; Titik tengah wilayah</button>
             <p class="fa-catatan fa-peringatan" id="fa-pratinjau" hidden></p>
 
             <div class="fa-baris2">
@@ -140,12 +138,12 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261017-06"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261017-06"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261017-06"></script>
-<script src="js/inti.js?v=20261017-06"></script>
-<script src="js/warna.js?v=20261017-06"></script>
-<script src="js/simpanan.js?v=20261017-06"></script>
-<script src="js/member.js?v=20261017-06"></script>
+<script src="js/lib/maplibre-gl.js?v=20261017-08"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261017-08"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261017-08"></script>
+<script src="js/inti.js?v=20261017-08"></script>
+<script src="js/warna.js?v=20261017-08"></script>
+<script src="js/simpanan.js?v=20261017-08"></script>
+<script src="js/member.js?v=20261017-08"></script>
 </body>
 </html>

@@ -348,61 +348,26 @@
   /* Orderan 15 — tombol pembuka di bilah atas + daftar pilihan yang melayang.
      Dibuat sendiri (bukan lewat MapLibre) supaya bentuk dan letaknya sama di
      HP maupun di PC. */
+  /* Revisi 2026-10-17: hanya ada 2 jenis peta, jadi tombolnya bergantian —
+     sekali tekan langsung ganti. Daftar pilihan yang dulu melayang tidak
+     dipakai lagi, jadi fungsi ini hanya memasang penanganan tombol. */
   function bangunPemilih() {
-    var wadah = document.getElementById('pemilih-peta');
     var tombol = document.getElementById('tombol-jenis');
-    if (!wadah || !tombol) { return; }
-
-    wadah.innerHTML = '';
-    for (var i = 0; i < JENIS.length; i++) {
-      (function (j) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'pilihan-peta';
-        b.dataset.jenis = j.id;
-        b.setAttribute('role', 'option');
-        b.innerHTML =
-          '<span class="pilihan-ikon">' + j.ikon + '</span>' +
-          '<span class="pilihan-nama">' + j.nama + '</span>' +
-          '<span class="pilihan-ket">' + j.ket + '</span>';
-        b.addEventListener('click', function () {
-          gantiJenis(j.id);
-          bukaTutupPemilih(false);
-        });
-        wadah.appendChild(b);
-      })(JENIS[i]);
-    }
-
-    tombol.addEventListener('click', function () {
-      bukaTutupPemilih(wadah.hidden);
-    });
-
-    /* Klik di luar daftar menutupnya. */
-    document.addEventListener('click', function (e) {
-      if (wadah.hidden) { return; }
-      if (wadah.contains(e.target) || tombol.contains(e.target)) { return; }
-      bukaTutupPemilih(false);
-    });
-  }
-
-  function bukaTutupPemilih(buka) {
-    var wadah = document.getElementById('pemilih-peta');
-    var tombol = document.getElementById('tombol-jenis');
-    if (!wadah || !tombol) { return; }
-    wadah.hidden = !buka;
-    tombol.setAttribute('aria-expanded', buka ? 'true' : 'false');
+    if (!tombol) { return; }
+    tombol.addEventListener('click', gantiJenisBerikut);
   }
 
   function tandaiPemilih() {
     var j = cariJenis(jenisAktif);
     document.getElementById('jenis-ikon').textContent = j.ikon;
     document.getElementById('jenis-nama').textContent = j.nama;
-
-    var b = document.querySelectorAll('.pilihan-peta');
-    for (var i = 0; i < b.length; i++) {
-      var ini = b[i].dataset.jenis === jenisAktif;
-      b[i].classList.toggle('nyala', ini);
-      b[i].setAttribute('aria-selected', ini ? 'true' : 'false');
+    /* Satu tombol bergantian (revisi 2026-10-17): keterangan tombol menyebut
+       jenis peta yang akan muncul bila ditekan, bukan yang sedang aktif. */
+    var tombol = document.getElementById('tombol-jenis');
+    if (tombol) {
+      var lain = JENIS[0].id === jenisAktif ? JENIS[1] : JENIS[0];
+      tombol.title = 'Ganti ke ' + lain.nama + ' (sekarang: ' + j.nama + ')';
+      tombol.setAttribute('aria-label', 'Jenis peta: ' + j.nama + ' — tekan untuk ganti ke ' + lain.nama);
     }
   }
 
@@ -426,6 +391,14 @@
     perbaruiKeterangan();
   }
 
+  /* Revisi 2026-10-17: hanya ada 2 jenis peta, jadi tombolnya dibuat
+     bergantian — sekali tekan ganti ke jenis yang lain. Daftar pilihan
+     (yang dulu melayang) tidak dipakai lagi. */
+  function gantiJenisBerikut() {
+    var lain = JENIS[0].id === jenisAktif ? JENIS[1] : JENIS[0];
+    gantiJenis(lain.id);
+  }
+
   function pasangTombol() {
     var langkah = 0.35; // bagian lebar layar tiap kali geser
 
@@ -439,9 +412,7 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowLeft') { geser(-1); }
       else if (e.key === 'ArrowRight') { geser(1); }
-      else if (e.key >= '1' && e.key <= String(JENIS.length)) {
-        gantiJenis(JENIS[Number(e.key) - 1].id);
-      }
+      else if (e.key === '1' || e.key === '2') { gantiJenisBerikut(); }
     });
   }
 
