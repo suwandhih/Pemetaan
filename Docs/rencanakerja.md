@@ -2004,3 +2004,132 @@ supaya tidak sekadar mengulang peta penduduk). Ketuk wilayah → kartu
 menampilkan rincian 7 agama: jumlah jiwa **dan** persentase. Berlaku di 4
 tingkat. Angka agama diambil **tanpa** gambar batas wilayah, jadi tidak perlu
 mengunduh ulang 73 MB batas yang sudah ada; perkiraan tambahan berkas 4–5 MB.
+
+---
+
+## Orderan 21 — Jumlah penduduk menurut agama, 4 tingkat (perintah 2026-10-17)
+
+### Perintah pemilik proyek
+
+1. Warna peta berdasarkan **persentase** (per 100 orang).
+2. Klik warna agama utama → tampil jumlah per agama (Islam jumlah, Kristen
+   jumlah, dst.). Konghucu & Kepercayaan tetap disajikan dalam angka jumlah.
+3. **Terpisah dulu** dari menu Populasi.
+4. Ingin daftar agama juga tampil di bawah form `+ Anggota`.
+5. Konghucu & Kepercayaan ikut jadi pilihan warna peta.
+
+### Keputusan yang diambil
+
+| Pertanyaan | Jawaban pemilik proyek |
+|---|---|
+| Letak tombol | Tombol baru tersendiri di bilah atas, di sebelah tombol Populasi → `[Populasi][Agama]` |
+| Sifat blok di form | Bisa diklik untuk mewarnai peta |
+| Konghucu & Kepercayaan | Ikut jadi pilihan warna peta |
+
+### Berkas baru
+
+- `js/agama.js` — modul peta tematik agama. Meniru pola `js/warna.js` tetapi
+  mewarnai menurut **persentase** dan memakai **tangga warna per agama**
+  (bukan 9 warna tetap). Lapisan peta (`wilayah`, `wilayah-isi`,
+  `wilayah-garis`) **dipakai bersama** dengan peta Populasi, jadi keduanya
+  saling mematikan.
+- `data/agama/` — 554 berkas, 4,56 MB (sudah di-commit lebih dulu sebagai
+  titik pulih `19e8ada`):
+  `prop-nasional.js` (38), `kab-nasional.js` (514),
+  `kec-<2 angka provinsi>.js` (38), `desa-<4 angka kab/kota>.js` (514).
+  Kolom: `[kode…, nama, jumlah_penduduk, islam, kristen, katholik, hindu,
+  budha, konghucu, kepercayaan]`.
+- `alat/ambil-agama.js` — pengambil data dari ArcGIS Dukcapil.
+
+### Berkas yang diubah
+
+- `index.html` — tombol `#tombol-agama`, daftar `#pemilih-agama`, blok
+  `#fa-agama` di form anggota, `<script src="js/agama.js">`, penanda versi
+  `?v=20261017-13` → `?v=20261017-14` (11 tempat).
+- `css/gaya.css` — gaya `#tombol-agama`, `.agama-*`, `.fa-agama-*`,
+  `.agama-mati`; `#pemilih-agama` ikut digeser di PC; bilah atas dirapatkan
+  lagi di `@media (max-width: 400px)`.
+- `js/warna.js` — `siapkanLapisan(paksa)` supaya lapisan bisa dibuat ulang
+  setelah peta dasar diganti; `ganti()` mematikan peta Agama lebih dulu;
+  klik wilayah tidak membuka kartu Populasi saat peta Agama menyala.
+- `js/member.js` — `tampilkanAgama()` mengisi `#fa-agama` lewat
+  `PD_AGAMA.untukWilayah()` + `ringkas()`; klik baris agama mewarnai peta.
+
+### Cara pakai
+
+1. Ketuk `[Agama 🙏]` di bilah atas → muncul 7 pilihan agama + 4 tingkat.
+2. Ketuk satu agama → peta langsung diwarnai tingkat provinsi.
+3. Ketuk tingkat lain (Kab/Kota, Kecamatan, Desa) untuk berpindah tingkat.
+   Kecamatan butuh z≥5, desa butuh z≥8 — sama seperti peta Populasi.
+4. Ketuk satu wilayah di peta → kartu rincian 7 agama + mayoritas.
+5. Di form `+ Anggota`, blok "Jumlah penduduk menurut agama" muncul di bawah
+   keterangan penduduk; tiap baris bisa diketuk untuk mewarnai peta.
+6. Tombol `Matikan peta agama` di dalam daftar untuk mematikan.
+
+### Bukti uji (2026-10-17, dijalankan sendiri)
+
+Diuji di peramban pada `http://127.0.0.1:8899` (server lokal) dan
+`https://suwandhih.github.io/Pemetaan/`.
+
+| Uji | Hasil |
+|---|---|
+| Tombol Agama muncul di sebelah Populasi | ✅ |
+| Islam tingkat provinsi | ✅ 38 wilayah, kelas 0%–32% … ≥97% |
+| Kristen tingkat provinsi | ✅ 38 wilayah, kelas 0%–1,5% … ≥39,6% |
+| Kristen tingkat kab/kota | ✅ 514 wilayah |
+| Kecamatan (z6,2) | ✅ 1.356 wilayah, kode `16.01.07` benar |
+| Desa (z9,5) | ✅ 1.884 wilayah, kode `36.71.07.1002` benar |
+| Angka cocok data mentah | ✅ SOSOH BUAY RAYAP 36/14.655 = 0,25%; BOJONG JAYA 558/9.056 = 6,16% |
+| Kartu rincian 7 agama | ✅ KALIMANTAN UTARA, JATIMULYA, JEPARA |
+| Blok agama di form anggota | ✅ KOTA BOGOR 1.144.108 jiwa, Islam 93% |
+| Klik baris agama di form | ✅ peta ikut berwarna |
+| Populasi ↔ Agama saling mematikan | ✅ |
+| Ganti peta dasar (Satelit ↔ Map) | ✅ lapisan dipasang ulang, warna tetap |
+| Bilah atas HP 390 px | ✅ 312 px isi = 312 px layar, tidak meluber |
+| Bilah atas HP 320 px | ✅ 256 px isi = 256 px layar |
+| Daftar melayang vs keterangan warna di HP | ✅ tidak tumpang-tindih |
+| Galat konsol | ✅ 0 |
+
+### Bug yang ditemukan & diperbaiki saat uji
+
+1. **Indeks kolom salah (off-by-one).** Berkas agama menyimpan barisnya
+   sebagai array langsung `[kode…, nama, penduduk, islam, …]`, bukan objek
+   `{a,g}` seperti berkas batas wilayah. Awalnya dibaca `r[kolom+1]` untuk
+   penduduk → seluruh persentase meleset (Papua Pegunungan tertulis 5.082%).
+   Diperbaiki jadi `r[kolom]`.
+2. **Jumlah kolom kode tertukar dengan indeks kolom penduduk.** Kecamatan
+   punya 3 kolom kode, bukan 4 → kode jadi `16.01.07.SOSOH BUAY RAYAP`.
+   Ditambahkan `kolomKode(tingkat) = banyakKolom(tingkat) - 1`.
+3. **Nama wilayah salah kolom** → `a[kolom]` seharusnya `a[kolom - 1]`.
+4. **Batas kelas tertulis kembar.** Konghucu tingkat kab/kota berbatas
+   0,00009%–3,5% → dengan 3 desimal semua kelas bawah tertulis "0,001%".
+   Kristen tingkat provinsi berbatas 2,0%–2,4% → dengan 0 desimal tertulis
+   "2% – 2%". Diperbaiki dengan `desimalKelas()` yang menghitung desimal dari
+   **nilai batas terkecil dan jarak terkecil antar batas**, diambil yang
+   paling banyak.
+5. **Tombol Agama langsung mematikan saat menyala** → pemakai tidak bisa
+   berganti agama/tingkat tanpa mematikan dulu. Diperbaiki: tombol hanya
+   membuka/menutup daftar, dan ditambahkan tombol `Matikan peta agama` di
+   dalam daftar.
+6. **Daftar melayang menutupi keterangan warna** di HP sempit dengan form
+   terbuka (daftar 44–273 px, keterangan 55–237 px). Diperbaiki: keterangan
+   disembunyikan selama daftar terbuka, lalu dikembalikan.
+7. **Klik wilayah membuka kartu Populasi** saat peta Agama menyala (dua
+   pendengar pada lapisan yang sama). Diperbaiki dengan penjagaan di
+   `js/warna.js`.
+
+### Catatan
+
+- Persentase dihitung dari **jumlah penduduk**, bukan dari jumlah 7 agama.
+  Diukur 17 Okt 2026: jumlah 7 agama 284.915.499 vs jumlah penduduk
+  284.973.643 (selisih 0,02%) pada tingkat provinsi & kab/kota — selisih itu
+  penduduk yang agamanya belum tercatat Dukcapil. Kalau dihitung dari jumlah
+  7 agama, angkanya jadi dilebih-lebihkan.
+- Nama kolom Dukcapil `katholik`, yang ditulis di layar "Katolik".
+- 18 berkas desa punya jumlah agama nol dan 518 desa berpenduduk 0 — wilayah
+  seperti itu diwarnai abu-abu (`#39434e`), bukan dikarang.
+- Konghucu & Kepercayaan tetap disajikan dalam **angka jumlah** di kartu dan
+  di blok form, sesuai permintaan; keduanya juga bisa dipakai mewarnai peta.
+- Perbandingan dengan tingkat atas dan catatan desa berpenduduk sedikit
+  **belum** dikerjakan (ide tambahan yang belum diputuskan pemilik proyek).
+
