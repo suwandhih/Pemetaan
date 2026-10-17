@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-17">
-<link rel="stylesheet" href="css/gaya.css?v=20261017-17">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-18">
+<link rel="stylesheet" href="css/gaya.css?v=20261017-18">
 </head>
 <body>
 
@@ -42,6 +42,8 @@
     </button>
     <button id="tombol-cari" type="button" aria-label="Cari wilayah, anggota, atau nama jalan"
             title="Cari wilayah, anggota, atau nama jalan">&#9906;</button>
+    <button id="tombol-panduan" type="button" aria-haspopup="dialog" aria-expanded="false"
+            aria-label="Panduan pemakaian" title="Panduan pemakaian">?</button>
   </header>
 
     <!-- Orderan 19: kotak cari wilayah / anggota / nama jalan -->
@@ -193,6 +195,21 @@
           </div>
         </div>
 
+        <!-- Panduan pemakaian: satu tombol [?] di bilah atas. Panduan yang
+             tampil menyesuaikan tempat pemakai berada. Di PC jadi kolom
+             kanan supaya form/daftar di kiri tetap terlihat. -->
+        <aside id="panduan" hidden aria-hidden="true" aria-label="Panduan pemakaian">
+          <div id="panduan-kepala">
+            <h2 id="panduan-judul">Panduan</h2>
+            <button id="panduan-tutup" type="button" aria-label="Tutup panduan">&#10005;</button>
+          </div>
+          <div id="panduan-isi"></div>
+          <div id="panduan-kaki">
+            <p class="panduan-kaki-judul">Panduan fitur lain</p>
+            <div id="panduan-daftar"></div>
+          </div>
+        </aside>
+
       <footer id="bilah-bawah">
               <button id="geser-kiri" type="button" aria-label="Geser ke kiri">&#9664;</button>
               <span id="posisi">—</span>
@@ -202,15 +219,16 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261017-17"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261017-17"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261017-17"></script>
-<script src="js/inti.js?v=20261017-17"></script>
-<script src="js/warna.js?v=20261017-17"></script>
-<script src="js/agama.js?v=20261017-17"></script>
-<script src="js/suku.js?v=20261017-17"></script>
-<script src="js/simpanan.js?v=20261017-17"></script>
-<script src="js/member.js?v=20261017-17"></script>
-<script src="js/cari.js?v=20261017-17"></script>
+<script src="js/lib/maplibre-gl.js?v=20261017-18"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261017-18"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261017-18"></script>
+<script src="js/inti.js?v=20261017-18"></script>
+<script src="js/warna.js?v=20261017-18"></script>
+<script src="js/agama.js?v=20261017-18"></script>
+<script src="js/suku.js?v=20261017-18"></script>
+<script src="js/simpanan.js?v=20261017-18"></script>
+<script src="js/member.js?v=20261017-18"></script>
+<script src="js/cari.js?v=20261017-18"></script>
+<script src="js/panduan.js?v=20261017-18"></script>
 </body>
 </html>

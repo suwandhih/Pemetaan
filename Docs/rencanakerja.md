@@ -2348,3 +2348,198 @@ dilihat pada saat fly.. tidak terganggu dengan box hitam"*.
 2. **Tabel rincian di panel berdesakan** karena aturan kisi `#kartu` ikut
    berlaku di panel 380 px. Diperbaiki: aturan kisi dibatasi `#kartu`,
    tabel di panel suku dikembalikan satu kolom.
+
+
+---
+
+## Panduan pemakaian di dalam aplikasi (perintah 2026-10-17)
+
+Pemilik proyek: *"saya mau minta km buatkan panduan user .. tentu bukan untuk
+saya saja.. jadi jangan pakai kata 'bapak'. panduan ini bukan 1 file tapi
+setiap fitur jika tombol '?' di klik .. mengeluarkan panduan fokus pada fitur
+di masing2 .. penjelasan penggunaan harus klik apa .. tapi tujuan fitur apa
+dijelaskan terlebih dahulu.. lalu bagaimana cara mengunakan.. tombol '?'
+otomatis mengetahui user sedang diposisikan mana.. jika di klik keluar panduan
+ditampilkan pada tambah anggota.. dan dijelaskan pada panduan ada bisa
+dijalankan misalkan peta fly, dll"*.
+
+### Keputusan pemilik proyek (ditanyakan sebelum dikerjakan)
+
+| Pertanyaan | Jawaban |
+|---|---|
+| Letak panduan di PC | **Kolom kanan** — form/daftar di kiri tetap terlihat dan bisa langsung dicoba |
+| Isi panduan | **Fokus + daftar** — fokus pada fitur yang sedang dibuka, plus daftar fitur lain supaya bisa pindah panduan tanpa menutup |
+
+### Cara kerja
+
+Satu tombol `?` di ujung kanan bilah atas. Saat diketuk, aplikasi memeriksa
+dulu **pemakai sedang berada di mana**, lalu menampilkan panduan yang cocok
+dengan tempat itu — bukan panduan umum yang panjang.
+
+**Sembilan keadaan yang dikenali** (diperiksa dari yang paling dalam):
+
+| Keadaan | Penanda yang diperiksa | Judul panduan |
+|---|---|---|
+| Form isian | `#form-anggota` tidak `hidden` | Tambah / ubah anggota |
+| Kelola kategori | `#anggota-kategori-panel` tidak `hidden` | Kelola kategori |
+| Daftar anggota | `#panel-anggota` tidak `hidden` | Daftar anggota |
+| Panel suku | `#panel-suku` tidak `hidden` | Peta suku bangsa |
+| Daftar Populasi | `#pemilih-warna` tidak `hidden` | Peta penduduk |
+| Daftar Agama | `#pemilih-agama` tidak `hidden` | Peta agama |
+| Kotak cari | `#cari` tidak `hidden` | Cari |
+| Kartu rincian | `#kartu` tidak `hidden` | Rincian wilayah |
+| Peta biasa | (bawaan) | Peta & navigasi |
+
+Urutan pemeriksaan penting: `#anggota-kategori-panel` berada **di dalam**
+`#panel-anggota`, jadi harus diperiksa lebih dulu — kalau tidak, panduan
+kategori tidak pernah muncul.
+
+**Urutan isi setiap panduan** (sama untuk kesembilan fitur):
+
+1. **Untuk apa** — tujuan fitur, ditulis lebih dulu.
+2. **Cara pakai** — langkah bernomor, jelas harus klik apa.
+3. **Yang akan terjadi** — akibat dari langkah itu (mis. peta terbang, pin
+   muncul, garis merah berkedip).
+4. **Catatan** — hal yang perlu diketahui.
+
+Di bawah panduan ada **daftar fitur lain** yang bisa diketuk, supaya pemakai
+bisa berpindah panduan tanpa menutup. Fitur yang sedang dibuka ditandai
+(garis biru).
+
+**Panduan ikut menyesuaikan sendiri**: kalau pemakai membuka atau menutup
+fitur lain sementara panduan terbuka, panduan langsung berganti ke fitur itu.
+
+### Berkas
+
+| Berkas | Perubahan |
+|---|---|
+| `js/panduan.js` | **Baru** (17.413 byte) — 9 panduan, pengenal keadaan, penggambar, daftar fitur |
+| `index.html` | Tombol `#tombol-panduan` (`?`) di bilah atas; `<aside id="panduan">` dengan `#panduan-kepala`, `#panduan-judul`, `#panduan-tutup`, `#panduan-isi`, `#panduan-kaki`, `#panduan-daftar`; `<script src="js/panduan.js">`; versi `?v=20261017-18` |
+| `css/gaya.css` | Gaya `#tombol-panduan`, `#panduan`, `#panduan-*`, `.panduan-*`; di PC `#panduan` jadi kolom kanan 380 px dan peta/bilah/kartu/keterangan menyusut dari kanan; **bilah atas dirapatkan di seluruh mode HP** (lihat bug di bawah) |
+
+### Tampilan
+
+- **PC (≥ 900 px)**: panduan menjadi **kolom kanan 380 px**. Peta menyusut
+  dari kanan (dan dari kiri juga kalau panel/form terbuka), jadi peta tetap
+  terlihat penuh dan form di kiri tetap bisa dicoba sambil membaca panduan.
+- **HP (< 900 px)**: panduan **menutupi layar** karena layarnya sempit.
+  Pemakai berpindah fitur lewat daftar "Panduan fitur lain" di bawah.
+
+### Bukti uji (2026-10-17, dijalankan sendiri, Chrome + Playwright)
+
+**Rangkaian 1 — pengenalan keadaan & tata letak (29 uji):**
+
+| Uji | Hasil |
+|---|---|
+| Tombol `?` ada di bilah atas | ✅ |
+| Panduan tertutup di awal | ✅ |
+| Klik `?` → panduan terbuka, keadaan awal "Peta & navigasi" | ✅ |
+| Isi panduan 4 blok (untuk/cara/hasil/catatan) | ✅ |
+| Langkah bernomor terisi | ✅ 4 langkah |
+| Daftar fitur lain terisi 9 | ✅ |
+| Fitur aktif ditandai | ✅ |
+| Pindah panduan lewat daftar | ✅ |
+| PC: panduan di sisi kanan (x=1060, w=380) | ✅ |
+| PC: peta menyusut dari kanan, tetap memenuhi tinggi (800 px) | ✅ |
+| PC: panel anggota kiri + panduan kanan, peta di tengah (x=380, w=680) | ✅ |
+| Panduan menyesuaikan ke Daftar anggota | ✅ |
+| Panduan menyesuaikan ke Tambah / ubah anggota | ✅ |
+| Panduan menyesuaikan ke Kelola kategori | ✅ |
+| Panduan menyesuaikan ke Peta suku bangsa | ✅ |
+| Panduan menyesuaikan ke Peta penduduk | ✅ |
+| Panduan menyesuaikan ke Peta agama | ✅ |
+| Panduan menyesuaikan ke Cari | ✅ |
+| `Escape` menutup panduan | ✅ |
+| Tombol `?` menutup panduan | ✅ |
+| HP: panduan menutupi layar (390x844) | ✅ |
+| HP: tombol `?` masih di dalam layar | ✅ |
+| HP 360: bilah atas tidak meluber | ✅ |
+| Galat konsol | ✅ 0 |
+
+**Rangkaian 2 — tata letak PC & kartu (11 uji):**
+
+| Uji | Hasil |
+|---|---|
+| PC: form kiri + panduan kanan, peta di tengah | ✅ peta x=380 w=680 |
+| PC: peta masih memenuhi tinggi | ✅ 800 px |
+| PC: daftar Populasi tidak masuk ke bawah panduan | ✅ kanan=208, panduan kiri=1060 |
+| Panduan menyesuaikan ke Rincian wilayah saat kartu muncul | ✅ |
+| PC: kartu rincian tidak masuk ke bawah panduan | ✅ kanan=568 |
+| PC: keterangan warna tidak masuk ke bawah panduan | ✅ kanan=172 |
+| PC: kartu tetap muat saat panel kiri + panduan kanan terbuka | ✅ lebar=560 |
+| Klik di dalam panduan tidak menutup panel anggota | ✅ |
+| Panduan pindah ke fitur yang dipilih | ✅ |
+| Membuka daftar Populasi saat panduan terbuka tetap jalan | ✅ |
+| Galat konsol | ✅ 0 |
+
+**Rangkaian 3 — HP (10 uji):**
+
+| Uji | Hasil |
+|---|---|
+| HP: panduan menutupi layar saat form terbuka | ✅ 390x844 |
+| HP: panduan menyesuaikan ke Tambah / ubah anggota | ✅ |
+| Panduan form menyebut peta terbang | ✅ |
+| Panduan form menyebut pin lokasi | ✅ |
+| Panduan form menyebut titik tengah wilayah | ✅ |
+| Menutup panduan tidak menutup form | ✅ |
+| HP: tombol bilah atas memang di belakang panduan (bukan bug) | ✅ |
+| HP: bisa pindah panduan lewat daftar fitur | ✅ |
+| HP: setelah panduan ditutup, daftar Populasi bisa dibuka | ✅ |
+| Galat konsol | ✅ 0 |
+
+**Rangkaian 4 — lebar layar (12 lebar):** 320, 340, 360, 390, 400, 412, 430,
+480, 600, 899, 900, 1440 px — semuanya ✅ bilah atas muat, tombol `?` tidak
+terpotong.
+
+**Isi kesembilan panduan** — semuanya lengkap 4 blok:
+
+| Panduan | Cara pakai | Yang akan terjadi | Catatan |
+|---|---|---|---|
+| Peta & navigasi | 4 langkah | 3 | 2 |
+| Daftar anggota | 6 langkah | 2 | 3 |
+| Tambah / ubah anggota | 7 langkah | 4 | 3 |
+| Kelola kategori | 5 langkah | 2 | 2 |
+| Peta suku bangsa | 5 langkah | 4 | 3 |
+| Peta penduduk | 5 langkah | 3 | 2 |
+| Peta agama | 6 langkah | 2 | 3 |
+| Cari | 4 langkah | 2 | 2 |
+| Rincian wilayah | 4 langkah | 1 | 2 |
+
+### Bug yang ditemukan & diperbaiki saat uji
+
+**Bilah atas meluber di lebar 401-430 px — tombol Cari & Panduan terpotong.**
+
+Ini bug **lama** yang sudah ada sebelum orderan panduan, tetapi tombol `?`
+yang baru memperburuknya (jadi 7 tombol). Diukur 17 Okt 2026 pada lebar
+430 px: bilah butuh **536 px** sedangkan bingkai HP hanya **430 px**
+(`--lebar-hp: 430px`), sehingga tombol paling kanan terpotong dan tidak bisa
+diklik. Diperparah lagi karena aturan perapatannya hanya berlaku di
+`@media (max-width: 400px)`, padahal bingkai HP **selalu** 430 px berapa pun
+lebar layarnya.
+
+Diperbaiki: aturan perapatan bilah atas (gap 5 px, padding 7 px, tombol
+Anggota/Agama/Suku jadi ikon saja) dipindah dari `max-width: 400px` ke
+`max-width: 899px` — jadi berlaku di **seluruh mode HP**. Setelah dirapatkan
+bilah butuh **387 px**, muat dengan sisa ruang. Tampilan di bawah 400 px
+**tidak berubah** karena aturannya sama, hanya cakupannya diperluas.
+
+Bukti: pada 430 px, tombol Cari kanan = 388 px dan tombol `?` kanan = 423 px
+(keduanya di dalam bingkai 430 px). Diuji ulang pada 12 lebar layar — semua
+muat.
+
+### Catatan
+
+- Bahasa panduan memakai **"Anda"**, bukan "Bapak", supaya bisa dipakai
+  siapa saja.
+- Panduan **tidak** memakai berkas terpisah per fitur; seluruh isi ada di
+  dalam `js/panduan.js` sebagai satu larik `PANDUAN`, supaya tidak ada
+  permintaan berkas tambahan saat tombol `?` diketuk.
+- `e.stopPropagation()` pada tombol `?` diperlukan agar pendengar klik di
+  `document` (yang menutup daftar melayang) tidak ikut menyala — kalau tidak,
+  membuka panduan akan menutup daftar Populasi/Agama yang sedang terbuka.
+- Pendengar klik di `document` memakai **fase tangkap** (`true`) supaya
+  berjalan sebelum pengubah keadaan, lalu ditunda `setTimeout(…, 0)` agar
+  keadaannya sudah menetap saat diperiksa.
+- Di HP panduan menutupi bilah atas, jadi tombol bilah atas tidak bisa
+  diklik selama panduan terbuka. Ini **disengaja** — pemakai berpindah fitur
+  lewat daftar "Panduan fitur lain" di bawah panduan.
