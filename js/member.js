@@ -1456,6 +1456,48 @@
 
   /* ---------- penanda di peta ---------- */
 
+  /* Orderan 19: penanda sementara untuk hasil pencarian nama jalan.
+     Berbeda dari penanda anggota — hanya satu titik, tidak ikut diklaster,
+     dan hilang sendiri saat peta digeser atau pencarian ditutup. */
+  var LAPISAN_TUNJUK = 'cari-tunjuk';
+  var SUMBER_TUNJUK = 'cari-tunjuk';
+  var jamTunjuk = null;
+
+  function tunjukTitik(lng, lat, nama) {
+    if (!peta) { return; }
+    if (!peta.getSource(SUMBER_TUNJUK)) {
+      peta.addSource(SUMBER_TUNJUK, {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      });
+      peta.addLayer({
+        id: LAPISAN_TUNJUK,
+        type: 'circle',
+        source: SUMBER_TUNJUK,
+        paint: {
+          'circle-radius': 8,
+          'circle-color': '#ffd166',
+          'circle-stroke-color': '#7a4b00',
+          'circle-stroke-width': 2
+        }
+      });
+    }
+    peta.getSource(SUMBER_TUNJUK).setData({
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        properties: { nama: nama || '' },
+        geometry: { type: 'Point', coordinates: [lng, lat] }
+      }]
+    });
+    if (jamTunjuk) { clearTimeout(jamTunjuk); }
+    jamTunjuk = setTimeout(function () {
+      if (peta && peta.getSource(SUMBER_TUNJUK)) {
+        peta.getSource(SUMBER_TUNJUK).setData({ type: 'FeatureCollection', features: [] });
+      }
+    }, 12000);
+  }
+
   function gambarPenanda() {
     if (!peta) { return; }
     var fc = {
@@ -1784,7 +1826,17 @@
       bukaPanel: bukaPanel,
           bukaForm: bukaForm,
           gambarSambung: gambarSambung,
-          terapkanTampil: terapkanTampil
+          terapkanTampil: terapkanTampil,
+          /* Dipakai modul pencarian (js/cari.js) — orderan 19. */
+          ambilAnggota: function () { return anggota; },
+          warnaKategori: warnaKategori,
+          daftarPoligon: daftarTingkat,
+          sorotWilayah: function (tingkat, kode) {
+            var daftar = daftarTingkat(tingkat);
+            gambarSorot(daftar, kode, kolomTingkat(tingkat));
+          },
+          bukaKartuAnggota: kartuAnggota,
+          tunjukTitik: tunjukTitik
         };
   }
 

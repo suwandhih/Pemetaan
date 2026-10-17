@@ -323,6 +323,216 @@ body {
 /* Revisi 2026-10-17: daftar jenis peta tidak dipakai lagi — tombolnya
    bergantian (Satelit ⇄ Map). Aturan #pemilih-peta / .pilihan-peta dihapus. */
 
+/* ---------- Orderan 19: tombol & kotak cari ---------- */
+
+/* Di HP sempit (≤ 400 px) bilah atas tidak muat bila keempat tombol memakai
+   tulisan penuh — diukur 17 Okt 2026: 322 px isi vs 312 px layar. Karena itu
+   jarak & padding dirapatkan dan tombol Anggota menjadi ikon saja. */
+@media (max-width: 400px) {
+  #bilah-atas {
+    gap: 5px;
+    padding: 0 7px;
+  }
+
+  #tombol-jenis,
+  #tombol-warna,
+  #tombol-anggota {
+    padding: 0 7px;
+  }
+
+  #tombol-anggota {
+    width: 30px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
+
+  #tombol-anggota::before {
+    content: '\2630';
+    font-size: 14px;
+  }
+}
+
+/* Layar sangat sempit (≤ 340 px) — diukur 17 Okt 2026: masih 265 px isi vs
+   256 px layar. Tulisan "Populasi" disembunyikan, tinggal ikon 👁. */
+@media (max-width: 340px) {
+  #warna-nama {
+    display: none;
+  }
+
+  #tombol-warna {
+    width: 30px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+#tombol-cari {
+  margin-left: auto;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  min-width: 30px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-cari[aria-expanded="true"] {
+  border-color: #58a6ff;
+  background: rgba(88, 166, 255, 0.22);
+}
+
+#cari {
+  position: absolute;
+  top: var(--tinggi-bilah);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - var(--tinggi-bilah) - var(--tinggi-bilah));
+  border-bottom: 1px solid var(--garis);
+  background: rgba(9, 12, 16, 0.97);
+  backdrop-filter: blur(8px);
+}
+
+#cari[hidden] {
+  display: none;
+}
+
+#cari-baris {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--garis);
+}
+
+#cari-ikon {
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+#cari-isian {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+#cari-isian:focus {
+  outline: none;
+  border-color: #58a6ff;
+}
+
+#cari-tutup {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--terang);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#cari-hasil {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 8px 10px;
+}
+
+.cari-grup {
+  margin: 8px 2px 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.cari-baris {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 9px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.cari-baris:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.cari-ikon {
+  flex: none;
+  width: 18px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.cari-titik {
+  width: 10px;
+  height: 10px;
+  margin: 4px 4px 0;
+  border-radius: 50%;
+}
+
+.cari-isi {
+  flex: 1;
+  min-width: 0;
+}
+
+.cari-nama {
+  display: block;
+  font-weight: 600;
+}
+
+.cari-ket {
+  display: block;
+  margin-top: 1px;
+  font-size: 10.5px;
+  opacity: 0.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cari-pesan {
+  margin: 10px 4px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  opacity: 0.7;
+}
+
 #bilah-bawah {
   bottom: 0;
   border-top: 1px solid var(--garis);
@@ -1226,5 +1436,11 @@ select.fa-input option:checked {
   #bingkai:has(#form-anggota:not([hidden])) #kartu,
   #bingkai:has(#form-anggota:not([hidden])) #derajat {
     left: calc(var(--lebar-panel) + 8px);
+  }
+
+  /* Kotak cari hanya selebar peta, tidak menutupi kolom kiri. */
+  #bingkai:has(#panel-anggota:not([hidden])) #cari,
+  #bingkai:has(#form-anggota:not([hidden])) #cari {
+    left: var(--lebar-panel);
   }
 }

@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-09">
-<link rel="stylesheet" href="css/gaya.css?v=20261017-09">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-10">
+<link rel="stylesheet" href="css/gaya.css?v=20261017-10">
 </head>
 <body>
 
@@ -30,7 +30,20 @@
       <span id="warna-nama">Populasi</span>
       <span id="warna-ikon">&#128065;</span>
     </button>
+    <button id="tombol-cari" type="button" aria-label="Cari wilayah, anggota, atau nama jalan"
+            title="Cari wilayah, anggota, atau nama jalan">&#9906;</button>
   </header>
+
+    <!-- Orderan 19: kotak cari wilayah / anggota / nama jalan -->
+    <div id="cari" hidden>
+      <div id="cari-baris">
+        <span id="cari-ikon">&#9906;</span>
+        <input id="cari-isian" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Cari wilayah, anggota, atau nama jalan…" />
+        <button id="cari-tutup" type="button" aria-label="Tutup pencarian">&#10005;</button>
+      </div>
+      <div id="cari-hasil"></div>
+    </div>
 
     <!-- Orderan 16: peta tematik jumlah penduduk (Dukcapil Kemendagri) -->
     <div id="pemilih-warna" role="listbox" aria-label="Peta penduduk" hidden></div>
@@ -138,12 +151,13 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261017-09"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261017-09"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261017-09"></script>
-<script src="js/inti.js?v=20261017-09"></script>
-<script src="js/warna.js?v=20261017-09"></script>
-<script src="js/simpanan.js?v=20261017-09"></script>
-<script src="js/member.js?v=20261017-09"></script>
+<script src="js/lib/maplibre-gl.js?v=20261017-10"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261017-10"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261017-10"></script>
+<script src="js/inti.js?v=20261017-10"></script>
+<script src="js/warna.js?v=20261017-10"></script>
+<script src="js/simpanan.js?v=20261017-10"></script>
+<script src="js/member.js?v=20261017-10"></script>
+<script src="js/cari.js?v=20261017-10"></script>
 </body>
 </html>
