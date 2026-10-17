@@ -34,7 +34,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 16 | **Data jumlah penduduk berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan, disajikan seperti `DataPeta`; sumber Dukcapil Kemendagri | MENUNGGU KONFIRMASI | 90–150 mnt | — |
 | 17 | **User input data anggota** — tambah/ubah/hapus data per lokasi; pengelompokan bisa per desa, kecamatan, kabupaten, atau provinsi; konsep diambil dari `DataPeta` lalu disesuaikan | MENUNGGU KONFIRMASI | 90–120 mnt | — |
 | 18 | **Form Tambah Anggota + Peta interaktif di bawah form** — saat pilih provinsi peta otomatis fokus ke provinsi; pilih kab/kota fokus lebih dalam ke kab/kota; pilih kecamatan fokus ke kecamatan; pilih desa/kelurahan fokus ke desa/kelurahan | **SELESAI DIKERJAKAN** — menunggu keputusan pemilik proyek | 30–45 mnt | — |
-| 19 | **Fitur Cari `[⌕]`** — pencarian lokasi/wilayah atau nama anggota/yayasan | BARU (dicatat untuk besok) | 30–45 mnt | — |
+| 19 | **Fitur Cari `[⌕]`** — pencarian lokasi/wilayah atau nama anggota/yayasan | **SELESAI DIKERJAKAN** — menunggu keputusan pemilik proyek | 30–45 mnt | — |
 | 20 | **Titik lokasi suku-suku** — data dari `c:\data\datapeta` dipelajari & **diolah ulang**, disajikan menurut konsep Pemetaan (bukan meniru cara saji DataPeta) | BARU (perintah 2026-10-17) | 60–90 mnt | — |
 | 21 | **Jumlah beragama berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan; data dari `c:\data\datapeta` dipelajari, **angka diolah & disajikan** menurut konsep Pemetaan | BARU (perintah 2026-10-17) | 90–120 mnt | — |
 | 22 | **Ralat orderan 14d — tampilan PC lebar (responsive)**: PC lebar penuh, peta **memenuhi tinggi layar tanpa ruang kosong**; HP tetap seperti sekarang (bila layar HP lebih lebar, peta ikut lebih lebar, tidak mengecil; tidak muat → geser kiri-kanan) | **SELESAI DIKERJAKAN** — menunggu keputusan pemilik proyek | 45–60 mnt | — |
@@ -1821,6 +1821,102 @@ Diuji lewat server lokal `python -m http.server` di `127.0.0.1:8777`.
 
 Kedipan dijalankan hanya selama ada wilayah yang disorot (`mulaiKedip` /
 `hentikanKedip`), supaya tidak membebani peramban tanpa guna.
+
+---
+
+## Orderan 19 — Fitur Cari (perintah 2026-10-17)
+
+### Perintah pemilik proyek
+
+> "Fitur Cari `[⌕]` — pencarian lokasi/wilayah atau nama anggota/yayasan."
+
+Tambahan saat paparan: *"Apakah bisa nama jalan, karena ada di peta?"* ·
+*"Tombol `⌕` ditempatkan di sisi kanan."* · *"Desa perlu, sangat perlu."*
+
+### Yang bisa dicari
+
+| Jenis | Sumber | Butuh internet? |
+|---|---|---|
+| **Wilayah** — provinsi → desa/kelurahan | Indeks Dukcapil di proyek | ❌ Tidak |
+| **Anggota / yayasan** | Database Neon (lewat `PD_ANGGOTA`) | ❌ Tidak |
+| **Nama jalan / tempat** | OpenStreetMap (Nominatim) | ✅ Ya |
+
+### Berkas baru
+
+| Berkas | Isi | Ukuran | Kapan dimuat |
+|---|---|---|---|
+| `alat/buat-indeks-cari.js` | Alat pembuat indeks | — | Sekali, saat pembuatan |
+| `data/cari-wilayah.js` | provinsi + kab/kota + kecamatan · **7.798 entri** | **253 KB** | Begitu kotak cari dibuka |
+| `data/cari-desa.js` | desa/kelurahan · **83.411 entri** | **3,3 MB** | Latar belakang |
+| `js/cari.js` | Modul pencarian | — | Bersama halaman |
+
+Indeks hanya memuat **kode + nama + kode induk** — tanpa poligon, sehingga
+jauh lebih kecil daripada berkas batas wilayah. Dibuat ulang kapan saja dengan
+`node alat/buat-indeks-cari.js`.
+
+### Cara pakai
+
+1. Tombol **`⌕`** di **paling kanan** bilah atas.
+2. Ketuk → kotak cari terbuka; pencarian wilayah langsung bisa dipakai.
+3. Ketik minimal **2 huruf** → hasil muncul sambil mengetik.
+4. Hasil dikelompokkan: **Anggota** · **Wilayah** · **Jalan / Tempat**.
+5. Ketuk hasil **wilayah** → peta terbang + garis merah berkedip mengelilinginya.
+6. Ketuk hasil **anggota** → peta terbang ke titik anggota + kartu terbuka.
+7. Ketuk hasil **jalan** → peta terbang + penanda kuning sementara (hilang 12 detik).
+
+### Batas sopan OpenStreetMap
+
+Nominatim membatasi **1 permintaan/detik**. Karena itu:
+
+| Pengaturan | Nilai |
+|---|---|
+| Jeda setelah ketikan berhenti | **220 ms** |
+| Jeda sebelum memanggil OSM | **400 ms** |
+| Huruf minimal untuk mencari jalan | **3** |
+| Hasil per permintaan | 8 |
+| Batas negara | `countrycodes=id` |
+
+Kalau OSM tidak bisa dihubungi, ditulis apa adanya: *"Nama jalan tidak bisa
+dicari (butuh internet)."* — pencarian wilayah & anggota tetap jalan.
+
+### Perbaikan tata letak bilah atas
+
+Setelah tombol cari ditambahkan, bilah atas **meluber** di HP sempit. Diukur
+17 Okt 2026: 322 px isi vs 312 px layar.
+
+| Lebar layar | Yang berlaku |
+|---|---|
+| > 400 px | Semua tombol memakai tulisan penuh |
+| ≤ 400 px | Jarak & padding dirapatkan; tombol `Anggota` menjadi ikon `☰` saja |
+| ≤ 340 px | Tulisan `Populasi` disembunyikan, tinggal ikon 👁 |
+
+### Bukti uji (2026-10-17, dijalankan sendiri)
+
+Diuji lewat server lokal `python -m http.server` di `127.0.0.1:8777`.
+
+| Uji | Hasil |
+|---|---|
+| Tombol `⌕` di paling kanan | ✅ kiri 292 px dari 312 px (HP) · 30 px lebar |
+| Bilah atas muat di 320 px | ✅ `potong: false` |
+| Bilah atas muat di 340 / 360 / 390 / 430 px | ✅ `potong: false` di keempatnya |
+| Bilah atas di PC 1152 px | ✅ `potong: false` |
+| Kotak cari terbuka | ✅ `[0,40,312,124]` (HP) · `[0,40,1152,640]` (PC) |
+| Kotak cari saat panel anggota terbuka (PC) | ✅ `[380,40,772,107]` — tidak menutupi kolom |
+| Cari `badung` | ✅ Wilayah (4): BADUNG · Kabupaten/Kota · BALI · BADUNG · Desa/Kelurahan · PROPPO · CIBADUNG · LARANGAN BADUNG |
+| Cari `semarang` | ✅ Wilayah (12) — termasuk SEMARANG UTARA/BARAT/TIMUR/TENGAH/SELATAN (Kecamatan) |
+| Cari `angantaka` (desa) | ✅ ANGANTAKA · Desa/Kelurahan · ABIANSEMAL |
+| Cari `malioboro` (jalan) | ✅ Jalan/Tempat (4) — termasuk *Malioboro, Jalan Malioboro, Suryatmajan, Danurejan, Yogyakarta* |
+| Klik hasil wilayah BADUNG | ✅ peta → `115,168° · -8,544° · z9,43` · garis sorot **1 fitur** · kotak cari tertutup |
+| Klik hasil jalan Malioboro | ✅ peta → `110,3657° · -7,7953° · z16` · penanda tunjuk **1 fitur** di `[110,36573, -7,79529]` |
+| Keterangan anggota belum tersambung | ✅ *"Anggota belum dimuat — isi kode database dulu."* |
+| Galat halaman | ✅ 0 galat |
+
+### Catatan
+
+Pencarian nama jalan **tidak menambah ukuran repo** — ditanyakan langsung ke
+OpenStreetMap saat dipakai. Kelengkapan nama jalan bergantung pada data OSM:
+lengkap di kota besar, bisa kosong di desa terpencil. Itu keadaan datanya,
+bukan kerusakan.
 
 ---
 
