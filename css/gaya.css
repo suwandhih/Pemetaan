@@ -374,8 +374,10 @@ body {
 }
 
 /* Grup tombol [Anggota][👁] di sebelah kanan bilah atas. */
+/* Grup tombol anggota — diletakkan paling kiri bilah atas (revisi
+   2026-10-17) supaya sejajar dengan kolom form anggota di bawahnya saat
+   kolom itu terbuka di PC. */
 #grup-anggota {
-  margin-left: auto;
   display: inline-flex;
   align-items: center;
   gap: 4px;
