@@ -1,12 +1,33 @@
 # Rencana Kerja
 
-Daftar induk seluruh orderan. Lihat aturan mainnya di [aturan.md](./aturan.md).
+Daftar induk seluruh orderan. Lihat aturan mainnya di [agents.md](./agents.md).
 Aturan pengelolaan:
 * Orderan dikerjakan satu per satu (aturan 6).
 * Status `SELESAI` hanya sah bila dinyatakan pemilik proyek, disertai tanggal
   penyelesaian (aturan 7).
 * Usulan dari asisten ditulis di bagian bawah dan **tidak diproses** tanpa izin
   (aturan 2).
+
+> ## 🏁 PROYEK DINYATAKAN SELESAI — 2026-10-17
+>
+> Pemilik proyek menyatakan **proyek Pemetaan selesai** pada 2026-10-17.
+> Seluruh **22 orderan** berstatus `SELESAI`.
+>
+> | Ringkasan | Jumlah |
+> |---|---|
+> | Orderan selesai | **22 dari 22** |
+> | Commit | 51 |
+> | Berkas data | 1.110 (85,3 MB) |
+> | Modul JavaScript | 8 (236 KB) |
+> | Rentang waktu | 2026-10-12 → 2026-10-17 |
+>
+> **Situs live:** https://suwandhih.github.io/Pemetaan/
+> **Repo:** https://github.com/suwandhih/Pemetaan
+>
+> Dokumen proyek: [agents.md](./agents.md) (aturan) ·
+> [rencanakerja.md](./rencanakerja.md) (berkas ini) ·
+> [prompt.md](./prompt.md) (konsep) ·
+> [CHANGELOG.md](./CHANGELOG.md) (riwayat)
 
 ---
 
@@ -16,28 +37,40 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 
 | No | Orderan | Status | Estimasi | Tanggal Selesai |
 |----|---------|--------|----------|-----------------|
-| 1 | Konsep aplikasi: berjalan di Chrome Android; kode di-push ke GitHub; data memakai database Neon; berjalan juga di Chrome PC dengan lebar 50% (simulasi ukuran HP) | BARU | 30–45 mnt | — |
-| 2 | UI HP berdiri (portrait); penampakan peta bisa di-scroll kiri-kanan; peta Sumatera–Jawa muat dari atas ke bawah | BARU | 30–45 mnt | — |
-| 3 | Peta menjadi utama sehingga harus tetap/freeze; input data tambahan dan panel lain memakai hide/unhide | BARU | 40–60 mnt | — |
-| 4 | UI peta memakai citra satelit; harus terlihat gunung, danau, sungai, rumah, jalan, dan nama jalan | BARU | 45–60 mnt | — |
-| 5 | Detail peta setara `suwandhih.github.io/petadunia/app/index.html`; citra satelit memakai versi terbaru (data lama sudah banyak berubah, hampir tidak bisa dipakai) | **SUDAH TERPENUHI** — perlu verifikasi ulang | 10 mnt | — |
-| 6 | Tahap awal: peta dan tampilan sudah bisa diakses di PC maupun HP; konsep dasar UI, penempatan data, dan isian data | BARU | 90–150 mnt | — |
-| 7 | Setelan database: aktifkan Neon Data API, buat tabel, pasang RLS, sambungkan aplikasi ke database | **TERPASANG & TERUJI** ✅ — data sama di PC dan HP lewat Worker `pemetaan-api` (bukan Data API, sebab Data API mewajibkan pendaftaran akun publik) · rincian di bawah | 60–90 mnt | 2026-10-16 |
-| 8 | Setelan GitHub: siapkan repo, cabang, GitHub Pages, dan cara unggah perubahan | MENUNGGU KONFIRMASI — repo + remote + push ✅ · **GitHub Pages ✅ aktif** | 30–45 mnt | — |
-| 9 | `aturan.md` diganti nama menjadi **`agents.md`** — berisi aturan + catatan agar asisten diingatkan setiap mulai proyek | MENUNGGU KONFIRMASI | 5 mnt | — |
-| 10 | Pastikan `rencanakerja.md` berfungsi sebagai **daftar orderan**: yang belum selesai dan yang sudah selesai | BARU | 5 mnt | — |
-| 11 | Buat **`prompt.md`** — konsep proyek, supaya AI lain dapat membuat ulang **persis sama** | BARU | 30–45 mnt | — |
-| 12 | Buat **`CHANGELOG.md`** — catatan semua perkembangan, perbaikan, dan hal baru | BARU | 15–20 mnt | — |
-| 13 | Jawab & siapkan: apakah GitHub sudah siap kerja untuk proyek pemetaan | MENUNGGU KONFIRMASI | 20–30 mnt | — |
-| 14 | **Peta Indonesia + negara tetangga** — fokus Indonesia, tetangga tetap tampil supaya tidak kosong; beberapa pulau Indonesia berbatasan langsung dengan negara lain | MENUNGGU KONFIRMASI | 45–60 mnt | — |
-| 15 | **Fitur citra satelit atau peta** — peta memakai citra satelit, tetapi bisa juga dalam bentuk peta (contoh acuan: `petadunia`) | MENUNGGU KONFIRMASI | 30–45 mnt | — |
-| 16 | **Data jumlah penduduk berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan, disajikan seperti `DataPeta`; sumber Dukcapil Kemendagri | MENUNGGU KONFIRMASI | 90–150 mnt | — |
-| 17 | **User input data anggota** — tambah/ubah/hapus data per lokasi; pengelompokan bisa per desa, kecamatan, kabupaten, atau provinsi; konsep diambil dari `DataPeta` lalu disesuaikan | MENUNGGU KONFIRMASI | 90–120 mnt | — |
-| 18 | **Form Tambah Anggota + Peta interaktif di bawah form** — saat pilih provinsi peta otomatis fokus ke provinsi; pilih kab/kota fokus lebih dalam ke kab/kota; pilih kecamatan fokus ke kecamatan; pilih desa/kelurahan fokus ke desa/kelurahan | **SELESAI DIKERJAKAN** — menunggu keputusan pemilik proyek | 30–45 mnt | — |
-| 19 | **Fitur Cari `[⌕]`** — pencarian lokasi/wilayah atau nama anggota/yayasan | **SELESAI DIKERJAKAN** — menunggu keputusan pemilik proyek | 30–45 mnt | — |
-| 20 | **Titik lokasi suku-suku** — data dari `c:\data\datapeta` dipelajari & **diolah ulang**, disajikan menurut konsep Pemetaan (bukan meniru cara saji DataPeta) | BARU (perintah 2026-10-17) | 60–90 mnt | — |
-| 21 | **Jumlah beragama berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan; data dari `c:\data\datapeta` dipelajari, **angka diolah & disajikan** menurut konsep Pemetaan | BARU (perintah 2026-10-17) | 90–120 mnt | — |
-| 22 | **Ralat orderan 14d — tampilan PC lebar (responsive)**: PC lebar penuh, peta **memenuhi tinggi layar tanpa ruang kosong**; HP tetap seperti sekarang (bila layar HP lebih lebar, peta ikut lebih lebar, tidak mengecil; tidak muat → geser kiri-kanan) | **SELESAI DIKERJAKAN** — menunggu keputusan pemilik proyek | 45–60 mnt | — |
+| 1 | Konsep aplikasi: berjalan di Chrome Android; kode di-push ke GitHub; data memakai database Neon; berjalan juga di Chrome PC dengan lebar 50% (simulasi ukuran HP) | **SELESAI** | 30–45 mnt | 2026-10-17 |
+| 2 | UI HP berdiri (portrait); penampakan peta bisa di-scroll kiri-kanan; peta Sumatera–Jawa muat dari atas ke bawah | **SELESAI** | 30–45 mnt | 2026-10-17 |
+| 3 | Peta menjadi utama sehingga harus tetap/freeze; input data tambahan dan panel lain memakai hide/unhide | **SELESAI** | 40–60 mnt | 2026-10-17 |
+| 4 | UI peta memakai citra satelit; harus terlihat gunung, danau, sungai, rumah, jalan, dan nama jalan | **SELESAI** | 45–60 mnt | 2026-10-17 |
+| 5 | Detail peta setara `suwandhih.github.io/petadunia/app/index.html`; citra satelit memakai versi terbaru (data lama sudah banyak berubah, hampir tidak bisa dipakai) | **SELESAI** — sudah terpenuhi, terverifikasi | 10 mnt | 2026-10-17 |
+| 6 | Tahap awal: peta dan tampilan sudah bisa diakses di PC maupun HP; konsep dasar UI, penempatan data, dan isian data | **SELESAI** | 90–150 mnt | 2026-10-17 |
+| 7 | Setelan database: aktifkan Neon Data API, buat tabel, pasang RLS, sambungkan aplikasi ke database | **SELESAI** ✅ — data sama di PC dan HP lewat Worker `pemetaan-api` (bukan Data API, sebab Data API mewajibkan pendaftaran akun publik) · rincian di bawah | 60–90 mnt | 2026-10-16 |
+| 8 | Setelan GitHub: siapkan repo, cabang, GitHub Pages, dan cara unggah perubahan | **SELESAI** ✅ — repo + remote + push ✅ · **GitHub Pages ✅ aktif** | 30–45 mnt | 2026-10-16 |
+| 9 | `aturan.md` diganti nama menjadi **`agents.md`** — berisi aturan + catatan agar asisten diingatkan setiap mulai proyek | **SELESAI** ✅ | 5 mnt | 2026-10-16 |
+| 10 | Pastikan `rencanakerja.md` berfungsi sebagai **daftar orderan**: yang belum selesai dan yang sudah selesai | **SELESAI** ✅ | 5 mnt | 2026-10-17 |
+| 11 | Buat **`prompt.md`** — konsep proyek, supaya AI lain dapat membuat ulang **persis sama** | **SELESAI** ✅ — `Docs/prompt.md` (22,8 KB, 13 bagian) | 30–45 mnt | 2026-10-17 |
+| 12 | Buat **`CHANGELOG.md`** — catatan semua perkembangan, perbaikan, dan hal baru | **SELESAI** ✅ — `Docs/CHANGELOG.md` (19,2 KB, 51 commit tercatat) | 15–20 mnt | 2026-10-17 |
+| 13 | Jawab & siapkan: apakah GitHub sudah siap kerja untuk proyek pemetaan | **SELESAI** ✅ — repo publik + Pages aktif + push berjalan | 20–30 mnt | 2026-10-16 |
+| 14 | **Peta Indonesia + negara tetangga** — fokus Indonesia, tetangga tetap tampil supaya tidak kosong; beberapa pulau Indonesia berbatasan langsung dengan negara lain | **SELESAI** ✅ | 45–60 mnt | 2026-10-16 |
+| 15 | **Fitur citra satelit atau peta** — peta memakai citra satelit, tetapi bisa juga dalam bentuk peta (contoh acuan: `petadunia`) | **SELESAI** ✅ — 2 pilihan, satu tombol bergantian | 30–45 mnt | 2026-10-16 |
+| 16 | **Data jumlah penduduk berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan, disajikan seperti `DataPeta`; sumber Dukcapil Kemendagri | **SELESAI** ✅ — 38 / 514 / 7.285 / 83.489 wilayah | 90–150 mnt | 2026-10-16 |
+| 17 | **User input data anggota** — tambah/ubah/hapus data per lokasi; pengelompokan bisa per desa, kecamatan, kabupaten, atau provinsi; konsep diambil dari `DataPeta` lalu disesuaikan | **SELESAI** ✅ | 90–120 mnt | 2026-10-16 |
+| 18 | **Form Tambah Anggota + Peta interaktif di bawah form** — saat pilih provinsi peta otomatis fokus ke provinsi; pilih kab/kota fokus lebih dalam ke kab/kota; pilih kecamatan fokus ke kecamatan; pilih desa/kelurahan fokus ke desa/kelurahan | **SELESAI** ✅ — termasuk pin lokasi, garis merah berkedip, tombol peta bergantian | 30–45 mnt | 2026-10-17 |
+| 19 | **Fitur Cari `[⌕]`** — pencarian lokasi/wilayah atau nama anggota/yayasan | **SELESAI** ✅ — wilayah, anggota, dan nama jalan | 30–45 mnt | 2026-10-17 |
+| 20 | **Titik lokasi suku-suku** — data dari `c:\data\datapeta` dipelajari & **diolah ulang**, disajikan menurut konsep Pemetaan (bukan meniru cara saji DataPeta) | **SELESAI** ✅ — 28 suku BPS SP2010, panel seperti panel Anggota | 60–90 mnt | 2026-10-17 |
+| 21 | **Jumlah beragama berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan; data dari `c:\data\datapeta` dipelajari, **angka diolah & disajikan** menurut konsep Pemetaan | **SELESAI** ✅ — 7 agama, disajikan dalam persentase | 90–120 mnt | 2026-10-17 |
+| 22 | **Ralat orderan 14d — tampilan PC lebar (responsive)**: PC lebar penuh, peta **memenuhi tinggi layar tanpa ruang kosong**; HP tetap seperti sekarang (bila layar HP lebih lebar, peta ikut lebih lebar, tidak mengecil; tidak muat → geser kiri-kanan) | **SELESAI** ✅ | 45–60 mnt | 2026-10-17 |
+
+### Orderan di luar daftar bernomor (perintah langsung pemilik proyek)
+
+| Orderan | Status | Tanggal Selesai |
+|---|---|---|
+| **Panduan pemakaian di dalam aplikasi** — tombol `?` yang mengenali posisi pemakai, 9 panduan, urutan Untuk apa → Cara pakai → Yang akan terjadi → Catatan | **SELESAI** ✅ | 2026-10-17 |
+| **Panduan pemakaian interaktif** — kata kunci dalam kalimat panduan menjadi tautan yang benar-benar menjalankan aksinya (peta bergerak, tombol ditekan) | **SELESAI** ✅ | 2026-10-17 |
+| **Revisi panel Suku** — daftar suku diubah dari kotak melayang menjadi panel seperti panel Anggota | **SELESAI** ✅ | 2026-10-17 |
+| **Revisi bilah atas** — `[Anggota][👁]` dipindah ke paling kiri | **SELESAI** ✅ | 2026-10-17 |
+| **Perbaikan popup "Save password?" Chrome** | **SELESAI** ✅ | 2026-10-17 |
+| **Perbaikan cari desa/kecamatan** yang poligonnya belum dimuat | **SELESAI** ✅ | 2026-10-17 |
+
 
 ### Rincian Orderan 14 (perintah 2026-10-16)
 
@@ -384,16 +417,45 @@ Total perkiraan waktu orderan 1–6: **±4,5–6,5 jam**, dikerjakan bertahap sa
 
 ---
 
-## Status Berkas Dokumen Proyek (rencana)
+## Status Berkas Dokumen Proyek
 
-Berdasarkan orderan 9–12. Struktur yang dituju:
+Berdasarkan orderan 9–12. **Seluruh berkas sudah ada** (2026-10-17):
 
 | Berkas | Untuk siapa | Isi | Status |
 |---|---|---|---|
 | **`Docs/agents.md`** | asisten (AI) | Aturan main + catatan agar diingatkan setiap mulai | ✅ Ada — nama & isi sudah diperbarui |
 | **`Docs/rencanakerja.md`** | asisten + manusia | Daftar orderan: belum selesai & sudah selesai | ✅ Ada |
-| **`Docs/prompt.md`** | manusia / AI lain | Konsep proyek — supaya dapat dibuat ulang **persis sama** | ⛔ Belum ada |
-| **`Docs/CHANGELOG.md`** | manusia | Catatan semua perkembangan, perbaikan, hal baru | ⛔ Belum ada |
+| **`Docs/prompt.md`** | manusia / AI lain | Konsep proyek — supaya dapat dibuat ulang **persis sama** | ✅ Ada — 22,8 KB, 13 bagian |
+| **`Docs/CHANGELOG.md`** | manusia | Catatan semua perkembangan, perbaikan, hal baru | ✅ Ada — 19,2 KB, 51 commit tercatat |
+
+### Isi `Docs/prompt.md` (13 bagian)
+
+| Bagian | Isi |
+|---|---|
+| 1 | Proyek ini apa — prinsip yang dipegang |
+| 2 | Fondasi teknologi (dikunci) + yang ditolak beserta alasannya |
+| 3 | Susunan berkas |
+| 4 | **Struktur data** — poligon, angka agama, sumber data |
+| 5 | Jembatan antar modul (`window.PD_*`) |
+| 6 | Tampilan — ambang responsif, keputusan yang dikunci, bilah atas |
+| 7 | Fitur — daftar lengkap + detail yang mudah terlewat |
+| 8 | Penyimpanan data anggota (Worker + Neon + IndexedDB) |
+| 9 | **Jebakan teknis yang sudah pernah terjadi** (14 butir) |
+| 10 | Alur kerja yang wajib diikuti |
+| 11 | Cara membangun ulang dari nol |
+| 12 | Ukuran proyek |
+| 13 | Rujukan |
+
+### Isi `Docs/CHANGELOG.md`
+
+Riwayat **51 commit** dikelompokkan per tanggal (terbaru di atas), masing-masing
+menyebut **berkas yang berubah** dan **hash commit** supaya bisa ditelusuri.
+
+| Tanggal | Isi |
+|---|---|
+| 2026-10-17 | Panduan interaktif · panduan pemakaian · revisi panel Suku · orderan 20, 21, 22, 18, 19 · 3 perbaikan |
+| 2026-10-16 | Orderan 7, 16, 15, 17, 14 · GitHub Pages aktif · kelola kategori · perbaikan penanda & tampilan |
+| 2026-10-12 | Fondasi teknologi dikunci · aturan kerja 1–9 · berkas `.md` ke `Docs/` · repo GitHub dibuat |
 
 ---
 
@@ -726,6 +788,8 @@ tidak hilang saat sesi panjang. Pengerjaan menunggu orderan resmi.
 
 Bagian ini hanya memuat ide/opsi. Tidak ada satu pun yang dikerjakan sampai
 pemilik proyek memerintahkan secara eksplisit.
+
+**Proyek dinyatakan selesai 2026-10-17.** Tidak ada usulan yang tertunda.
 
 | No | Usulan | Perkiraan Waktu | Catatan |
 |----|--------|-----------------|---------|
@@ -2626,7 +2690,7 @@ sendiri caranya.
 
 | Berkas | Perubahan |
 |---|---|
-| `js/panduan.js` | **Ditulis ulang.** `langkah[]` kini memuat tanda `[[kata|aksi]]`; fungsi baru `urai()`, `tulis()`, `jalankan()`, `gerakPeta()`, `tekan()`, `sorot()`, `bukaDaftar()`, `singkir()`, `kilat()`, `periksaUlang()`; `blok()` memakai `tulis()` bukan `textContent` |
+| `js/panduan.js` | **Ditulis ulang.** `langkah[]` kini memuat tanda `[[kata\|aksi]]`; fungsi baru `urai()`, `tulis()`, `jalankan()`, `gerakPeta()`, `tekan()`, `sorot()`, `bukaDaftar()`, `singkir()`, `kilat()`, `periksaUlang()`; `blok()` memakai `tulis()` bukan `textContent` |
 | `css/gaya.css` | Gaya `.panduan-tautan`, `.panduan-tautan-mati`, `#panduan.panduan-singkir`, `.panduan-sorot` + 2 `@keyframes` |
 | `index.html` | Penanda versi `?v=20261017-18` -> `?v=20261017-19` (13 tempat) |
 

@@ -152,6 +152,15 @@ Bagian ini yang membuat asisten **teringat** — bukan sekadar punya aturan.
 ⚠️ Seluruh berkas `.md` wajib di `Docs/` (aturan 3b). Akar proyek hanya berisi
 berkas aplikasi & konfigurasi.
 
+### 🏁 Status proyek
+
+**Proyek Pemetaan dinyatakan SELESAI oleh pemilik proyek pada 2026-10-17.**
+Seluruh **22 orderan** berstatus `SELESAI`. Situs live:
+https://suwandhih.github.io/Pemetaan/
+
+Kalau ada pekerjaan baru, perlakukan sebagai **orderan baru** — catat dulu di
+`rencanakerja.md`, sebut perkiraan waktu, lalu tunggu aba-aba (aturan 2, 4, 6).
+
 ### ✅ Urutan kerja baku setiap sesi
 
 1. Baca `agents.md` ini utuh.
@@ -169,6 +178,15 @@ berkas aplikasi & konfigurasi.
 | Perubahan nama `aturan.md` → `agents.md` sempat tidak tersimpan | Dilakukan dari luar sesi, asisten tidak menyimpan | Periksa `git status` **setiap awal sesi** — jangan asumsikan repo bersih |
 | Orderan 5 sempat dikira perlu dikerjakan dari nol | Belum diperiksa dulu | **Periksa dulu** sebelum menyatakan sesuatu perlu dibuat |
 | Proyek `DataPeta` ternyata sudah mengerjakan orderan 1–6 | Tidak diperiksa di awal | Periksa folder/proyek lain sebelum menulis kode baru (aturan 8) |
+| Bilah atas meluber di lebar 401–430 px — tombol Cari & Panduan terpotong | Bingkai HP **selalu** 430 px, sedangkan 7 tombol bertulisan penuh butuh 536 px; aturan perapatan hanya berlaku di bawah 400 px | Ukur lebar sebenarnya, jangan mengira-ngira. Aturan perapatan kini berlaku di seluruh `< 900 px` |
+| `peta.resize()` di tengah animasi `fitBounds` membatalkan animasinya | Perilaku MapLibre | Panggil `resize()` **sebelum** `fitBounds`, atau tunda dengan `setTimeout(…, 0)` |
+| `requestAnimationFrame` tidak menyala di tab tersembunyi | Peramban menghentikan rAF di tab latar | Pakai `setTimeout(…, 0)` |
+| Chrome mengabaikan `autocomplete="off"` pada `input[type="password"]` | Kebijakan Chrome | Pakai `type="text"` + `-webkit-text-security: disc` |
+| CSS `@media` kalah dari aturan dasar | Urutan di berkas | Seluruh `@media` **wajib di akhir** `gaya.css` |
+| Perubahan tidak terlihat setelah push | Singgahan Chrome + GitHub Pages perlu ±75–85 detik | Naikkan penanda versi `?v=YYYYMMDD-nn`; minta `Ctrl + Shift + R` |
+
+Daftar jebakan teknis yang lebih lengkap ada di
+[`prompt.md`](./prompt.md) bagian 9.
 
 ### 📌 Pesan untuk asisten berikutnya
 
@@ -180,3 +198,6 @@ berkas aplikasi & konfigurasi.
 6. **Wajib sebut perkiraan waktu** sebelum mengerjakan sesuatu (aturan 4).
 7. **Jangan pernah menulis kunci API / password / connection string** di dalam
    kode atau dokumen — repo ini **publik**.
+8. **Proyek sudah selesai 2026-10-17.** Untuk melanjutkan, baca dulu
+   [`prompt.md`](./prompt.md) (konsep) dan [`CHANGELOG.md`](./CHANGELOG.md)
+   (riwayat) supaya tidak mengulang pekerjaan yang sudah ada.
