@@ -969,6 +969,15 @@ body {
   min-width: 0;
 }
 
+/* Kode database disamarkan sendiri, bukan lewat type="password" — lihat
+   keterangan di index.html. `-webkit-text-security` didukung Chrome, Edge,
+   dan Safari; peramban yang tidak mendukungnya tetap menampilkan tulisan
+   biasa (tidak rusak, hanya tidak tersamar). */
+.anggota-kunci-samar {
+  -webkit-text-security: disc;
+  text-security: disc;
+}
+
 .anggota-kunci-simpan {
   flex: none;
   padding: 0 14px;

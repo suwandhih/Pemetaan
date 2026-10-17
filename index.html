@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-10">
-<link rel="stylesheet" href="css/gaya.css?v=20261017-10">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261017-12">
+<link rel="stylesheet" href="css/gaya.css?v=20261017-12">
 </head>
 <body>
 
@@ -39,6 +39,7 @@
       <div id="cari-baris">
         <span id="cari-ikon">&#9906;</span>
         <input id="cari-isian" type="search" autocomplete="off" spellcheck="false"
+               name="cari-pemetaan" data-form-type="other" data-lpignore="true"
                placeholder="Cari wilayah, anggota, atau nama jalan…" />
         <button id="cari-tutup" type="button" aria-label="Tutup pencarian">&#10005;</button>
       </div>
@@ -73,7 +74,8 @@
             </div>
             <div id="kat-daftar" class="kat-daftar"></div>
             <div class="kat-tambah-baris">
-              <input class="fa-input" id="kat-baru" type="text" placeholder="Nama kategori baru…" />
+              <input class="fa-input" id="kat-baru" type="text" placeholder="Nama kategori baru…"
+                     autocomplete="off" name="kategori-baru" data-form-type="other" />
               <button id="kat-tambah" type="button">+ Tambah</button>
               <button id="kat-ubah" type="button" hidden>Edit</button>
               <button id="kat-hapus" type="button" hidden>Del</button>
@@ -86,9 +88,18 @@
                         Setelah itu data anggota tersimpan bersama dan sama di kedua
                         perangkat.
                       </p>
+                      <!-- Kolom ini BUKAN kata sandi login, jadi sengaja tidak
+                           memakai type="password". Diukur 17 Okt 2026: dengan
+                           type="password", Chrome mengabaikan autocomplete="off"
+                           dan menawarkan "Save password?" setiap kali ada isian
+                           lain diisi (mis. kotak cari) — mengganggu. Tulisan
+                           disamarkan sendiri lewat CSS (-webkit-text-security),
+                           jadi tetap tidak terbaca orang di sebelah. -->
                       <div class="anggota-kunci-baris">
-                        <input class="fa-input" id="anggota-kunci-isian" type="password"
-                               placeholder="Kode database" autocomplete="off" />
+                        <input class="fa-input anggota-kunci-samar" id="anggota-kunci-isian" type="text"
+                               placeholder="Kode database" autocomplete="off"
+                               autocorrect="off" autocapitalize="off" spellcheck="false"
+                               data-lpignore="true" data-1p-ignore data-form-type="other" />
                         <button class="anggota-kunci-simpan" id="anggota-kunci-simpan" type="button">Simpan</button>
                       </div>
                       <p class="fa-catatan fa-peringatan" id="anggota-kunci-pesan" hidden></p>
@@ -105,7 +116,8 @@
 
           <div class="fa-isi">
             <label class="fa-label" for="fa-nama">Nama anggota</label>
-            <input class="fa-input" id="fa-nama" type="text" placeholder="Contoh: Yayasan Cahaya Nusantara" />
+            <input class="fa-input" id="fa-nama" type="text" placeholder="Contoh: Yayasan Cahaya Nusantara"
+                   autocomplete="off" name="nama-anggota" data-form-type="other" />
 
             <label class="fa-label">Wilayah (pilih dari tingkat atas ke bawah)</label>
             <div id="fa-tingkat-wilayah"></div>
@@ -126,12 +138,14 @@
               </div>
               <div>
                 <label class="fa-label" for="fa-inisial">Inisial penanda</label>
-                <input class="fa-input" id="fa-inisial" type="text" maxlength="3" placeholder="CN" />
+                <input class="fa-input" id="fa-inisial" type="text" maxlength="3" placeholder="CN"
+                       autocomplete="off" name="inisial-anggota" data-form-type="other" />
               </div>
             </div>
 
             <label class="fa-label" for="fa-rincian">Keterangan (satu per baris, format: Nama = Isi)</label>
             <textarea class="fa-input fa-area" id="fa-rincian" rows="4"
+                      autocomplete="off" name="keterangan-anggota" data-form-type="other"
                       placeholder="Berdiri = 2015&#10;Bidang = Pendidikan anak"></textarea>
           </div>
 
@@ -151,13 +165,13 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261017-10"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261017-10"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261017-10"></script>
-<script src="js/inti.js?v=20261017-10"></script>
-<script src="js/warna.js?v=20261017-10"></script>
-<script src="js/simpanan.js?v=20261017-10"></script>
-<script src="js/member.js?v=20261017-10"></script>
-<script src="js/cari.js?v=20261017-10"></script>
+<script src="js/lib/maplibre-gl.js?v=20261017-12"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261017-12"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261017-12"></script>
+<script src="js/inti.js?v=20261017-12"></script>
+<script src="js/warna.js?v=20261017-12"></script>
+<script src="js/simpanan.js?v=20261017-12"></script>
+<script src="js/member.js?v=20261017-12"></script>
+<script src="js/cari.js?v=20261017-12"></script>
 </body>
 </html>
