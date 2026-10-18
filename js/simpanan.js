@@ -145,16 +145,21 @@ const Simpanan = (function () {
       return v === null || v === undefined ? '' : String(v);
     }
 
-    function panggil(isi) {
+    function panggil(isi, batasKhusus) {
     var paket = {};
     for (var k in isi) { if (Object.prototype.hasOwnProperty.call(isi, k)) { paket[k] = isi[k]; } }
       /* Seluruh permintaan memakai kunci — termasuk membaca. Data anggota
          bersifat internal, jadi tidak boleh terbuka untuk umum. */
       paket.kunci = KUNCI;
 
+    /* Penarikan tokomedia.org butuh waktu lebih lama: Worker harus
+       mengambil 5 halaman dari internet. Batas 15 detik terlalu pendek
+       bila Worker baru bangun (cold start). */
+    var tunggu = batasKhusus || BATAS_TUNGGU;
+
     var pembatal = null;
     var batas = new Promise(function (_, gagal) {
-      pembatal = setTimeout(function () { gagal(new Error('waktu habis')); }, BATAS_TUNGGU);
+      pembatal = setTimeout(function () { gagal(new Error('waktu habis')); }, tunggu);
     });
 
     var minta = fetch(ALAMAT, {
@@ -285,7 +290,8 @@ const Simpanan = (function () {
     if (!MENYALA || !adaKunci()) {
       return Promise.resolve({ ok: false, pesan: 'Kode database belum diisi.' });
     }
-    return panggil({ aksi: 'tarikTokomedia' });
+    /* 90 detik: Worker mengambil 5 halaman tokomedia.org. */
+    return panggil({ aksi: 'tarikTokomedia' }, 90000);
   }
 
   /* Simpan banyak anggota sekaligus. Dipakai setelah penarikan supaya
@@ -308,7 +314,7 @@ const Simpanan = (function () {
       return lokal.then(function () { return daftar.length; });
     }
 
-    return panggil({ aksi: 'simpanAnggotaBanyak', anggota: daftar })
+    return panggil({ aksi: 'simpanAnggotaBanyak', anggota: daftar }, 90000)
       .then(function (h) {
         daring = true;
         return h.jumlah || daftar.length;
