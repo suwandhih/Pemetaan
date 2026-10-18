@@ -1195,8 +1195,8 @@ button.agama-baris:hover {
   opacity: 0.6;
 }
 
-#anggota-kat-tombol {
-  margin-left: auto;
+#anggota-kat-tombol,
+#anggota-update {
   padding: 6px 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
@@ -1208,6 +1208,15 @@ button.agama-baris:hover {
   white-space: nowrap;
   cursor: pointer;
   touch-action: manipulation;
+}
+
+#anggota-kat-tombol {
+  margin-left: auto;
+}
+
+#anggota-update:disabled {
+  opacity: 0.55;
+  cursor: default;
 }
 
 #anggota-kat-tombol.nyala {
@@ -1232,6 +1241,7 @@ button.agama-baris:hover {
 /* Saat mode Kategori aktif, bersihkan layar kerja dari form + Anggota
    dan daftar anggota di bawahnya supaya tidak membingungkan. */
 #panel-anggota.mode-kategori #anggota-tambah,
+#panel-anggota.mode-kategori #anggota-update,
 #panel-anggota.mode-kategori #anggota-jumlah,
 #panel-anggota.mode-kategori #anggota-tingkat,
 #panel-anggota.mode-kategori #anggota-daftar {

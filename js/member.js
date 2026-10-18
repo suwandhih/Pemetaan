@@ -208,21 +208,27 @@
   }
 
   function kodeUntukTingkat(a, id) {
-    var kolom = kolomTingkat(id);
+    /* Anggota yang hanya diketahui provinsinya (mis. data tokomedia.org)
+       tetap harus tampil di tingkat yang lebih rendah. Jadi bila kode
+       tingkat itu kosong, dipakai kode tingkat di atasnya. */
     if (id === 'provinsi') { return a.kodeProvinsi || ''; }
-    if (id === 'kabkota') { return a.kodeKabkota || ''; }
-    if (id === 'kecamatan') { return a.kodeKecamatan || ''; }
-    return a.kodeDesa || '';
+    if (id === 'kabkota') { return a.kodeKabkota || a.kodeProvinsi || ''; }
+    if (id === 'kecamatan') {
+      return a.kodeKecamatan || a.kodeKabkota || a.kodeProvinsi || '';
+    }
+    return a.kodeDesa || a.kodeKecamatan || a.kodeKabkota || a.kodeProvinsi || '';
   }
 
   function namaWilayah(a, id) {
     if (id === 'provinsi') { return a.provinsi || 'Provinsi belum tercatat'; }
-    if (id === 'kabkota') { return a.kabkota || 'Kabupaten/kota belum tercatat'; }
+    if (id === 'kabkota') {
+      return a.kabkota || a.provinsi || 'Kabupaten/kota belum tercatat';
+    }
     if (id === 'kecamatan') {
-      return (a.kecamatan || 'Kecamatan belum tercatat') +
+      return (a.kecamatan || a.kabkota || a.provinsi || 'Kecamatan belum tercatat') +
         (a.kabkota ? ' \u00B7 ' + a.kabkota : '');
     }
-    return (a.desa || 'Desa belum tercatat') +
+    return (a.desa || a.kecamatan || a.kabkota || a.provinsi || 'Desa belum tercatat') +
       (a.kecamatan ? ' \u00B7 ' + a.kecamatan : '');
   }
 
@@ -1552,6 +1558,15 @@
 
   function gambarPenanda() {
     if (!peta) { return; }
+
+    /* Icon harus masuk ke gaya peta SEBELUM lapisan `symbol` dibuat.
+       Gambar hilang setiap kali gaya peta diganti (tombol Satelit/Map),
+       jadi dipasang ulang di sini — bukan sekali di awal saja. */
+    if (window.PD_IKON && !PD_IKON.lengkap(peta)) {
+      PD_IKON.pasang(peta, gambarPenanda);
+      return;
+    }
+
     var fc = {
       type: 'FeatureCollection',
       features: anggota.filter(function (a) {
@@ -1563,6 +1578,7 @@
             id: a.id,
             nama: a.nama,
             inisial: a.inisial || (a.nama || '?').slice(0, 2).toUpperCase(),
+            ikon: (window.PD_IKON ? PD_IKON.untukKategori(a.kategori) : 'ikon-pin'),
             warna: warnaKategori(a.kategori)
           },
           geometry: { type: 'Point', coordinates: [a.lon, a.lat] }
@@ -1704,26 +1720,21 @@
             }
           });
 
-          /* 5. Kode anggota di dalam bulatan. Butuh `glyphs` di gaya peta —
-                sudah ditambahkan di js/inti.js (diuji 16 Okt 2026).
-                `text-allow-overlap` dibiarkan `true` supaya kode tidak pernah
-                hilang, dan `text-ignore-placement` supaya label peta dasar
-                tetap boleh digambar (bulatannya sudah naik, jadi tidak
-                bertabrakan dengan nama tempat). */
+          /* 5. Icon kategori di dalam bulatan. Menggantikan tulisan 2–3
+                huruf supaya bentuknya langsung terbaca. Gambar dipasang
+                oleh js/ikon.js sebelum lapisan ini dibuat. */
           peta.addLayer({
             id: 'anggota-huruf',
             type: 'symbol',
             source: 'anggota',
             filter: TANPA_TUMPUK,
             layout: {
-              'text-field': ['get', 'inisial'],
-              'text-size': 10,
-              'text-font': ['Open Sans Bold'],
-              'text-offset': [0, JARAK / 10],
-              'text-allow-overlap': true,
-              'text-ignore-placement': true
-            },
-            paint: { 'text-color': '#0b0f14' }
+              'icon-image': ['get', 'ikon'],
+              'icon-size': 0.24,
+              'icon-allow-overlap': true,
+              'icon-ignore-placement': true,
+              'icon-offset': [0, JARAK]
+            }
           });
 
           /* ---------- sentuhan ---------- */

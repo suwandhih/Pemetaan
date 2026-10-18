@@ -59,6 +59,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 20 | **Titik lokasi suku-suku** — data dari `c:\data\datapeta` dipelajari & **diolah ulang**, disajikan menurut konsep Pemetaan (bukan meniru cara saji DataPeta) | **SELESAI** ✅ — 28 suku BPS SP2010, panel seperti panel Anggota | 60–90 mnt | 2026-10-17 |
 | 21 | **Jumlah beragama berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan; data dari `c:\data\datapeta` dipelajari, **angka diolah & disajikan** menurut konsep Pemetaan | **SELESAI** ✅ — 7 agama, disajikan dalam persentase | 90–120 mnt | 2026-10-17 |
 | 22 | **Ralat orderan 14d — tampilan PC lebar (responsive)**: PC lebar penuh, peta **memenuhi tinggi layar tanpa ruang kosong**; HP tetap seperti sekarang (bila layar HP lebih lebar, peta ikut lebih lebar, tidak mengecil; tidak muat → geser kiri-kanan) | **SELESAI** ✅ | 45–60 mnt | 2026-10-17 |
+| 23 | **Data anggota dari tokomedia.org** — 5 kategori (Film Isa Al-Masih, Film Ikatan Ilahi, Video Kitab Suci, Clip Kitab Suci, Aplikasi Kitab Suci), masing-masing berisi bahasa daerah. Data lama dihapus termasuk kategori. Tombol **[↻ Update]** menarik data terbaru dari tokomedia.org lewat Worker, **selalu disertai koordinat**. Icon kategori menggantikan 2 digit di bulatan peta | **MENUNGGU KONFIRMASI** — 699 anggota masuk database, 5 kategori baru, 699 titik unik | 100–140 mnt | — |
 
 ### Orderan di luar daftar bernomor (perintah langsung pemilik proyek)
 
@@ -2737,3 +2738,123 @@ sendiri caranya.
   kali dipakai, supaya tidak ada keadaan tersisa antar pemanggilan.
 - Tautan dibuat sebagai `<button>` (bukan `<a>`), jadi bisa difokus dengan
   Tab dan ditekan dengan Enter — tetap bisa dipakai tanpa mouse.
+
+---
+
+## Orderan 23 — data anggota dari tokomedia.org (perintah 2026-10-18)
+
+Pemilik proyek: *"data member / anggota .. mau minta km input data.. sumber data
+https://tokomedia.org/ kategori: film isa, film ikatan ilahi, video kitab suci,
+clip kitab suci, dan aplikasi alkitab .. masing2 kategori berisi berbagai bahasa
+daerah.. jadi semua data tsb mau dimasuk dalam keanggota .. 2 digit di ganti icon
+.. data yg ada dihapus termasuk kategori .. di input dengan kategori baru ini ..
+input semua data per kategori dan daerahnya"*
+
+Lalu ditambah: *"data bekerja berdasarkan API dari website TokoMedia .. jika data
+dimasuk di TokoMedia.. di Pemetaan otomatis muncul bendera kategori ditempatkan
+sesuai lokasi diinput.. otomatis tidak harus real time .. bisa lewat tombol
+[update]"*
+
+### Keputusan pemilik proyek (ditanyakan sebelum dikerjakan)
+
+| Pertanyaan | Jawaban |
+|---|---|
+| Satu bahasa jadi berapa data? | **3 data terpisah** bila muncul di 3 kategori (total 699) |
+| Titik di peta dari mana? | **Perkiraan provinsi asal bahasa**, dipetakan satu per satu |
+| Data lama? | **Dihapus semua** (anggota + kategori), di-backup dulu |
+| Kunci aplikasi? | Dikirim lewat chat |
+| Icon kategori? | Seperti gambar acuan (orang, rantai, kamera, putar, ponsel) **+ beberapa pilihan lain** |
+| Nama di daftar | **Nama bahasa + kategori** — "Aceh - Film Isa Al-Masih" |
+| Cara ambil data | **A. Worker + tombol [Update]** |
+
+### Temuan penting sebelum mengerjakan
+
+| Yang diperiksa | Hasil |
+|---|---|
+| API `tokomedia.org/api/index.php/api/...` | ❌ **Belum terpasang** — 5 variasi alamat semuanya mengembalikan halaman login HTML (5.070 byte), bukan JSON |
+| CORS tokomedia.org | ❌ **Tidak ada** `Access-Control-Allow-Origin` — peramban dilarang mengambil langsung |
+| Kolom lokasi di database TokoMedia | ❌ **Tidak ada** `lat`/`lng`/`koordinat` di 15 tabel mana pun |
+| Endpoint tulis TokoMedia | ❌ Tidak ada — data masuk lewat admin `/manage/*` |
+| Ambil halaman dari server | ✅ **Bisa** — 5 halaman kategori, ±3,8 detik |
+
+**Kesimpulan:** "otomatis muncul" bisa, tapi lewat **Worker** (server), bukan
+peramban. "Sesuai lokasi diinput" **tidak bisa persis** — TokoMedia tidak
+menyimpan lokasi. Yang dipakai: nama bahasa → provinsi (perkiraan).
+
+### Cara kerja
+
+1. Tombol **[↻ Update]** di kepala panel Anggota.
+2. Worker `pemetaan-api` mengambil 5 halaman kategori tokomedia.org.
+3. Worker mengurai tabel bahasa per gugus pulau dari HTML.
+4. Worker menghitung **koordinat** tiap bahasa: nama → provinsi → titik tengah
+   kotak batas provinsi. Bila belum terpetakan → titik tengah gugus pulau.
+5. Titik digeser dalam lingkaran kecil per provinsi **dan** per kategori,
+   supaya 699 penanda tidak bertumpuk (terbukti **699 titik unik**).
+6. Worker menyimpan ke Neon lewat `simpanAnggotaBanyak` (100 baris perintah).
+7. Aplikasi memuat ulang daftar + penanda.
+
+**Tidak ada penarikan otomatis.** Hanya saat tombol ditekan — supaya
+tokomedia.org tidak dibebani.
+
+### Berkas yang dibuat / diubah
+
+| Berkas | Isi |
+|---|---|
+| `cloudflare/worker.js` | Aksi baru `tarikTokomedia` + `simpanAnggotaBanyak`; pengurai HTML; penghitung koordinat |
+| `cloudflare/peta-bahasa.js` | **Baru** — 430 bahasa → kode provinsi, 38 titik provinsi, 5 titik gugus (12 KB) |
+| `alat/buat-peta-bahasa.js` | **Baru** — pembangkit `peta-bahasa.js` dari data Dukcapil |
+| `alat/sumber-tokomedia/peta-provinsi.json` | **Baru** — pemetaan 430 bahasa → provinsi (diedit manual, satu per satu) |
+| `js/ikon.js` | **Baru** — 14 icon SVG (5 kategori + 9 pilihan lain) |
+| `js/tokomedia.js` | **Baru** — tombol [Update], pesan kemajuan, pemuatan ulang |
+| `js/simpanan.js` | `tarikTokomedia()`, `simpanAnggotaBanyak()` |
+| `js/member.js` | Penanda memakai `icon-image`; `kodeUntukTingkat`/`namaWilayah` memakai tingkat di atasnya bila kosong |
+| `index.html` | Tombol `[↻ Update]`, skrip `ikon.js` + `tokomedia.js`, penanda versi `?v=20261018-01` |
+| `css/gaya.css` | Gaya `#anggota-update` |
+
+### Icon kategori
+
+| Kategori | Icon |
+|---|---|
+| Film Isa Al-Masih | 👤 orang |
+| Film Ikatan Ilahi | 🔗 rantai |
+| Video Kitab Suci | 📹 kamera |
+| Clip Kitab Suci | ▶ tombol putar |
+| Aplikasi Kitab Suci | 📱 ponsel |
+
+Pilihan tambahan: buku, audio, globe, bintang, pin, rumah, sekolah, kesehatan,
+sosial. Icon digambar 64×64 lalu ditampilkan 15 px, jadi tetap tajam di HP.
+
+### Bukti uji (2026-10-18, dijalankan sendiri)
+
+| Uji | Hasil |
+|---|---|
+| Penarikan dari Worker sungguhan | ✅ **699 bahasa, 0 gagal, 3,8 detik** |
+| Per kategori | ✅ Film Isa 177 · Ikatan Ilahi 8 · Video 107 · Clip 177 · Aplikasi 230 |
+| Bahasa belum terpetakan | ✅ **0** — semua 430 nama punya provinsi |
+| Titik unik | ✅ **699 dari 699** — tidak ada yang bertumpuk |
+| Tanpa koordinat | ✅ **0** |
+| Hapus data lama | ✅ 3 anggota + 6 kategori lama terhapus (backup tersimpan) |
+| Kategori baru | ✅ 5 kategori masuk |
+| Simpan 699 anggota | ✅ **4,4 detik**, 100 baris per perintah |
+| Verifikasi database | ✅ 699 anggota · 5 kategori · 699 titik unik · 0 tanpa koordinat |
+| Tombol [Update] dari aplikasi | ✅ "699 anggota tersimpan dari tokomedia.org." · 0 antrean |
+| Icon terpasang di peta | ✅ 5 icon unik tampil (`ikon-orang`, `ikon-rantai`, `ikon-kamera`, `ikon-putar`, `ikon-ponsel`) |
+| Icon tetap ada setelah ganti jenis peta | ✅ Satelit → Map, 5 icon masih terpasang |
+| Semua 14 icon SVG valid | ✅ termuat, piksel terisi 873–1653 |
+| Daftar dikelompokkan per provinsi | ✅ ACEH · JAWA BARAT · JAWA TENGAH · KEPULAUAN BANGKA BELITUNG · SULAWESI SELATAN |
+| Tombol muat di HP 320/390/430 px | ✅ semua muat, tidak terpotong |
+| Galat konsol | ✅ **0** (selain 401 dari uji kunci salah yang disengaja) |
+
+### Catatan
+
+- **Kunci aplikasi sempat dikirim lewat chat** atas permintaan pemilik proyek.
+  Sebaiknya **diganti** setelah pekerjaan selesai.
+- Backup data lama: `files/backup-anggota-20261018.json` di folder sesi
+  (3 anggota: yayasan obi, Rsud mata, paud + 6 kategori lama).
+- Anggota tokomedia hanya diketahui **provinsinya**, bukan kabupaten/kecamatan/
+  desa. Karena itu `kodeUntukTingkat()` dan `namaWilayah()` memakai tingkat di
+  atasnya bila tingkat yang dipilih kosong — supaya tetap tampil di semua
+  tingkat pengelompokan.
+- Bila tokomedia.org menambah bahasa baru yang belum ada di
+  `peta-provinsi.json`, Worker memakai titik tengah gugus pulau sebagai
+  cadangan (tidak gagal).

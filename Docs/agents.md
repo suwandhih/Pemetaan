@@ -158,6 +158,10 @@ berkas aplikasi & konfigurasi.
 Seluruh **22 orderan** berstatus `SELESAI`. Situs live:
 https://suwandhih.github.io/Pemetaan/
 
+**2026-10-18 — orderan 23** (data anggota dari tokomedia.org + tombol
+`[↻ Update]` + icon kategori) berstatus `MENUNGGU KONFIRMASI`. 699 anggota
+sudah masuk database, 5 kategori baru, 699 titik unik.
+
 Kalau ada pekerjaan baru, perlakukan sebagai **orderan baru** — catat dulu di
 `rencanakerja.md`, sebut perkiraan waktu, lalu tunggu aba-aba (aturan 2, 4, 6).
 
@@ -184,6 +188,9 @@ Kalau ada pekerjaan baru, perlakukan sebagai **orderan baru** — catat dulu di
 | Chrome mengabaikan `autocomplete="off"` pada `input[type="password"]` | Kebijakan Chrome | Pakai `type="text"` + `-webkit-text-security: disc` |
 | CSS `@media` kalah dari aturan dasar | Urutan di berkas | Seluruh `@media` **wajib di akhir** `gaya.css` |
 | Perubahan tidak terlihat setelah push | Singgahan Chrome + GitHub Pages perlu ±75–85 detik | Naikkan penanda versi `?v=YYYYMMDD-nn`; minta `Ctrl + Shift + R` |
+| Gambar icon penanda hilang setelah ganti jenis peta | MapLibre membuang gambar bersama gaya lama | pasang ulang di `gambarPenanda()` dengan pemeriksaan `hasImage()` |
+| Anggota yang hanya punya provinsi tidak muncul di tingkat bawah | `kodeUntukTingkat()` mengembalikan kosong | pakai kode tingkat di atasnya bila kosong |
+| API TokoMedia mengembalikan halaman login, bukan JSON | API belum terpasang di produksi | ambil lewat Worker (server), bukan peramban |
 
 Daftar jebakan teknis yang lebih lengkap ada di
 [`prompt.md`](./prompt.md) bagian 9.

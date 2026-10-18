@@ -88,7 +88,9 @@ C:\data\Pemetaan\
 │   ├── agama.js                peta tematik penduduk menurut agama (orderan 21)
 │   ├── suku.js                 titik lokasi suku bangsa (orderan 20)
 │   ├── simpanan.js             penyimpanan: Neon → IndexedDB → antrean
+│   ├── ikon.js                 icon penanda kategori (14 icon SVG)
 │   ├── member.js               daftar anggota, form, kategori, penanda (1.860 baris)
+│   ├── tokomedia.js            tombol [Update] — tarik data tokomedia.org
 │   ├── cari.js                 pencarian wilayah / anggota / nama jalan (orderan 19)
 │   └── panduan.js              panduan pemakaian interaktif (tombol ?)
 ├── data\
@@ -101,9 +103,12 @@ C:\data\Pemetaan\
 │   ├── ambil-dukcapil.js       poligon + penduduk dari Dukcapil
 │   ├── ambil-agama.js          angka agama dari Dukcapil
 │   ├── buat-indeks-cari.js     indeks pencarian wilayah
+│   ├── buat-peta-bahasa.js     peta bahasa → koordinat untuk Worker
+│   ├── sumber-tokomedia\       peta-provinsi.json (430 bahasa → provinsi)
 │   └── neon-siapkan.js         menyiapkan tabel di Neon
 ├── cloudflare\
-│   ├── worker.js               perantara situs ↔ Neon (9,7 KB)
+│   ├── worker.js               perantara situs ↔ Neon + penarik tokomedia.org
+│   ├── peta-bahasa.js          hasil buat-peta-bahasa.js (12 KB)
 │   ├── wrangler.toml           setelan Worker
 │   └── package.json
 └── Docs\
@@ -210,6 +215,8 @@ sebagai skrip biasa supaya bisa jalan dari GitHub Pages tanpa build.
 | `PD_AGAMA` | `agama.js` | `ganti(tingkat, agama)`, `matikan()`, `aktif()`, `untukWilayah()`, `ringkas()`, `AGAMA`, `TINGKAT` |
 | `PD_SUKU` | `suku.js` | `ganti(i)`, `matikan()`, `aktif()`, `tutupPanel()`, `SUKU` |
 | `PD_ANGGOTA` | `member.js` | `muat()`, `gambarPenanda()`, `bukaPanel()`, `bukaForm()`, `tutupPanel()`, `tutupForm()`, `ambilAnggota()`, `sorotWilayah()`, `tunjukTitik()` |
+| `PD_IKON` | `ikon.js` | `DAFTAR`, `KATEGORI`, `untukKategori()`, `pasang()`, `lengkap()` |
+| `PD_TOKOMEDIA` | `tokomedia.js` | `tarik()`, `siap()` |
 | `PD_CARI` | `cari.js` | `buka()`, `tutup()`, `setAnggotaSiap()` |
 | `PD_PANDUAN` | `panduan.js` | `buka()`, `tutup()`, `aktif()`, `keadaan()`, `PANDUAN` |
 
@@ -218,7 +225,8 @@ karena modul lain menunggu `PD.peta` siap:
 
 ```html
 maplibre-gl.js → prop-nasional.js → kab-nasional.js → inti.js → warna.js
-→ agama.js → suku.js → simpanan.js → member.js → cari.js → panduan.js
+→ agama.js → suku.js → simpanan.js → ikon.js → member.js → tokomedia.js
+→ cari.js → panduan.js
 ```
 
 Modul yang butuh peta memakai pola tunggu:
@@ -284,6 +292,7 @@ bilah butuh **387 px**.
 | 20 | Titik lokasi suku bangsa | `suku.js` | 28 suku BPS SP2010; panel seperti panel Anggota; garis merah berkedip + satu titik di tengah kawasan |
 | 21 | Peta agama 4 tingkat | `agama.js` | disajikan dalam **persentase** supaya tidak mengulang peta penduduk; Konghucu & Kepercayaan tetap dalam angka jumlah |
 | 22 | Tampilan PC lebar (responsive) | `gaya.css` | PC lebar penuh, HP seperti semula |
+| 23 | Data anggota dari tokomedia.org + tombol [Update] | `tokomedia.js`, `worker.js` | 699 anggota · 5 kategori · koordinat otomatis · icon kategori |
 | — | Panduan pemakaian interaktif | `panduan.js` | tombol `?` mengenali posisi pemakai; kata kunci jadi tautan yang benar-benar menjalankan aksinya |
 
 ### Detail yang mudah terlewat
@@ -352,11 +361,29 @@ kode atau dokumen — repo ini publik.**
 |---|---|
 | `ambilSemua` | `{ anggota, kategori, pengaturan }` |
 | `simpanAnggota` | `{ anggota }` |
+| `simpanAnggotaBanyak` | `{ anggota[] }` → `{ jumlah }` (100 baris per perintah) |
 | `hapusAnggota` | `{ id }` |
 | `simpanKategori` / `hapusKategori` | `{ nama }` |
 | `simpanAtur` | `{ nama, nilai }` |
 | `kosongkan` | hapus semua anggota |
+| `tarikTokomedia` | `{ kategori? }` → `{ anggota[], jumlah, gagal[] }` |
 | `cek` | uji sambungan |
+
+### Penarikan data tokomedia.org (orderan 23)
+
+**Kenapa lewat Worker, bukan peramban:** API TokoMedia belum terpasang dan
+situsnya tidak mengirim header CORS. Worker berjalan di server, jadi bisa
+mengambil halaman HTML-nya.
+
+**Alur:** tombol `[↻ Update]` → Worker ambil 5 halaman kategori → urai tabel
+bahasa per gugus → hitung koordinat → simpan ke Neon.
+
+**Koordinat:** TokoMedia **tidak menyimpan lokasi**. Titik dihitung dari nama
+bahasa → provinsi (`cloudflare/peta-bahasa.js`, 430 bahasa). Bila belum
+terpetakan → titik tengah gugus pulau. Titik digeser dalam lingkaran kecil per
+provinsi dan per kategori supaya tidak bertumpuk (terbukti 699 titik unik).
+
+**Tidak ada penarikan otomatis** — hanya saat tombol ditekan.
 
 ---
 
@@ -381,6 +408,10 @@ waktu di proyek ini.
 | Playwright: `setViewportSize` di Windows menghasilkan lebar efektif lebih kecil | scrollbar | bandingkan dengan **tepi kanan bingkai**, bukan lebarnya |
 | Playwright: `page.on('pageerror')` harus dipasang **sebelum** `goto()` | urutan | pasang pendengar lebih dulu |
 | Playwright headless: font tampak bertumpuk | artefak rendering | bukan bug — ukuran sebenarnya normal |
+| `const Simpanan = ...` **tidak** menjadi `window.Simpanan` | `const` di lingkup atas tidak menempel ke `window` | periksa dengan `typeof Simpanan`, bukan `window.Simpanan` |
+| Gambar `addImage` **hilang** setiap kali gaya peta diganti | MapLibre membuang gambar bersama gaya lama | pasang ulang di `gambarPenanda()` dengan pemeriksaan `hasImage()` |
+| Anggota yang hanya punya provinsi **tidak muncul** di tingkat kabupaten/kecamatan/desa | `kodeUntukTingkat()` mengembalikan string kosong | pakai kode tingkat di atasnya bila kode tingkat itu kosong |
+| 699 anggota dari provinsi sama **bertumpuk** di satu titik | titik tengah provinsi sama untuk semua | geser dalam lingkaran kecil; jari-jari berbeda per kategori |
 
 ---
 
@@ -444,14 +475,14 @@ Kalau proyek ini harus dibangun ulang di tempat lain:
 | Bagian | Jumlah | Ukuran |
 |---|---|---|
 | Berkas data | 1.110 | 85,3 MB |
-| Modul JavaScript | 8 | 236 KB |
+| Modul JavaScript | 10 | 247 KB |
 | Pustaka peta (lokal) | 2 | 1,0 MB |
 | Tampilan (`gaya.css`) | 1 | 55 KB |
 | Halaman (`index.html`) | 1 | 12 KB |
-| Worker Cloudflare | 1 | 9,7 KB |
-| Skrip alat | 4 | 27 KB |
+| Worker Cloudflare | 2 | 22 KB |
+| Skrip alat | 5 | 32 KB |
 | Dokumen | 4 | — |
-| Commit | 60 | — |
+| Commit | 61 | — |
 
 ---
 

@@ -277,6 +277,49 @@ const Simpanan = (function () {
     return Promise.resolve(anggota.length);
   }
 
+  /* ---------- tarik data tokomedia.org (tombol [Update]) ---------- */
+
+  /* Penarikan dilakukan Worker (bukan peramban) karena tokomedia.org tidak
+     mengirim header CORS. Worker juga yang menghitung koordinat. */
+  function tarikTokomedia() {
+    if (!MENYALA || !adaKunci()) {
+      return Promise.resolve({ ok: false, pesan: 'Kode database belum diisi.' });
+    }
+    return panggil({ aksi: 'tarikTokomedia' });
+  }
+
+  /* Simpan banyak anggota sekaligus. Dipakai setelah penarikan supaya
+     tidak mengirim 699 permintaan satu per satu. */
+  function simpanAnggotaBanyak(daftar) {
+    if (!Array.isArray(daftar) || !daftar.length) {
+      return Promise.resolve(0);
+    }
+
+    /* Salinan di memori + peramban diperbarui dulu, jadi daftar langsung
+       berubah walau pengiriman ke database masih berjalan. */
+    var peta = {};
+    anggota.forEach(function (a) { peta[a.id] = a; });
+    daftar.forEach(function (a) { peta[a.id] = a; });
+    anggota = Object.keys(peta).map(function (k) { return peta[k]; });
+
+    var lokal = Promise.all(daftar.map(simpanLokalAnggota));
+
+    if (!MENYALA || !adaKunci()) {
+      return lokal.then(function () { return daftar.length; });
+    }
+
+    return panggil({ aksi: 'simpanAnggotaBanyak', anggota: daftar })
+      .then(function (h) {
+        daring = true;
+        return h.jumlah || daftar.length;
+      })
+      .catch(function () {
+        /* Gagal terkirim — simpan di peramban saja. Data tidak hilang;
+           pengiriman ulang dilakukan saat tombol [Update] ditekan lagi. */
+        return lokal.then(function () { return daftar.length; });
+      });
+  }
+
   function kosongkanAnggota() {
     anggota = [];
     return toko(T_ANGGOTA, 'readwrite', function (s) { return s.clear(); })
@@ -474,6 +517,8 @@ const Simpanan = (function () {
     semuaAnggota: semuaAnggota,
     ambilAnggota: ambilAnggota,
     simpanAnggota: simpanAnggota,
+    simpanAnggotaBanyak: simpanAnggotaBanyak,
+    tarikTokomedia: tarikTokomedia,
     hapusAnggota: hapusAnggota,
     hitungAnggota: hitungAnggota,
     semuaKategori: semuaKategori,

@@ -18,15 +18,59 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 | Hal | Jumlah |
 |---|---|
-| Commit | 60 |
-| Orderan selesai | 22 |
+| Commit | 61 |
+| Orderan selesai | 22 (+1 menunggu konfirmasi) |
 | Berkas data | 1.110 (85,3 MB) |
-| Modul JavaScript | 8 (236 KB) |
+| Modul JavaScript | 10 (247 KB) |
 | Baris tampilan (`gaya.css`) | ~2.400 |
-| Rentang waktu | 2026-10-12 → 2026-10-17 |
+| Rentang waktu | 2026-10-12 → 2026-10-18 |
 
 **Sebaran commit:** 2026-10-12 → 14 commit · 2026-10-16 → 25 commit ·
-2026-10-17 → 21 commit.
+2026-10-17 → 21 commit · 2026-10-18 → 1 commit.
+---
+
+## 2026-10-18
+
+### Orderan 23 — data anggota dari tokomedia.org + tombol [Update]
+
+**Baru.** Seluruh data anggota kini berasal dari **tokomedia.org** — 5 kategori,
+masing-masing berisi bahasa daerah. Data lama (3 anggota + 6 kategori) dihapus
+setelah di-backup.
+
+- **699 anggota** masuk database: Film Isa Al-Masih 177 · Film Ikatan Ilahi 8 ·
+  Video Kitab Suci 107 · Clip Kitab Suci 177 · Aplikasi Kitab Suci 230.
+- **5 kategori baru** menggantikan 6 kategori lama (Yayasan, Sekolah, Kesehatan,
+  Sosial, Pemerintahan, Lainnya).
+- **Tombol [↻ Update]** di kepala panel Anggota — sekali tekan, Worker menarik
+  5 halaman tokomedia.org lalu menyimpannya. **Tidak ada penarikan otomatis**,
+  jadi tokomedia.org tidak dibebani.
+- **Setiap penarikan selalu disertai koordinat.** Tokomedia.org tidak menyimpan
+  lokasi, jadi titik dihitung dari nama bahasa → provinsi (430 bahasa dipetakan
+  satu per satu). Bila belum terpetakan → titik tengah gugus pulau.
+- **699 titik unik** — tidak ada penanda yang bertumpuk. Titik digeser dalam
+  lingkaran kecil per provinsi dan per kategori.
+- **Icon kategori menggantikan 2 digit** di bulatan peta: orang, rantai, kamera,
+  tombol putar, ponsel — sesuai gambar acuan pemilik proyek. Ditambah 9 pilihan
+  lain (buku, audio, globe, bintang, pin, rumah, sekolah, kesehatan, sosial).
+
+**Temuan penting:** API TokoMedia (`/api/index.php/api/...`) **belum terpasang**
+— semua alamat mengembalikan halaman login HTML. Situsnya juga **tidak mengirim
+header CORS**, jadi peramban tidak boleh mengambil datanya langsung. Karena itu
+penarikan dilakukan **Worker Cloudflare** (berjalan di server).
+
+**Perbaikan ikutan:** anggota yang hanya diketahui provinsinya kini tetap tampil
+di tingkat Kabupaten/Kota, Kecamatan, dan Desa — memakai kode tingkat di atasnya
+bila kode tingkat itu kosong.
+
+Berkas: `cloudflare/worker.js`, `cloudflare/peta-bahasa.js` (baru),
+`alat/buat-peta-bahasa.js` (baru), `alat/sumber-tokomedia/peta-provinsi.json`
+(baru), `js/ikon.js` (baru), `js/tokomedia.js` (baru), `js/simpanan.js`,
+`js/member.js`, `index.html`, `css/gaya.css`.
+
+Uji: 699 bahasa ditarik dalam 3,8 detik · 699 anggota tersimpan dalam 4,4 detik ·
+699 titik unik · 0 tanpa koordinat · 5 icon tampil · 0 galat konsol · tombol muat
+di 320/390/430 px.
+
 ---
 
 ## 2026-10-17
@@ -463,7 +507,8 @@ Commit: `dfd4e52`, `8c060d4`
 | 2026-10-12 | 14 | Inisialisasi repo · aturan kerja 1–9 · fondasi teknologi dikunci · berkas `.md` ke `Docs/` · repo GitHub dibuat |
 | 2026-10-16 | 25 | Orderan 14, 15, 16, 17, 7 · GitHub Pages aktif · kelola kategori · perbaikan penanda & tampilan |
 | 2026-10-17 | 21 | Orderan 22, 18, 19, 21, 20 · panduan pemakaian · panduan interaktif · 3 perbaikan · dokumen lengkap |
-| **Total** | **60** | |
+| 2026-10-18 | 1 | Orderan 23 · data anggota dari tokomedia.org · tombol [Update] · icon kategori |
+| **Total** | **61** | |
 
 ---
 
