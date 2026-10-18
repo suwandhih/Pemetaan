@@ -18,7 +18,7 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 | Hal | Jumlah |
 |---|---|
-| Commit | 61 |
+| Commit | 64 |
 | Orderan selesai | 22 (+1 menunggu konfirmasi) |
 | Berkas data | 1.110 (85,3 MB) |
 | Modul JavaScript | 10 (247 KB) |
@@ -26,7 +26,7 @@ Repo: https://github.com/suwandhih/Pemetaan
 | Rentang waktu | 2026-10-12 → 2026-10-18 |
 
 **Sebaran commit:** 2026-10-12 → 14 commit · 2026-10-16 → 25 commit ·
-2026-10-17 → 21 commit · 2026-10-18 → 1 commit.
+2026-10-17 → 21 commit · 2026-10-18 → 4 commit.
 ---
 
 ## 2026-10-18
@@ -70,6 +70,30 @@ Berkas: `cloudflare/worker.js`, `cloudflare/peta-bahasa.js` (baru),
 Uji: 699 bahasa ditarik dalam 3,8 detik · 699 anggota tersimpan dalam 4,4 detik ·
 699 titik unik · 0 tanpa koordinat · 5 icon tampil · 0 galat konsol · tombol muat
 di 320/390/430 px.
+
+### Penggabungan penanda dihapus + icon diperbaiki
+
+**Diubah.** Penggabungan penanda (cluster) **dihapus seluruhnya** atas permintaan
+pemilik proyek — angka tumpukan dinilai sulit dipahami karena tidak jelas
+anggota mana yang digabung. Seluruh **699 penanda** kini tampil satu per satu
+sebagai icon kategori.
+
+- Lapisan penanda berkurang dari **12 → 7**: titik lokasi, 4 titik garis
+  putus-putus, bulatan, dan icon. Lima lapisan tumpukan dibuang.
+- Klik tumpukan (memperbesar peta) dihapus.
+- **Bug posisi icon diperbaiki.** `icon-offset` ternyata **dikalikan
+  `icon-size`** — bukan piksel, bukan em. Dengan `icon-size: 0.24`, offset `-34`
+  hanya menggeser **8 px**, sehingga icon tampak di titik lokasi, bukan di dalam
+  bulatan. Perbaikannya: `icon-offset = -34 / 0.24 = -141,67`.
+- Ditambahkan penjaga `peta.isStyleLoaded()` + `setTimeout` — MapLibre menolak
+  `addSource`/`addLayer` bila gaya peta belum selesai dimuat (mis. sesudah
+  menekan tombol Satelit).
+
+Uji: pusat icon −34 px vs pusat bulatan −33,5…−34,5 px (sejajar) di z6/9/12/15/18 ·
+kelima kategori sejajar · 699 fitur · 7 lapisan · icon tetap benar setelah ganti
+ke Satelit · tombol sembunyikan penanda bekerja · **0 galat konsol**.
+
+Berkas: `js/member.js`, `index.html` (versi `?v=20261018-06`).
 
 ---
 

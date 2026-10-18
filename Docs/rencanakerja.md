@@ -59,7 +59,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 20 | **Titik lokasi suku-suku** — data dari `c:\data\datapeta` dipelajari & **diolah ulang**, disajikan menurut konsep Pemetaan (bukan meniru cara saji DataPeta) | **SELESAI** ✅ — 28 suku BPS SP2010, panel seperti panel Anggota | 60–90 mnt | 2026-10-17 |
 | 21 | **Jumlah beragama berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan; data dari `c:\data\datapeta` dipelajari, **angka diolah & disajikan** menurut konsep Pemetaan | **SELESAI** ✅ — 7 agama, disajikan dalam persentase | 90–120 mnt | 2026-10-17 |
 | 22 | **Ralat orderan 14d — tampilan PC lebar (responsive)**: PC lebar penuh, peta **memenuhi tinggi layar tanpa ruang kosong**; HP tetap seperti sekarang (bila layar HP lebih lebar, peta ikut lebih lebar, tidak mengecil; tidak muat → geser kiri-kanan) | **SELESAI** ✅ | 45–60 mnt | 2026-10-17 |
-| 23 | **Data anggota dari tokomedia.org** — 5 kategori (Film Isa Al-Masih, Film Ikatan Ilahi, Video Kitab Suci, Clip Kitab Suci, Aplikasi Kitab Suci), masing-masing berisi bahasa daerah. Data lama dihapus termasuk kategori. Tombol **[↻ Update]** menarik data terbaru dari tokomedia.org lewat Worker, **selalu disertai koordinat**. Icon kategori menggantikan 2 digit di bulatan peta | **MENUNGGU KONFIRMASI** — 699 anggota masuk database, 5 kategori baru, 699 titik unik | 100–140 mnt | — |
+| 23 | **Data anggota dari tokomedia.org** — 5 kategori (Film Isa Al-Masih, Film Ikatan Ilahi, Video Kitab Suci, Clip Kitab Suci, Aplikasi Kitab Suci), masing-masing berisi bahasa daerah. Data lama dihapus termasuk kategori. Tombol **[↻ Update]** menarik data terbaru dari tokomedia.org lewat Worker, **selalu disertai koordinat**. Icon kategori menggantikan 2 digit di bulatan peta. Penggabungan penanda (cluster) **dihapus** atas permintaan pemilik proyek — 699 penanda tampil satu per satu | **MENUNGGU KONFIRMASI** — 699 anggota masuk database, 5 kategori baru, 699 titik unik, 7 lapisan penanda, icon tepat di dalam bulatan | 100–140 mnt | — |
 
 ### Orderan di luar daftar bernomor (perintah langsung pemilik proyek)
 
@@ -2858,3 +2858,51 @@ sosial. Icon digambar 64×64 lalu ditampilkan 15 px, jadi tetap tajam di HP.
 - Bila tokomedia.org menambah bahasa baru yang belum ada di
   `peta-provinsi.json`, Worker memakai titik tengah gugus pulau sebagai
   cadangan (tidak gagal).
+
+### Revisi 2026-10-18 (lanjutan) — penggabungan dihapus, icon diperbaiki
+
+Pemilik proyek menolak penggabungan penanda (cluster):
+
+> *"jumlah anggota yg di gabung agak sulit tau yg mana di maksud gabung.. sulit
+> mengetahui.. kurang efektif"* dan *"km harusnya ikuti arahan saya.. ini agak
+> beda.. km membuat kesimpulan sendiri"*
+
+**Keputusan:** penggabungan **dihapus seluruhnya**. Seluruh 699 penanda tampil
+satu per satu sebagai icon kategori.
+
+| Yang diubah | Sebelum | Sesudah |
+|---|---|---|
+| Sumber `anggota` | `cluster: true`, radius 62, maxZoom 16 | tanpa cluster |
+| Lapisan penanda | 12 lapisan (termasuk 5 lapisan tumpukan) | **7 lapisan** |
+| Klik tumpukan | memperbesar peta | dihapus |
+| `LAPISAN_PENANDA` | 12 id | 7 id |
+| Posisi icon | di titik lokasi, bukan di bulatan | tepat di pusat bulatan |
+
+**Bug `icon-offset` (ditemukan & diperbaiki 18 Okt 2026).** Nilai `icon-offset`
+**dikalikan `icon-size`** — bukan piksel, bukan em. Dengan `icon-size: 0.24`,
+offset `-34` hanya menggeser **8 px**, sehingga icon tampak di titik lokasi.
+Perbaikannya: `icon-offset = JARAK / UKURAN_IKON` = `-34 / 0.24` = **-141,67**.
+
+Bukti pengukuran langsung dari peta (jarak piksel dari titik lokasi):
+
+| `icon-size` | `icon-offset` | Geser sebenarnya |
+|---|---|---|
+| 0,24 | 0 | 0 px |
+| 0,24 | −34 | **−8 px** |
+| 0,24 | −100 | −24 px |
+| 0,24 | −142 | **−34 px** ✅ |
+| 0,5 | −34 | −16,5 px |
+| 1 | −34 | −33,5 px |
+
+**Bukti uji setelah perbaikan:**
+
+| Uji | Hasil |
+|---|---|
+| Posisi icon vs bulatan (z12, z15, z18) | ✅ pusat icon −34 px, pusat bulatan −33,5…−34,5 px → sejajar |
+| Kelima kategori | ✅ semua icon sejajar di dalam bulatan |
+| Zoom 6 / 9 / 12 / 15 / 18 | ✅ icon tetap di dalam bulatan di semua tingkat |
+| Jumlah fitur | ✅ 699 |
+| Lapisan penanda | ✅ 7 (tidak ada lapisan tumpukan) |
+| Icon setelah ganti ke Satelit | ✅ tetap terpasang & sejajar |
+| Tombol sembunyikan penanda | ✅ `visibility` → `none` lalu `visible` |
+| Galat konsol | ✅ **0** |

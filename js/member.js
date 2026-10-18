@@ -56,16 +56,16 @@
 
   /* Semua lapisan penanda anggota. Dipakai untuk menyembunyikan /
      menampilkan penanda tanpa perlu membuang datanya (orderan lanjutan
-     16 Okt 2026). */
+     16 Okt 2026). Penggabungan (cluster) sudah dihapus 18 Okt 2026 —
+     pemilik proyek memutuskan angka tumpukan sulit dipahami. */
   var LAPISAN_PENANDA = [
-    'anggota-titik', 'anggota-tumpuk-titik', 'anggota-tumpuk-putus-1',
-    'anggota-tumpuk-putus-2', 'anggota-tumpuk', 'anggota-tumpuk-angka',
-    'anggota-putus-1', 'anggota-putus-2', 'anggota-putus-3', 'anggota-putus-4',
-    'anggota-lingkaran', 'anggota-huruf'
+    'anggota-titik', 'anggota-putus-1', 'anggota-putus-2', 'anggota-putus-3',
+    'anggota-putus-4', 'anggota-lingkaran', 'anggota-huruf'
   ];
 
   var KUNCI_TAMPIL = 'anggota_tampil';
   var penandaTampil = true;
+  var jamPenanda = null;
 
   /* ---------- bantu ---------- */
 
@@ -1559,6 +1559,14 @@
   function gambarPenanda() {
     if (!peta) { return; }
 
+    /* Gaya peta belum siap (mis. baru ganti jenis peta) → tunda sebentar.
+       MapLibre menolak addSource/addLayer sebelum gaya selesai dimuat. */
+    if (!peta.isStyleLoaded()) {
+      if (jamPenanda) { clearTimeout(jamPenanda); }
+      jamPenanda = setTimeout(gambarPenanda, 120);
+      return;
+    }
+
     /* Icon harus masuk ke gaya peta SEBELUM lapisan `symbol` dibuat.
        Gambar hilang setiap kali gaya peta diganti (tombol Satelit/Map),
        jadi dipasang ulang di sini — bukan sekali di awal saja. */
@@ -1587,27 +1595,25 @@
     };
 
     if (!peta.getSource('anggota')) {
-          /* `cluster` = anti-tumpuk dari MapLibre. Titik-titik yang berdekatan
-             pada satu tingkat zoom digabung menjadi satu bulatan berisi jumlah
-             anggota, lalu pecah sendiri saat peta diperbesar. Ini yang menjaga
-             tampilan tetap terbaca walau anggotanya ribuan. */
+          /* Tanpa penggabungan (cluster). Pemilik proyek memutuskan angka
+             tumpukan sulit dipahami — tidak jelas anggota mana yang digabung.
+             Jadi seluruh 699 penanda ditampilkan satu per satu sebagai icon.
+             Saat peta masih jauh, icon memang saling berdekatan; itu diterima
+             karena jenis datanya langsung terbaca dari bentuk icon. */
           peta.addSource('anggota', {
             type: 'geojson',
-            data: fc,
-            cluster: true,
-            clusterRadius: 62,
-            clusterMaxZoom: 16
+            data: fc
           });
 
           /* ---------- bentuk penanda ----------
-             Titik lokasi → garis putus-putus → bulatan berisi kode anggota.
+             Titik lokasi → garis putus-putus → bulatan berisi icon kategori.
              Bulatan dinaikkan supaya tidak menutupi nama tempat dari peta dasar.
              Seluruh pergeseran memakai satuan PIXEL (circle-translate dan
-             text-offset), jadi besarnya tetap sama di semua tingkat zoom —
+             icon-offset), jadi besarnya tetap sama di semua tingkat zoom —
              tidak mengecil saat peta diperbesar. */
           var JARAK = -34;                 /* pusat bulatan, 34 px di atas lokasi */
+          var UKURAN_IKON = 0.24;          /* icon-size, dipakai juga untuk icon-offset */
           var PUTUS = [-5, -11, -17, -23]; /* titik-titik garis putus-putus */
-          var TANPA_TUMPUK = ['!', ['has', 'point_count']];
 
           /* 1. Titik kecil tepat di lokasi. Diberi cincin terang supaya terlihat
                 di atas citra gelap maupun peta terang. */
@@ -1615,7 +1621,6 @@
             id: 'anggota-titik',
             type: 'circle',
             source: 'anggota',
-            filter: TANPA_TUMPUK,
             paint: {
               'circle-radius': 3.5,
               'circle-color': ['get', 'warna'],
@@ -1624,77 +1629,13 @@
             }
           });
 
-          /* 2. Klaster (anti-tumpuk) — jumlah anggota di satu wilayah.
-                Diberi perlakuan sama seperti penanda tunggal: titik kecil di
-                lokasi, bulatan angka diangkat ke atas. Dengan begitu nama
-                tempat tidak tertutup dan bentuknya konsisten. */
-          peta.addLayer({
-            id: 'anggota-tumpuk-titik',
-            type: 'circle',
-            source: 'anggota',
-            filter: ['has', 'point_count'],
-            paint: {
-              'circle-radius': 3.5,
-              'circle-color': '#1f6feb',
-              'circle-stroke-color': '#ffffff',
-              'circle-stroke-width': 1.5
-            }
-          });
-
-          [-11, -21].forEach(function (j, i) {
-            peta.addLayer({
-              id: 'anggota-tumpuk-putus-' + (i + 1),
-              type: 'circle',
-              source: 'anggota',
-              filter: ['has', 'point_count'],
-              paint: {
-                'circle-radius': 2.2,
-                'circle-color': '#ffffff',
-                'circle-stroke-color': '#1f6feb',
-                'circle-stroke-width': 1.6,
-                'circle-translate': [0, j]
-              }
-            });
-          });
-
-          peta.addLayer({
-            id: 'anggota-tumpuk',
-            type: 'circle',
-            source: 'anggota',
-            filter: ['has', 'point_count'],
-            paint: {
-              'circle-color': '#1f6feb',
-              'circle-stroke-color': '#ffffff',
-              'circle-stroke-width': 2.5,
-              'circle-radius': ['step', ['get', 'point_count'], 13, 10, 16, 50, 20],
-              'circle-translate': [0, JARAK]
-            }
-          });
-
-          peta.addLayer({
-            id: 'anggota-tumpuk-angka',
-            type: 'symbol',
-            source: 'anggota',
-            filter: ['has', 'point_count'],
-            layout: {
-              'text-field': ['get', 'point_count_abbreviated'],
-              'text-size': 11,
-              'text-font': ['Open Sans Bold'],
-              'text-offset': [0, JARAK / 10],
-              'text-allow-overlap': true,
-              'text-ignore-placement': true
-            },
-            paint: { 'text-color': '#ffffff' }
-          });
-
-          /* 3. Garis putus-putus penghubung. Dibuat beberapa titik supaya
+          /* 2. Garis putus-putus penghubung. Dibuat beberapa titik supaya
                 bentuknya jelas dan langsung dimengerti. */
           PUTUS.forEach(function (j, i) {
             peta.addLayer({
               id: 'anggota-putus-' + (i + 1),
               type: 'circle',
               source: 'anggota',
-              filter: TANPA_TUMPUK,
               paint: {
                 'circle-radius': 2.2,
                 'circle-color': '#ffffff',
@@ -1705,12 +1646,11 @@
             });
           });
 
-          /* 4. Bulatan kode: latar terang, cincin warna kategori. */
+          /* 3. Bulatan icon: latar terang, cincin warna kategori. */
           peta.addLayer({
             id: 'anggota-lingkaran',
             type: 'circle',
             source: 'anggota',
-            filter: TANPA_TUMPUK,
             paint: {
               'circle-radius': 10,
               'circle-color': '#f2f7fc',
@@ -1720,39 +1660,29 @@
             }
           });
 
-          /* 5. Icon kategori di dalam bulatan. Menggantikan tulisan 2–3
-                huruf supaya bentuknya langsung terbaca. Gambar dipasang
-                oleh js/ikon.js sebelum lapisan ini dibuat. */
+          /* 4. Icon kategori di dalam bulatan. Menggantikan tulisan 2–3
+                huruf supaya jenis datanya langsung terbaca. Gambar dipasang
+                oleh js/ikon.js sebelum lapisan ini dibuat.
+
+                PENTING: `icon-offset` BUKAN piksel dan BUKAN em — nilainya
+                dikalikan `icon-size`. Dengan icon-size 0.24, offset -34 hanya
+                menggeser 8 px. Jadi offset harus JARAK / UKURAN_IKON
+                (-34 / 0.24 = -141.67) supaya icon tepat di pusat bulatan.
+                Diukur langsung dari peta (18 Okt 2026). */
           peta.addLayer({
             id: 'anggota-huruf',
             type: 'symbol',
             source: 'anggota',
-            filter: TANPA_TUMPUK,
             layout: {
               'icon-image': ['get', 'ikon'],
-              'icon-size': 0.24,
+              'icon-size': UKURAN_IKON,
               'icon-allow-overlap': true,
               'icon-ignore-placement': true,
-              'icon-offset': [0, JARAK]
+              'icon-offset': [0, JARAK / UKURAN_IKON]
             }
           });
 
           /* ---------- sentuhan ---------- */
-
-          /* Bulatan tumpukan: sekali ketuk → peta mendekat sampai anggotanya
-             terpisah satu per satu. */
-          peta.on('click', 'anggota-tumpuk', function (e) {
-            var f = peta.queryRenderedFeatures(e.point, { layers: ['anggota-tumpuk'] })[0];
-            if (!f) { return; }
-            var sumber = peta.getSource('anggota');
-            var id = f.properties.cluster_id;
-            var titik = f.geometry.coordinates;
-            Promise.resolve(sumber.getClusterExpansionZoom(id)).then(function (z) {
-              peta.easeTo({ center: titik, zoom: z + 0.3 });
-            }).catch(function () {
-              peta.easeTo({ center: titik, zoom: peta.getZoom() + 2 });
-            });
-          });
 
           ['anggota-titik', 'anggota-lingkaran', 'anggota-huruf'].forEach(function (id) {
             peta.on('click', id, function (e) {
@@ -1760,7 +1690,7 @@
             });
           });
 
-          ['anggota-tumpuk', 'anggota-tumpuk-titik', 'anggota-titik', 'anggota-lingkaran', 'anggota-huruf']
+          ['anggota-titik', 'anggota-lingkaran', 'anggota-huruf']
             .forEach(function (id) {
               peta.on('mouseenter', id, function () {
                 peta.getCanvas().style.cursor = 'pointer';

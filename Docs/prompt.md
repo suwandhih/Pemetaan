@@ -286,7 +286,7 @@ bilah butuh **387 px**.
 | 14 | Peta Indonesia + negara tetangga | `inti.js` | batas geser 92°–148° BT; tetangga tetap tampil supaya pulau berbatasan tidak terpotong |
 | 15 | Jenis peta: Satelit ⇄ Map | `inti.js` | satu tombol bergantian; ganti jenis tidak menggeser kamera |
 | 16 | Peta tematik jumlah penduduk 4 tingkat | `warna.js` | 9 kelas warna; wilayah tanpa data diwarnai abu-abu |
-| 17 | Data anggota (tambah/ubah/hapus) | `member.js` | dikelompokkan per provinsi/kab/kec/desa; penanda berwarna menurut kategori |
+| 17 | Data anggota (tambah/ubah/hapus) | `member.js` | dikelompokkan per provinsi/kab/kec/desa; penanda = titik lokasi → garis putus-putus → bulatan berisi icon kategori |
 | 18 | Peta interaktif mengikuti isian form | `member.js` | pilih wilayah → peta terbang + garis merah berkedip keliling area; pin 📌 bisa digeser dengan mengetuk peta |
 | 19 | Cari wilayah / anggota / nama jalan | `cari.js` | wilayah dari data lokal; nama jalan dari Nominatim (jeda 400 ms, minimal 3 huruf, `countrycodes=id`) |
 | 20 | Titik lokasi suku bangsa | `suku.js` | 28 suku BPS SP2010; panel seperti panel Anggota; garis merah berkedip + satu titik di tengah kawasan |
@@ -412,6 +412,10 @@ waktu di proyek ini.
 | Gambar `addImage` **hilang** setiap kali gaya peta diganti | MapLibre membuang gambar bersama gaya lama | pasang ulang di `gambarPenanda()` dengan pemeriksaan `hasImage()` |
 | Anggota yang hanya punya provinsi **tidak muncul** di tingkat kabupaten/kecamatan/desa | `kodeUntukTingkat()` mengembalikan string kosong | pakai kode tingkat di atasnya bila kode tingkat itu kosong |
 | 699 anggota dari provinsi sama **bertumpuk** di satu titik | titik tengah provinsi sama untuk semua | geser dalam lingkaran kecil; jari-jari berbeda per kategori |
+| `icon-offset` **dikalikan `icon-size`** — bukan piksel, bukan em | perilaku MapLibre GL JS | offset = jarak_px / icon-size; dengan `icon-size: 0.24`, `-34` hanya menggeser 8 px, jadi perlu `-141.67` |
+| `icon-translate` **tidak ada** di MapLibre GL JS | hanya `circle-translate` yang punya padanan translate | pakai `icon-offset` untuk `symbol`, `circle-translate` untuk `circle` |
+| `addSource`/`addLayer` melempar **"Style is not done loading"** | dipanggil sebelum gaya selesai dimuat (mis. sesudah ganti jenis peta) | periksa `peta.isStyleLoaded()` lalu tunda dengan `setTimeout` |
+| Penggabungan (cluster) **dihapus** 18 Okt 2026 | pemilik proyek menilai angka tumpukan sulit dipahami | jangan pasang `cluster: true` lagi; tampilkan semua penanda satu per satu |
 
 ---
 

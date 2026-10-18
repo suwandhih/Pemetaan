@@ -191,6 +191,8 @@ Kalau ada pekerjaan baru, perlakukan sebagai **orderan baru** — catat dulu di
 | Gambar icon penanda hilang setelah ganti jenis peta | MapLibre membuang gambar bersama gaya lama | pasang ulang di `gambarPenanda()` dengan pemeriksaan `hasImage()` |
 | Anggota yang hanya punya provinsi tidak muncul di tingkat bawah | `kodeUntukTingkat()` mengembalikan kosong | pakai kode tingkat di atasnya bila kosong |
 | API TokoMedia mengembalikan halaman login, bukan JSON | API belum terpasang di produksi | ambil lewat Worker (server), bukan peramban |
+| Icon kategori tidak muncul di dalam bulatan penanda | `icon-offset` **dikalikan `icon-size`** (bukan piksel/em) | offset = jarak_px / icon-size; `-34 / 0.24 = -141.67` |
+| Penggabungan penanda (cluster) dibuang | Pemilik proyek menilai angka tumpukan sulit dipahami | jangan pasang `cluster: true` lagi |
 
 Daftar jebakan teknis yang lebih lengkap ada di
 [`prompt.md`](./prompt.md) bagian 9.
