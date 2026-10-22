@@ -275,6 +275,29 @@
       ]
     },
     {
+      id: 'label-media',
+      judul: 'Label media di peta',
+      untuk: 'Mengetahui provinsi mana yang punya data media, dan media apa ' +
+        'saja isinya, tanpa harus membuka daftar anggota satu per satu.',
+      langkah: [
+        'Lihat peta dari jauh. Setiap provinsi yang punya data media diberi satu jangkar — bulatan putih dengan cincin berwarna.',
+        'Di sebelah jangkar ada label pendek berisi nama medianya, mis. [[Film Isa \u00B7 Clip|tekan:#tombol-media]].',
+        'Ketuk jangkar atau labelnya. Provinsi itu langsung diberi garis merah berkedip, sama seperti saat mencari wilayah.',
+        'Buka [[\uD83D\uDCFA|tekan:#tombol-media]] untuk memilih kelompok mana yang ikut dihitung. Kelompok yang dimatikan tidak lagi disebut di label.'
+      ],
+      hasil: [
+        'Satu provinsi = satu jangkar + satu label, jadi tidak ada tulisan bertumpuk walau provinsinya berdekatan.',
+        'Label hanya menyebut kelompok media yang sedang hidup, jadi isinya selalu sama dengan penanda yang tampil di peta.',
+        'Keterangan warna di kiri bawah peta menjelaskan arti tiap warna, dan hanya muncul kalau memang ada datanya.'
+      ],
+      catatan: [
+        'Nama di label dipendekkan supaya muat: Film Isa Al-Masih \u2192 Film Isa, Film Ikatan Ilahi \u2192 Film Ilahi, Video Kitab Suci \u2192 Video, Clip Kitab Suci \u2192 Clip, Aplikasi Kitab Suci \u2192 Ap Kitab.',
+        'Jangkar diletakkan di titik tengah daratan utama provinsi, bukan di tengah kotak pembatasnya — supaya tidak jatuh di laut pada provinsi kepulauan.',
+        'Label baru muncul mulai pembesaran sedang (z4); jangkarnya sudah muncul sedikit lebih awal (z3,5).',
+        'Kalau tidak ada satu pun provinsi berdata media, jangkar, label, dan keterangannya tidak ditampilkan sama sekali.'
+      ]
+    },
+    {
       id: 'ikon',
       judul: 'Arti ikon di bilah atas',
       untuk: 'Mengenal tombol-tombol di bilah atas, karena semuanya memakai ' +

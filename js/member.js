@@ -1711,6 +1711,10 @@
            ulang. Keadaan tampil/sembunyi harus dipasang lagi, kalau tidak
            penandanya muncul kembali walau sedang disembunyikan. */
         terapkanTampil();
+
+        /* Orderan 26: jangkar & label media ikut digambar ulang, karena
+           lapisannya juga hilang setiap kali gaya peta diganti. */
+        if (window.PD_LABEL && PD_LABEL.segarkan) { PD_LABEL.segarkan(); }
       }
 
   /* ---------- pindah peta ke satu anggota ---------- */
@@ -1773,6 +1777,10 @@
           peta.setFilter(id, tapis);
         } catch (e) { /* lapisan belum siap — dilewati */ }
       });
+
+      /* Orderan 26: label provinsi hanya menyebut kelompok media yang
+         sedang hidup, jadi ikut disegarkan setiap penyaringan berubah. */
+      if (window.PD_LABEL && PD_LABEL.segarkan) { PD_LABEL.segarkan(); }
     }
 
   /* ---------- mulai ---------- */

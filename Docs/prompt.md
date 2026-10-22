@@ -91,6 +91,7 @@ C:\data\Pemetaan\
 │   ├── ikon.js                 icon penanda kategori (14 icon SVG)
 │   ├── member.js               daftar anggota, form, kategori, penanda (1.860 baris)
 │   ├── media.js                menu "Media on/off" — pilih kelompok yang tampil (orderan 24)
+│   ├── label.js                jangkar & label media per provinsi (orderan 26)
 │   ├── tokomedia.js            tombol [Update] — tarik data tokomedia.org
 │   ├── cari.js                 pencarian wilayah / anggota / nama jalan (orderan 19)
 │   └── panduan.js              panduan pemakaian interaktif (tombol ?)
@@ -218,6 +219,7 @@ sebagai skrip biasa supaya bisa jalan dari GitHub Pages tanpa build.
 | `PD_ANGGOTA` | `member.js` | `muat()`, `gambarPenanda()`, `bukaPanel()`, `bukaForm()`, `tutupPanel()`, `tutupForm()`, `terapkanTampil()`, `ambilAnggota()`, `sorotWilayah()`, `tunjukTitik()` |
 | `PD_IKON` | `ikon.js` | `DAFTAR`, `KATEGORI`, `untukKategori()`, `gambar()`, `pasang()`, `lengkap()` |
 | `PD_MEDIA` | `media.js` | `MEDIA`, `siap()`, `hidup(nama)`, `saring()`, `semua(nyala)`, `terapkan()`, `bukaTutup(buka)`, `segarkan()` |
+| `PD_LABEL` | `label.js` | `siap()`, `segarkan()`, `gambar()`, `data()`, `inventaris()` |
 | `PD_TOKOMEDIA` | `tokomedia.js` | `tarik()`, `siap()` |
 | `PD_CARI` | `cari.js` | `buka()`, `tutup()`, `setAnggotaSiap()` |
 | `PD_PANDUAN` | `panduan.js` | `buka()`, `tutup()`, `aktif()`, `keadaan()`, `PANDUAN` |
@@ -228,8 +230,11 @@ karena modul lain menunggu `PD.peta` siap:
 ```html
 maplibre-gl.js → prop-nasional.js → kab-nasional.js → inti.js → warna.js
 → agama.js → suku.js → simpanan.js → ikon.js → member.js → media.js
-→ tokomedia.js → cari.js → panduan.js
+→ label.js → tokomedia.js → cari.js → panduan.js
 ```
+
+`label.js` **wajib** dimuat setelah `media.js` — ia membaca `PD_MEDIA.hidup()`
+untuk tahu kelompok mana yang sedang menyala.
 
 Modul yang butuh peta memakai pola tunggu:
 
@@ -265,6 +270,7 @@ var coba = 0;
 | **Form anggota: peta 45% atas, form 55% bawah (HP)** | peta tetap terlihat saat mengisi; peta benar-benar menyusut (tingginya dipangkas) sehingga MapLibre menghitung ulang ukurannya |
 | **Tombol Satelit/Map bergantian** | hanya ada 2 pilihan, jadi satu tombol lebih enak daripada daftar melayang |
 | **Bilah atas ikon saja** | 8 tombol bertulisan penuh butuh 536 px, bingkai HP hanya 430 px. Arti tiap ikon dijelaskan di panduan (bagian "Arti ikon di bilah atas") |
+| **Jangkar + label media di peta** | satu provinsi = satu jangkar + satu label. Jangkar menunjukkan **tempat**, label menunjukkan **isi**. Dipisah supaya MapLibre bisa menyembunyikan label yang bertumpuk tanpa ikut menghilangkan jangkarnya |
 
 ### Bilah atas — 8 tombol, ikon saja (orderan 24)
 
@@ -295,6 +301,32 @@ tombol ke 28 px (butuh 253 px).
 tulisan) **kalah** dari aturan `#tombol-anggota { font-size: 12px }` yang ada di
 bagian bawah berkas. Karena itu penulisannya harus `#bilah-atas #tombol-anggota`.
 
+### Jangkar & label media (orderan 26)
+
+```
+        ● Film Isa · Clip        ← jangkar + label, di titik berat daratan utama
+```
+
+| Bagian | Nilai |
+|---|---|
+| Lapisan jangkar | `media-jangkar` — `circle`, `minzoom` 3,5, radius 5,5 px, isi `#f2f7fc`, cincin warna kelompok |
+| Lapisan label | `media-label` — `symbol`, `minzoom` 4, `Open Sans Bold` 11 px, halo `#0b0f14` 1,8 px |
+| Sumber | `media-provinsi` — GeoJSON, satu titik per provinsi berdata media |
+| Keterangan | `#keterangan-media` + pil `.km-pil`, kiri bawah, `bottom: calc(var(--tinggi-bilah) + 18px)` |
+
+Nama di label dipendekkan supaya muat: `Film Isa Al-Masih` → **Film Isa**,
+`Film Ikatan Ilahi` → **Film Ilahi**, `Video Kitab Suci` → **Video**,
+`Clip Kitab Suci` → **Clip**, `Aplikasi Kitab Suci` → **Ap Kitab**. Peta
+singkatnya ada di `PENDEK` (`js/label.js`) — satu tempat saja.
+
+⚠️ **Jebakan:** titik tengah **kotak pembatas** provinsi jatuh di laut untuk
+provinsi kepulauan. Jangkar harus dihitung dari **titik berat cincin terluas**
+poligonnya.
+
+⚠️ **Jebakan:** `#keterangan-media` bertumpuk dengan `#atribusi` di layar sempit
+kalau keduanya diletakkan di `bottom: calc(var(--tinggi-bilah) + 6px)`. Atribusi
+tingginya ±11 px + 4 px jarak, jadi keterangan perlu diangkat ke **+18 px**.
+
 ---
 
 ## 7. Fitur — daftar lengkap
@@ -313,6 +345,7 @@ bagian bawah berkas. Karena itu penulisannya harus `#bilah-atas #tombol-anggota`
 | 23 | Data anggota dari tokomedia.org + tombol [Update] | `tokomedia.js`, `worker.js` | 699 anggota · 5 kategori · koordinat otomatis · icon kategori |
 | 24 | Menu "Media on/off" | `media.js` | pilih kelompok data yang tampil di peta; keadaan disimpan di database; bilah atas menjadi ikon saja |
 | 25 | Seluruh kategori bisa dihidupkan / dimatikan | `media.js` | daftar digabung dari kategori yang dipakai anggota + daftar kategori resmi |
+| 26 | Jangkar & label media per provinsi | `label.js` | satu jangkar + satu label per provinsi berdata media; label menyebut nama pendek kelompok yang sedang hidup; ketuk → garis merah provinsi |
 | — | Panduan pemakaian interaktif | `panduan.js` | tombol `?` mengenali posisi pemakai; kata kunci jadi tautan yang benar-benar menjalankan aksinya |
 
 ### Detail yang mudah terlewat
@@ -436,6 +469,9 @@ waktu di proyek ini.
 | `icon-translate` **tidak ada** di MapLibre GL JS | hanya `circle-translate` yang punya padanan translate | pakai `icon-offset` untuk `symbol`, `circle-translate` untuk `circle` |
 | `addSource`/`addLayer` melempar **"Style is not done loading"** | dipanggil sebelum gaya selesai dimuat (mis. sesudah ganti jenis peta) | periksa `peta.isStyleLoaded()` lalu tunda dengan `setTimeout` |
 | Penggabungan (cluster) **dihapus** 18 Okt 2026 | pemilik proyek menilai angka tumpukan sulit dipahami | jangan pasang `cluster: true` lagi; tampilkan semua penanda satu per satu |
+| Titik tengah **kotak pembatas** provinsi jatuh di laut | provinsi kepulauan (Maluku, Papua, Kep. Riau) | hitung titik berat **cincin terluas** poligonnya, bukan titik tengah bbox |
+| `#keterangan-media` **bertumpuk** dengan `#atribusi` di layar sempit | keduanya di kiri/kanan bawah | angkat keterangan ke `bottom: calc(var(--tinggi-bilah) + 18px)` — atribusi tingginya ±11 px + 4 px jarak |
+| `idBaru()` bisa **mengembalikan id yang sama** bila dipanggil beruntun dalam satu milidetik | berbasis waktu | untuk data uji, pakai id berurutan sendiri; jangan mengandalkan `idBaru()` dalam gelung rapat |
 
 ---
 
@@ -477,7 +513,7 @@ Kalau proyek ini harus dibangun ulang di tempat lain:
 4. **Tulis `index.html`** dengan urutan skrip seperti di bagian 5.
 5. **Tulis `js/inti.js`** — peta, batas geser, jenis peta, bilah bawah.
 6. **Tulis modul fitur** satu per satu: `warna.js` → `agama.js` → `suku.js` →
-   `simpanan.js` → `member.js` → `media.js` → `cari.js` → `panduan.js`.
+   `simpanan.js` → `member.js` → `media.js` → `label.js` → `cari.js` → `panduan.js`.
 7. **Siapkan Worker Cloudflare** (`cloudflare/worker.js`) + database Neon.
    Isi secret `DATABASE_URL` dan `KUNCI` lewat `wrangler secret put`.
 8. **Aktifkan GitHub Pages** dari cabang `main`.
@@ -499,14 +535,14 @@ Kalau proyek ini harus dibangun ulang di tempat lain:
 | Bagian | Jumlah | Ukuran |
 |---|---|---|
 | Berkas data | 1.110 | 81,4 MB |
-| Modul JavaScript | 11 | 254 KB |
+| Modul JavaScript | 12 | 267 KB |
 | Pustaka peta (lokal) | 2 | 1,0 MB |
-| Tampilan (`gaya.css`) | 1 | 2.594 baris |
+| Tampilan (`gaya.css`) | 1 | 2.673 baris |
 | Halaman (`index.html`) | 1 | 13 KB |
 | Worker Cloudflare | 2 | 22 KB |
 | Skrip alat | 5 | 32 KB |
 | Dokumen | 4 | — |
-| Commit | 67 | — |
+| Commit | 68 | — |
 
 ---
 

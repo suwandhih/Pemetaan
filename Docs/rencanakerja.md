@@ -3017,3 +3017,91 @@ sekolah rumah sakit dsb kalau masih ada di restore ke data member"*
 
 **Catatan:** kunci aplikasi sempat dikirim lewat chat atas permintaan pemilik
 proyek. Sebaiknya **diganti** setelah pekerjaan selesai.
+
+---
+
+## Orderan 26 — jangkar & label media per provinsi (perintah 2026-10-22)
+
+Pemilik proyek: *"setiap provinsi yg punya data media harus jelas apa video isa,
+clip atau ... usulan ada di pasted image / pakai jangkar dan label .. lebih
+menolong user untuk mengetahui apa / bisa dibuatkan .. ??"*
+
+### Masalah
+
+Sebelum orderan ini, peta hanya bisa menjawab **"di mana ada anggota"**. Untuk
+tahu **"provinsi ini punya media apa saja"**, pemakai harus membuka daftar
+anggota satu per satu. Penanda anggota juga terlalu kecil untuk dibaca dari
+jauh, dan jumlahnya bisa ratusan.
+
+### Yang dikerjakan
+
+**Modul baru `js/label.js`.** Setiap provinsi yang punya data media diberi
+**satu jangkar** (bulatan putih dengan cincin berwarna) dan **satu label**
+berisi nama pendek kelompok medianya.
+
+| Bagian | Keterangan |
+|---|---|
+| Jangkar | Lapisan `circle`, `minzoom` 3,5 — radius 5,5 px, isi `#f2f7fc`, cincin warna kelompok pertama |
+| Label | Lapisan `symbol`, `minzoom` 4 — `Open Sans Bold` 11 px, halo `#0b0f14` 1,8 px |
+| Isi label | Nama pendek kelompok, digabung ` · ` — mis. `Film Isa · Clip` |
+| Ketuk | Jangkar atau label → provinsinya diberi garis merah berkedip (`PD_ANGGOTA.sorotWilayah`) |
+| Keterangan | Pil warna di kiri bawah peta, hanya muncul kalau ada datanya |
+
+**Nama pendek** dipakai supaya label muat:
+
+| Nama panjang | Nama di label |
+|---|---|
+| Film Isa Al-Masih | Film Isa |
+| Film Ikatan Ilahi | Film Ilahi |
+| Video Kitab Suci | Video |
+| Clip Kitab Suci | Clip |
+| Aplikasi Kitab Suci | Ap Kitab |
+
+**Titik jangkar dihitung dari poligon provinsi**, bukan dari kotak pembatasnya.
+Cincin terluas dipilih lebih dulu (daratan utama), lalu dihitung titik beratnya
+dengan rumus titik berat poligon. Cara ini penting untuk provinsi kepulauan —
+kalau memakai titik tengah kotak pembatas, jangkarnya jatuh di laut.
+
+**Label mengikuti menu Media on/off.** `inventaris()` hanya menghitung kelompok
+yang sedang hidup (`PD_MEDIA.hidup`), jadi label tidak pernah menyebut kelompok
+yang penandanya sedang disembunyikan. `PD_LABEL.segarkan()` dipanggil dari
+`js/media.js` (`terapkan`), `js/member.js` (`terapkanTampil`), dan di akhir
+`gambarPenanda()` supaya lapisan ikut dibuat ulang setiap kali gaya peta diganti.
+
+### Berkas yang berubah
+
+| Berkas | Perubahan |
+|---|---|
+| `js/label.js` | **Baru** — 10,7 KB, seluruh logika jangkar & label |
+| `index.html` | `<script src="js/label.js">` setelah `media.js`; markup `#keterangan-media`; versi aset naik ke `20261022-04` |
+| `css/gaya.css` | Gaya `#keterangan-media` + `.km-pil`; pergeseran di PC saat kolom kiri terbuka |
+| `js/member.js` | `PD_LABEL.segarkan()` di `terapkanTampil()` dan di akhir `gambarPenanda()` |
+| `js/media.js` | `PD_LABEL.segarkan()` di `terapkan()` |
+| `js/panduan.js` | Bagian baru "Label media di peta" (12 bagian) |
+
+### Bukti uji
+
+Diuji dengan 6 anggota sementara di 5 provinsi (Aceh, Bali, NTB, Sulawesi
+Selatan, Papua Tengah), lalu seluruhnya dihapus kembali.
+
+| Uji | Hasil |
+|---|---|
+| 5 provinsi berdata → 5 jangkar + 5 label | ✅ `Film Isa · Clip`, `Video`, `Ap Kitab`, `Clip`, `Film Ilahi` |
+| Warna cincin sesuai kelompok | ✅ 5 warna berbeda, sama dengan `warnaKategori` |
+| Ketuk jangkar → garis merah provinsi | ✅ Bali disorot, kelilingnya tepat |
+| Matikan "Video Kitab Suci" di menu | ✅ label Bali hilang, keterangan ikut berubah |
+| Semua mati | ✅ 0 jangkar, 0 label, keterangan disembunyikan |
+| Semua hidup | ✅ 5 jangkar kembali |
+| Ganti jenis peta (Satelit ⇄ Map) | ✅ lapisan dibuat ulang, label tetap ada |
+| Layar 256 px — keterangan vs atribusi | ✅ tidak bertumpuk |
+| PC 1440 px, kolom kiri terbuka | ✅ keterangan bergeser ke kanan kolom |
+| Tanpa data media | ✅ jangkar, label, dan keterangan tidak ditampilkan |
+| Galat konsol | ✅ **0** |
+
+### Catatan
+
+- Data media **belum ada** di database saat orderan ini selesai (hanya 3 anggota
+  lama: Yayasan, Kesehatan, Sekolah). Fitur ini akan langsung bekerja begitu
+  data media dimasukkan — tidak perlu perubahan kode lagi.
+- Nama pendek hanya ada di `PENDEK` (`js/label.js`). Kalau pemilik proyek ingin
+  nama lain, cukup ubah satu tempat itu.

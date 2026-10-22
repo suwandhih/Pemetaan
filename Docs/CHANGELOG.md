@@ -18,18 +18,52 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 | Hal | Jumlah |
 |---|---|
-| Commit | 67 |
-| Orderan selesai | 25 |
+| Commit | 68 |
+| Orderan selesai | 26 |
 | Berkas data | 1.110 (81,4 MB) |
-| Modul JavaScript | 11 (254 KB) |
-| Baris tampilan (`gaya.css`) | ~2.594 |
+| Modul JavaScript | 12 (267 KB) |
+| Baris tampilan (`gaya.css`) | ~2.673 |
 | Rentang waktu | 2026-10-12 → 2026-10-22 |
 
 **Sebaran commit:** 2026-10-12 → 14 commit · 2026-10-16 → 25 commit ·
-2026-10-17 → 22 commit · 2026-10-18 → 4 commit · 2026-10-22 → 2 commit.
+2026-10-17 → 22 commit · 2026-10-18 → 4 commit · 2026-10-22 → 3 commit.
 ---
 
 ## 2026-10-22
+
+### Orderan 26 — jangkar & label media per provinsi
+
+**Baru.** Peta sekarang bisa menjawab **"provinsi ini punya media apa saja"**
+langsung dari tampilannya. Setiap provinsi yang punya data media diberi **satu
+jangkar** (bulatan putih dengan cincin berwarna) dan **satu label** berisi nama
+pendek kelompok medianya — mis. `Film Isa · Clip`.
+
+- **Modul baru `js/label.js`** (10,7 KB). Jangkar = lapisan `circle` (`minzoom`
+  3,5), label = lapisan `symbol` (`minzoom` 4, `Open Sans Bold` 11 px, halo
+  gelap 1,8 px).
+- **Nama pendek** supaya label muat: Film Isa Al-Masih → `Film Isa`, Film
+  Ikatan Ilahi → `Film Ilahi`, Video Kitab Suci → `Video`, Clip Kitab Suci →
+  `Clip`, Aplikasi Kitab Suci → `Ap Kitab`.
+- **Titik jangkar dihitung dari poligon provinsi** — cincin terluas dipilih
+  lebih dulu (daratan utama), lalu dihitung titik beratnya. Kalau memakai titik
+  tengah kotak pembatas, jangkar provinsi kepulauan jatuh di laut.
+- **Ketuk jangkar atau label** → provinsinya diberi garis merah berkedip,
+  memakai mekanisme sorot yang sudah ada (`PD_ANGGOTA.sorotWilayah`).
+- **Label mengikuti menu Media on/off.** Kelompok yang dimatikan tidak lagi
+  disebut di label, dan keterangan warnanya ikut berubah.
+- **Keterangan warna** di kiri bawah peta (pil `.km-pil`), hanya muncul kalau
+  memang ada provinsi berdata media.
+- **Panduan bertambah satu bagian:** "Label media di peta" (kini 12 bagian).
+
+**Bukti uji:** 6 anggota sementara di 5 provinsi → 5 jangkar + 5 label dengan
+warna berbeda · ketuk jangkar Bali → garis merah tepat di kelilingnya · matikan
+"Video Kitab Suci" → label Bali hilang · semua mati → 0 jangkar, keterangan
+tersembunyi · ganti jenis peta → lapisan dibuat ulang · layar 256 px → keterangan
+tidak bertumpuk dengan atribusi · PC 1440 px dengan kolom kiri terbuka →
+keterangan bergeser · tanpa data media → tidak ada yang ditampilkan · **0 galat
+konsol**. Seluruh anggota uji dihapus kembali; database tetap 3 anggota.
+
+---
 
 ### Orderan 24 — menu "Media on/off" + bilah atas ikon saja
 

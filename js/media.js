@@ -235,6 +235,11 @@
     if (window.PD_ANGGOTA && window.PD_ANGGOTA.terapkanTampil) {
       window.PD_ANGGOTA.terapkanTampil();
     }
+    /* Orderan 26: label provinsi menyebut kelompok media yang hidup saja,
+       jadi keterangan di peta ikut berubah saat menu ini dipakai. */
+    if (window.PD_LABEL && window.PD_LABEL.segarkan) {
+      window.PD_LABEL.segarkan();
+    }
   }
 
   function semua(hidupSemua) {

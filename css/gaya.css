@@ -596,6 +596,78 @@ button.agama-baris:hover {
 }
 
 /* ============================================================
+   Orderan 26 — keterangan media di peta
+   ------------------------------------------------------------
+   Jangkar (titik) dan label (tulisan) ditaruh di atas provinsi yang
+   punya data media. Keterangan ini menjelaskan warna tiap kelompok,
+   dan hanya muncul kalau memang ada datanya — jadi tidak pernah
+   menampilkan kelompok yang kosong.
+
+   Letaknya di kiri bawah, di atas bilah bawah. Sisi kanan bawah sudah
+   dipakai #atribusi, jadi keduanya tidak bertabrakan.
+   ============================================================ */
+
+#keterangan-media {
+  position: absolute;
+  left: 8px;
+  /* Diangkat melewati #atribusi (kanan bawah, tinggi ±11 px + 4 px jarak)
+     supaya keduanya tidak bertumpuk saat keterangan melipat jadi
+     beberapa baris di layar sempit. */
+  bottom: calc(var(--tinggi-bilah) + 18px);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: calc(100% - 16px);
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  background: rgba(11, 15, 20, 0.82);
+  backdrop-filter: blur(6px);
+  font-size: 10.5px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+#keterangan-media[hidden] {
+  display: none;
+}
+
+#km-judul {
+  flex: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+#km-daftar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* Pil warna — bentuknya sama dengan label di peta supaya pemakai
+   langsung menghubungkan warna dengan kelompoknya. */
+.km-pil {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  white-space: nowrap;
+}
+
+.km-pil i {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================================
    Orderan 20 — titik lokasi suku bangsa
    ------------------------------------------------------------
    Tombol [Suku 🧬] berdiri sendiri di sebelah tombol Agama. Daftarnya
@@ -2442,6 +2514,13 @@ select.fa-input option:checked {
   #bingkai:has(#panel-suku:not([hidden])) #cari,
   #bingkai:has(#form-anggota:not([hidden])) #cari {
     left: var(--lebar-panel);
+  }
+
+  /* Keterangan media ikut bergeser supaya tidak tertutup kolom kiri. */
+  #bingkai:has(#panel-anggota:not([hidden])) #keterangan-media,
+  #bingkai:has(#panel-suku:not([hidden])) #keterangan-media,
+  #bingkai:has(#form-anggota:not([hidden])) #keterangan-media {
+    left: calc(var(--lebar-panel) + 8px);
   }
 
   /* ------------------------------------------------------------

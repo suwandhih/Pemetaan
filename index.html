@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261022-01">
-<link rel="stylesheet" href="css/gaya.css?v=20261022-01">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261022-04">
+<link rel="stylesheet" href="css/gaya.css?v=20261022-04">
 </head>
 <body>
 
@@ -72,6 +72,13 @@
 
     <!-- Orderan 24: daftar kelompok media yang bisa dihidupkan / dimatikan -->
     <div id="pemilih-media" role="listbox" aria-label="Media on/off" hidden></div>
+
+    <!-- Orderan 26: keterangan warna jangkar & label media di peta.
+         Hanya muncul kalau ada provinsi yang benar-benar punya data media. -->
+    <div id="keterangan-media" hidden aria-label="Keterangan media di peta">
+      <span id="km-judul">Media</span>
+      <div id="km-daftar"></div>
+    </div>
 
     <!-- Orderan 20: titik lokasi suku bangsa (BPS Sensus Penduduk 2010).
          Disusun seperti panel Anggota — di PC jadi kolom kiri sehingga peta
@@ -229,19 +236,20 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261022-01"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261022-01"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261022-01"></script>
-<script src="js/inti.js?v=20261022-01"></script>
-<script src="js/warna.js?v=20261022-01"></script>
-<script src="js/agama.js?v=20261022-01"></script>
-<script src="js/suku.js?v=20261022-01"></script>
-<script src="js/simpanan.js?v=20261022-01"></script>
-<script src="js/ikon.js?v=20261022-01"></script>
-<script src="js/member.js?v=20261022-01"></script>
-<script src="js/media.js?v=20261022-01"></script>
-<script src="js/tokomedia.js?v=20261022-01"></script>
-<script src="js/cari.js?v=20261022-01"></script>
-<script src="js/panduan.js?v=20261022-01"></script>
+<script src="js/lib/maplibre-gl.js?v=20261022-04"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261022-04"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261022-04"></script>
+<script src="js/inti.js?v=20261022-04"></script>
+<script src="js/warna.js?v=20261022-04"></script>
+<script src="js/agama.js?v=20261022-04"></script>
+<script src="js/suku.js?v=20261022-04"></script>
+<script src="js/simpanan.js?v=20261022-04"></script>
+<script src="js/ikon.js?v=20261022-04"></script>
+<script src="js/member.js?v=20261022-04"></script>
+<script src="js/media.js?v=20261022-04"></script>
+<script src="js/label.js?v=20261022-04"></script>
+<script src="js/tokomedia.js?v=20261022-04"></script>
+<script src="js/cari.js?v=20261022-04"></script>
+<script src="js/panduan.js?v=20261022-04"></script>
 </body>
 </html>
