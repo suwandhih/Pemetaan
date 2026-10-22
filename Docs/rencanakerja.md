@@ -810,8 +810,8 @@ orderan 23–26 (2026-10-18 dan 2026-10-22) — semuanya sudah selesai.
 
 | No | Usulan | Perkiraan Waktu | Catatan |
 |----|--------|-----------------|---------|
-| U1 | **Tarik ulang data media dari tokomedia.org** (699 anggota, 5 kategori) | 5–10 mnt | Orderan 23 pernah mengisinya, lalu dihapus atas perintah pemilik proyek (orderan 1–3). Akibatnya fitur **jangkar & label media** (orderan 26) belum menampilkan apa pun — database hanya berisi 3 anggota lama tanpa data media. Backup 699 anggota tersimpan di berkas sesi `backup-tokomedia-20261022.json`. Menunggu keputusan pemilik proyek: tarik ulang, gabung dengan 3 anggota lama, atau biarkan kosong. |
-| U2 | **Rotasi kunci aplikasi (`KUNCI`)** | 5 mnt | Kunci `PMA-…` sempat tertulis di riwayat percakapan. Sebaiknya diganti di Worker (`env.KUNCI`) lalu diperbarui di peramban. Tidak mendesak, tetapi baik dilakukan. |
+| U1 | ~~**Tarik ulang data media dari tokomedia.org**~~ **SELESAI lewat orderan 27** | — | Orderan 27 sudah mengisi 300 anggota media dari API TokoMedia di Rumahweb. Fitur jangkar & label media (orderan 26) kini menampilkan 35 provinsi. |
+| U2 | ~~**Rotasi kunci aplikasi (`KUNCI`)**~~ **DIBATALKAN 2026-10-22** | — | Pemilik proyek menyatakan ini **hanya demo dan tidak dipublikasikan**, jadi kunci tidak perlu diganti. |
 
 ---
 
@@ -2865,7 +2865,8 @@ sosial. Icon digambar 64×64 lalu ditampilkan 15 px, jadi tetap tajam di HP.
 ### Catatan
 
 - **Kunci aplikasi sempat dikirim lewat chat** atas permintaan pemilik proyek.
-  Sebaiknya **diganti** setelah pekerjaan selesai.
+  Pemilik proyek menyatakan ini **hanya demo dan tidak dipublikasikan**, jadi
+  kunci **tidak perlu diganti** (keputusan 2026-10-22).
 - Backup data lama: `files/backup-anggota-20261018.json` di folder sesi
   (3 anggota: yayasan obi, Rsud mata, paud + 6 kategori lama).
 - Anggota tokomedia hanya diketahui **provinsinya**, bukan kabupaten/kecamatan/
@@ -3033,7 +3034,8 @@ sekolah rumah sakit dsb kalau masih ada di restore ke data member"*
 | Pulihkan pengaturan | ✅ `anggota_tingkat=kabkota`, `anggota_tampil=1` |
 
 **Catatan:** kunci aplikasi sempat dikirim lewat chat atas permintaan pemilik
-proyek. Sebaiknya **diganti** setelah pekerjaan selesai.
+proyek. Pemilik proyek menyatakan ini **hanya demo dan tidak dipublikasikan**,
+jadi kunci **tidak perlu diganti** (keputusan 2026-10-22).
 
 ---
 
@@ -3238,6 +3240,7 @@ hilang, tetapi tidak dipakai lagi oleh tombol.
 - **Tidak ada endpoint tulis** di daftar izin jembatan. Data TokoMedia tidak
   mungkin berubah lewat jalur ini — sesuai permintaan pemilik proyek.
 - Kunci jembatan dan token API **sempat dikirim lewat chat** selama pengerjaan.
-  Sebaiknya **diganti** setelah pekerjaan selesai.
+  Pemilik proyek menyatakan ini **hanya demo dan tidak dipublikasikan**, jadi
+  kunci **tidak perlu diganti** (keputusan 2026-10-22).
 - Aksi lama `tarikTokomedia` (pembaca HTML) masih ada di Worker sebagai cadangan,
   tetapi tombol [↻ Update] sudah tidak memakainya.

@@ -78,7 +78,8 @@ Suci" → label berubah `Film Isa · Video` → `Film Isa` · semua hidup kembal
 fitur · **0 galat konsol**.
 
 **Catatan:** kunci jembatan dan token API sempat dikirim lewat chat selama
-pengerjaan — sebaiknya **diganti** setelah pekerjaan selesai.
+pengerjaan. Pemilik proyek menyatakan ini **hanya demo dan tidak
+dipublikasikan**, jadi kunci **tidak perlu diganti** (keputusan 2026-10-22).
 
 ---
 
