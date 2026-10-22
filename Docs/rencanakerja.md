@@ -13,15 +13,15 @@ Aturan pengelolaan:
 > Pemilik proyek menyatakan **proyek Pemetaan selesai** pada 2026-10-17.
 > Seluruh **22 orderan** berstatus `SELESAI`.
 >
-> Setelah itu pemilik proyek menambah **4 orderan baru** (23–26) pada
+> Setelah itu pemilik proyek menambah **5 orderan baru** (23–27) pada
 > 2026-10-18 dan 2026-10-22. Keadaan terkini:
 >
 > | Ringkasan | Jumlah |
 > |---|---|
-> | Orderan selesai | **26** |
-> | Commit | 69 |
+> | Orderan selesai | **27** |
+> | Commit | 70 |
 > | Berkas data | 1.110 (81,4 MB) |
-> | Modul JavaScript | 12 (267 KB) |
+> | Modul JavaScript | 12 (270 KB) |
 > | Rentang waktu | 2026-10-12 → 2026-10-22 |
 >
 > **Situs live:** https://suwandhih.github.io/Pemetaan/
@@ -66,6 +66,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 24 | **Menu "Media on/off"** — tombol mata (👁) dihapus, diganti menu yang bisa memilih kelompok data mana yang tampil di peta. Bilah atas menjadi **ikon saja** supaya 8 tombol muat di HP | **SELESAI** ✅ — `js/media.js` baru, keadaan disimpan di database, 2 bagian panduan baru | 60–90 mnt | 2026-10-22 |
 | 25 | **Seluruh kategori bisa dihidupkan / dimatikan** — bukan hanya kategori yang sedang dipakai anggota | **SELESAI** ✅ — daftar digabung dari kategori terpakai + daftar kategori resmi, dibaca ulang setiap menu dibuka | 20–30 mnt | 2026-10-22 |
 | 26 | **Jangkar & label media per provinsi** — setiap provinsi yang punya data media harus jelas media apa saja isinya, memakai jangkar + label | **SELESAI** ✅ — `js/label.js` baru, 1 jangkar + 1 label per provinsi, label mengikuti menu Media on/off, ketuk → garis merah provinsi | 90–120 mnt | 2026-10-22 |
+| 27 | **Pemetaan memakai 2 server** — Neon untuk data anggota (baca/tulis), Rumahweb untuk data media TokoMedia (**baca saja**). Dibuat jembatan tambahan `pemetaan-bridge.php` di cPanel; `tm-bridge.php` milik TokoMedia **tidak disentuh**. Tombol [↻ Update] beralih memakai API TokoMedia, bukan lagi membaca halaman tokomedia.org | **SELESAI** ✅ — 300 anggota dari 5 kelompok media, 35 provinsi berlabel, 0 gagal. Token API tetap di sisi server | 120–180 mnt | 2026-10-22 |
 
 ### Orderan di luar daftar bernomor (perintah langsung pemilik proyek)
 
@@ -81,6 +82,8 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | **Bilah atas ikon saja** — `[Anggota][👁][Satelit][Populasi][Agama][Suku][⌕][?]` diganti ikon supaya 8 tombol muat di layar HP; keterangan ikon masuk panduan | **SELESAI** ✅ | 2026-10-22 |
 | **Panduan ikon bilah atas** — bagian panduan baru yang menjelaskan arti setiap ikon | **SELESAI** ✅ | 2026-10-22 |
 | **Panduan label media** — bagian panduan baru yang menjelaskan jangkar & label media di peta | **SELESAI** ✅ | 2026-10-22 |
+| **Panduan perbarui data media** — bagian panduan baru yang menjelaskan tombol [↻ Update] dan sifat baca-saja-nya | **SELESAI** ✅ | 2026-10-22 |
+| **Jembatan Rumahweb untuk Pemetaan** — `pemetaan-bridge.php` di cPanel, terpisah dari `tm-bridge.php`; hanya endpoint baca, wajib kunci di header | **SELESAI** ✅ | 2026-10-22 |
 
 
 ### Rincian Orderan 14 (perintah 2026-10-16)
@@ -3119,3 +3122,122 @@ Selatan, Papua Tengah), lalu seluruhnya dihapus kembali.
   data media dimasukkan — tidak perlu perubahan kode lagi.
 - Nama pendek hanya ada di `PENDEK` (`js/label.js`). Kalau pemilik proyek ingin
   nama lain, cukup ubah satu tempat itu.
+
+---
+
+## Orderan 27 — Pemetaan memakai 2 server (perintah 2026-10-22)
+
+Pemilik proyek: *"maksud saya rumahweb di gunakan pada pemetaan hanya ambil atau
+baca bukan update data karena rumahweb yg terhubung langsung ke API client /
+sedang pemetaan adalah aplikasi dashboard untuk management .. pemetaan
+menggunakan 2 server 1 neon untuk data member dll sedang data tokomedia (media)
+ini hanya baca tidak ada update >> apakah bisa guna 2 server"*
+
+lalu: *"set cPanel jangan mengubah untuk TokoMedia ini jangan di utak utik ..
+karena sudah terhubung / yg di set cPanel tambahan untuk hub ke pemetaan / jika
+aman lanjut proses sampai terhubung pemetaan dengan rumahweb"*
+
+### Masalah
+
+Sebelum orderan ini, Pemetaan mengambil data media dengan **membaca halaman
+tokomedia.org** lalu menebak isinya dari HTML. Cara itu rapuh: begitu susunan
+halaman berubah, pembacanya rusak. Padahal TokoMedia sudah punya **API
+terstruktur** di Rumahweb yang mengembalikan JSON.
+
+Yang menghalangi pemakaian langsung dari peramban: **token API**. Kalau token
+ditaruh di JavaScript, siapa pun bisa membacanya lewat "View Source".
+
+### Jawaban: bisa, dan aman
+
+Pemetaan memang bisa memakai **dua server** sekaligus:
+
+| Server | Dipakai untuk | Sifat |
+|---|---|---|
+| **Neon** (lewat Worker `pemetaan-api`) | data anggota, kategori, pengaturan | baca **dan** tulis |
+| **Rumahweb** (lewat `pemetaan-bridge.php`) | data media TokoMedia | **baca saja** |
+
+Pemisahannya rapi karena keduanya tidak pernah menulis ke tempat yang sama.
+
+### Yang dikerjakan
+
+**1. Jembatan baru `pemetaan-bridge.php` di cPanel.**
+
+Berkas baru di `/home/suwj4466/public_html/pemetaan-bridge.php`. **Terpisah
+sama sekali** dari `tm-bridge.php` milik aplikasi TokoMedia — berkas itu tidak
+disentuh, tidak diubah satu baris pun.
+
+| Pengamanan | Keterangan |
+|---|---|
+| Hanya POST | `GET` dijawab 405 |
+| Kunci jembatan | Wajib di header `X-Pemetaan-Kunci`, dibandingkan `hash_equals` → 401 bila salah |
+| Daftar izin | 25 endpoint, **semuanya baca** — tidak ada satu pun endpoint tulis |
+| CORS | Hanya `https://suwandhih.github.io` |
+| Token API | Disimpan di sisi server, tidak pernah dikirim ke peramban |
+
+**2. Aksi baru `tarikRumahweb` di Worker.**
+
+Worker memanggil jembatan 9 kali (3 kelompok berbahasa + 5 wilayah aplikasi +
+1 daftar clip), lalu menghitung koordinat memakai `cloudflare/peta-bahasa.js`
+yang sudah ada. Kunci jembatan disimpan sebagai **secret Worker**
+(`RUMAHWEB_KUNCI`), bukan di dalam kode.
+
+| Kelompok media | Sumber | Jumlah |
+|---|---|---|
+| Film Isa Al-Masih | `category/languages` id 1 | 177 bahasa |
+| Film Ikatan Ilahi | `category/languages` id 304 | 10 bahasa |
+| Video Kitab Suci | `category/languages` id 126 | 107 bahasa |
+| Clip Kitab Suci | `ckitab/index` | 1 titik (39 video) |
+| Aplikasi Kitab Suci | `aplikasi/area` × 5 gugus | 5 titik |
+| | **Jumlah** | **300 anggota** |
+
+**3. Tombol [↻ Update] beralih ke API.**
+
+`js/tokomedia.js` sekarang memanggil `Simpanan.tarikRumahweb()`, bukan lagi
+`tarikTokomedia()`. Fungsi lama tetap ada di Worker supaya tidak ada yang
+hilang, tetapi tidak dipakai lagi oleh tombol.
+
+**4. Bagian panduan baru** "Perbarui data media" (13 bagian).
+
+### Berkas yang berubah
+
+| Berkas | Perubahan |
+|---|---|
+| `pemetaan-bridge.php` | **Baru** — di cPanel, 4,4 KB, 25 endpoint baca |
+| `cloudflare/worker.js` | Aksi `tarikRumahweb`, `panggilRumahweb()`, `GRUP_RUMAHWEB`, `AREA_APLIKASI`, `KODE_CLIP` |
+| `js/simpanan.js` | `tarikRumahweb()` + diekspor |
+| `js/tokomedia.js` | Tombol [↻ Update] memakai `tarikRumahweb()` |
+| `js/label.js` | Ukuran label mengikuti pembesaran (`interpolate` z4→z7), `text-padding` 8 |
+| `js/panduan.js` | Bagian baru "Perbarui data media" (13 bagian) |
+| `index.html` | Keterangan tombol Update; versi aset naik ke `20261022-05` |
+
+### Bukti uji
+
+| Uji | Hasil |
+|---|---|
+| Jembatan + kunci benar | ✅ HTTP 200, JSON kategori lengkap |
+| Jembatan tanpa kunci | ✅ **HTTP 401** |
+| Jembatan kunci salah | ✅ **HTTP 401** |
+| Endpoint tulis lewat jembatan | ✅ `{"status":404,"message":"Endpoint tidak diizinkan"}` |
+| `tm-bridge.php` masih hidup | ✅ HTTP 200, 68.819 byte — **tidak tersentuh** |
+| Worker `tarikRumahweb` | ✅ `ok:true`, **300 anggota**, **0 gagal** |
+| Tombol [↻ Update] di situs | ✅ "300 anggota tersimpan dari API TokoMedia." |
+| Anggota di database | ✅ 303 (300 media + 3 lama) |
+| Provinsi berlabel | ✅ **35 provinsi** |
+| Contoh label | ✅ `ACEH = Film Isa · Film Ilahi · Video · Ap Kitab` |
+| Jangkar & label tampil di peta | ✅ 24 jangkar + 24 label pada z4,6 |
+| Ketuk jangkar → garis merah provinsi | ✅ Maluku Utara disorot |
+| Matikan "Video Kitab Suci" | ✅ label Maluku Utara berubah `Film Isa · Video` → `Film Isa` |
+| Semua hidup kembali | ✅ 35 fitur, keterangan 5 pil |
+| Bagian panduan baru | ✅ "Perbarui data media" tampil lengkap |
+| Galat konsol | ✅ **0** |
+
+### Catatan
+
+- **`tm-bridge.php` tidak disentuh.** Jembatan Pemetaan adalah berkas terpisah
+  dengan kunci terpisah, jadi aplikasi TokoMedia tidak terpengaruh sama sekali.
+- **Tidak ada endpoint tulis** di daftar izin jembatan. Data TokoMedia tidak
+  mungkin berubah lewat jalur ini — sesuai permintaan pemilik proyek.
+- Kunci jembatan dan token API **sempat dikirim lewat chat** selama pengerjaan.
+  Sebaiknya **diganti** setelah pekerjaan selesai.
+- Aksi lama `tarikTokomedia` (pembaca HTML) masih ada di Worker sebagai cadangan,
+  tetapi tombol [↻ Update] sudah tidak memakainya.

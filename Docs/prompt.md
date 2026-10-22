@@ -92,7 +92,7 @@ C:\data\Pemetaan\
 │   ├── member.js               daftar anggota, form, kategori, penanda (1.860 baris)
 │   ├── media.js                menu "Media on/off" — pilih kelompok yang tampil (orderan 24)
 │   ├── label.js                jangkar & label media per provinsi (orderan 26)
-│   ├── tokomedia.js            tombol [Update] — tarik data tokomedia.org
+│   ├── tokomedia.js            tombol [Update] — tarik data media dari API TokoMedia (orderan 27)
 │   ├── cari.js                 pencarian wilayah / anggota / nama jalan (orderan 19)
 │   └── panduan.js              panduan pemakaian interaktif (tombol ?)
 ├── data\
@@ -109,7 +109,7 @@ C:\data\Pemetaan\
 │   ├── sumber-tokomedia\       peta-provinsi.json (430 bahasa → provinsi)
 │   └── neon-siapkan.js         menyiapkan tabel di Neon
 ├── cloudflare\
-│   ├── worker.js               perantara situs ↔ Neon + penarik tokomedia.org
+│   ├── worker.js               perantara situs ↔ Neon + penarik data media (orderan 27)
 │   ├── peta-bahasa.js          hasil buat-peta-bahasa.js (12 KB)
 │   ├── wrangler.toml           setelan Worker
 │   └── package.json
@@ -310,7 +310,7 @@ bagian bawah berkas. Karena itu penulisannya harus `#bilah-atas #tombol-anggota`
 | Bagian | Nilai |
 |---|---|
 | Lapisan jangkar | `media-jangkar` — `circle`, `minzoom` 3,5, radius 5,5 px, isi `#f2f7fc`, cincin warna kelompok |
-| Lapisan label | `media-label` — `symbol`, `minzoom` 4, `Open Sans Bold` 11 px, halo `#0b0f14` 1,8 px |
+| Lapisan label | `media-label` — `symbol`, `minzoom` 4, `Open Sans Bold`, ukuran `interpolate` z4 → 10 px, z7 → 12,5 px, halo `#0b0f14` 1,8 px, `text-padding` 8 |
 | Sumber | `media-provinsi` — GeoJSON, satu titik per provinsi berdata media |
 | Keterangan | `#keterangan-media` + pil `.km-pil`, kiri bawah, `bottom: calc(var(--tinggi-bilah) + 18px)` |
 
@@ -346,6 +346,7 @@ tingginya ±11 px + 4 px jarak, jadi keterangan perlu diangkat ke **+18 px**.
 | 24 | Menu "Media on/off" | `media.js` | pilih kelompok data yang tampil di peta; keadaan disimpan di database; bilah atas menjadi ikon saja |
 | 25 | Seluruh kategori bisa dihidupkan / dimatikan | `media.js` | daftar digabung dari kategori yang dipakai anggota + daftar kategori resmi |
 | 26 | Jangkar & label media per provinsi | `label.js` | satu jangkar + satu label per provinsi berdata media; label menyebut nama pendek kelompok yang sedang hidup; ketuk → garis merah provinsi |
+| 27 | Pemetaan memakai 2 server (Neon + Rumahweb) | `worker.js`, `simpanan.js`, `tokomedia.js` | Neon = data anggota (baca/tulis); Rumahweb = data media TokoMedia (**baca saja**) lewat `pemetaan-bridge.php`; 300 anggota · 35 provinsi berlabel |
 | — | Panduan pemakaian interaktif | `panduan.js` | tombol `?` mengenali posisi pemakai; kata kunci jadi tautan yang benar-benar menjalankan aksinya |
 
 ### Detail yang mudah terlewat
@@ -419,24 +420,56 @@ kode atau dokumen — repo ini publik.**
 | `simpanKategori` / `hapusKategori` | `{ nama }` |
 | `simpanAtur` | `{ nama, nilai }` |
 | `kosongkan` | hapus semua anggota |
-| `tarikTokomedia` | `{ kategori? }` → `{ anggota[], jumlah, gagal[] }` |
+| `tarikTokomedia` | `{ kategori? }` → `{ anggota[], jumlah, gagal[] }` — cara lama, membaca halaman tokomedia.org (cadangan) |
+| `tarikRumahweb` | `{ kategori? }` → `{ anggota[], jumlah, gagal[] }` — cara sekarang, lewat API TokoMedia di Rumahweb |
 | `cek` | uji sambungan |
 
-### Penarikan data tokomedia.org (orderan 23)
+### Penarikan data media (orderan 23 → 27)
 
-**Kenapa lewat Worker, bukan peramban:** API TokoMedia belum terpasang dan
-situsnya tidak mengirim header CORS. Worker berjalan di server, jadi bisa
-mengambil halaman HTML-nya.
+**Cara lama (orderan 23):** Worker membaca 5 halaman tokomedia.org lalu menebak
+isinya dari HTML. Rapuh — begitu susunan halaman berubah, pembacanya rusak.
 
-**Alur:** tombol `[↻ Update]` → Worker ambil 5 halaman kategori → urai tabel
-bahasa per gugus → hitung koordinat → simpan ke Neon.
+**Cara sekarang (orderan 27):** Worker memanggil **API TokoMedia** di Rumahweb
+lewat jembatan `pemetaan-bridge.php`. Hasilnya JSON terstruktur: nama bahasa +
+gugus pulau datang langsung dari database.
 
-**Koordinat:** TokoMedia **tidak menyimpan lokasi**. Titik dihitung dari nama
-bahasa → provinsi (`cloudflare/peta-bahasa.js`, 430 bahasa). Bila belum
+**Alur:** tombol `[↻ Update]` → Worker → `pemetaan-bridge.php` → API TokoMedia →
+hitung koordinat → simpan ke Neon.
+
+**Kenapa harus lewat jembatan:** token API TokoMedia harus disimpan di sisi
+server. Kalau ditaruh di JavaScript, siapa pun bisa membacanya lewat
+"View Source".
+
+**Sifatnya baca saja.** Daftar izin jembatan memuat 25 endpoint, **tidak ada
+satu pun endpoint tulis**. Data TokoMedia tidak mungkin berubah lewat jalur ini.
+
+**Koordinat:** API TokoMedia **tidak menyimpan lokasi**. Titik dihitung dari
+nama bahasa → provinsi (`cloudflare/peta-bahasa.js`, 430 bahasa). Bila belum
 terpetakan → titik tengah gugus pulau. Titik digeser dalam lingkaran kecil per
-provinsi dan per kategori supaya tidak bertumpuk (terbukti 699 titik unik).
+provinsi dan per kategori supaya tidak bertumpuk.
+
+**Kelompok yang tidak punya daftar bahasa** ditangani khusus: Clip Kitab Suci
+(39 video, satu titik di Jakarta) dan Aplikasi Kitab Suci (satu titik per gugus
+pulau, di provinsi wakil gugus).
 
 **Tidak ada penarikan otomatis** — hanya saat tombol ditekan.
+
+### Dua server (orderan 27)
+
+| Server | Dipakai untuk | Sifat | Jalur |
+|---|---|---|---|
+| **Neon** | data anggota, kategori, pengaturan | baca **dan** tulis | Worker `pemetaan-api` |
+| **Rumahweb** | data media TokoMedia | **baca saja** | `pemetaan-bridge.php` |
+
+Keduanya tidak pernah menulis ke tempat yang sama, jadi pemisahannya rapi.
+
+**`tm-bridge.php` milik aplikasi TokoMedia TIDAK BOLEH disentuh** — berkas itu
+sudah terhubung ke aplikasi klien. Jembatan Pemetaan adalah berkas **terpisah**
+dengan kunci terpisah.
+
+**Kunci jembatan** disimpan sebagai secret Worker (`RUMAHWEB_KUNCI`), dikirim di
+header `X-Pemetaan-Kunci`, dan dibandingkan dengan `hash_equals` di sisi PHP.
+Tanpa kunci yang benar → **401**.
 
 ---
 
@@ -472,6 +505,10 @@ waktu di proyek ini.
 | Titik tengah **kotak pembatas** provinsi jatuh di laut | provinsi kepulauan (Maluku, Papua, Kep. Riau) | hitung titik berat **cincin terluas** poligonnya, bukan titik tengah bbox |
 | `#keterangan-media` **bertumpuk** dengan `#atribusi` di layar sempit | keduanya di kiri/kanan bawah | angkat keterangan ke `bottom: calc(var(--tinggi-bilah) + 18px)` — atribusi tingginya ±11 px + 4 px jarak |
 | `idBaru()` bisa **mengembalikan id yang sama** bila dipanggil beruntun dalam satu milidetik | berbasis waktu | untuk data uji, pakai id berurutan sendiri; jangan mengandalkan `idBaru()` dalam gelung rapat |
+| Token API **tidak boleh** ditanam di JavaScript | repo publik, "View Source" | simpan di sisi server (PHP) atau secret Worker; peramban hanya memanggil perantara |
+| `category/languages` **tidak ada** untuk sebagian kategori TokoMedia | kategori 127 (Clip) dan 129 (Aplikasi) isinya daftar video/aplikasi, bukan bahasa | tangani terpisah: Clip → `ckitab/index`, Aplikasi → `aplikasi/area` per gugus |
+| `region` dari API memakai **tanda hubung** (`Jawa - Bali - Nusa Tenggara`) sedangkan `GUGUS` memakai koma | dua sumber berbeda | `GUGUS_ALIAS` memetakan kedua bentuk ke satu nama |
+| Label media **berdesakan** saat peta dilihat dari jauh | 35 provinsi berlabel pada z4 | `text-size` dibuat `interpolate` (z4 → 10 px, z7 → 12,5 px) dan `text-padding` dinaikkan ke 8 |
 
 ---
 
@@ -535,14 +572,14 @@ Kalau proyek ini harus dibangun ulang di tempat lain:
 | Bagian | Jumlah | Ukuran |
 |---|---|---|
 | Berkas data | 1.110 | 81,4 MB |
-| Modul JavaScript | 12 | 267 KB |
+| Modul JavaScript | 12 | 270 KB |
 | Pustaka peta (lokal) | 2 | 1,0 MB |
 | Tampilan (`gaya.css`) | 1 | 2.673 baris |
 | Halaman (`index.html`) | 1 | 13 KB |
-| Worker Cloudflare | 2 | 22 KB |
+| Worker Cloudflare | 2 | 41 KB |
 | Skrip alat | 5 | 32 KB |
 | Dokumen | 4 | — |
-| Commit | 69 | — |
+| Commit | 70 | — |
 
 ---
 

@@ -1,26 +1,38 @@
-/* Pemetaan — tarik data dari tokomedia.org (tombol [Update])
+/* Pemetaan — tarik data media dari API TokoMedia (tombol [Update])
    ------------------------------------------------------------------
    TUGAS
-     Mengambil daftar bahasa dari 5 kategori tokomedia.org, lalu
-     menyimpannya ke database Pemetaan — lengkap dengan KOORDINAT.
+     Mengambil daftar bahasa media dari API TokoMedia yang ada di
+     Rumahweb, lalu menyimpannya ke database Pemetaan — lengkap dengan
+     KOORDINAT.
 
    KENAPA LEWAT WORKER
-     tokomedia.org tidak mengirim header CORS dan API-nya belum terpasang,
-     jadi peramban tidak boleh mengambil datanya langsung. Worker Cloudflare
-     yang mengambil (berjalan di server), lalu mengirim hasilnya ke sini.
+     Token API TokoMedia harus disimpan di sisi server. Kalau ditaruh di
+     JavaScript, siapa pun bisa membacanya lewat "View Source" lalu
+     memakainya sesuka hati. Jadi jalurnya:
+
+       peramban -> Worker Cloudflare -> pemetaan-bridge.php -> API
+
+     Worker juga yang menghitung koordinat, karena peta-bahasa.js ada di
+     sisi Worker.
+
+   SIFATNYA BACA SAJA
+     pemetaan-bridge.php hanya memuat endpoint baca. Tidak ada satu pun
+     endpoint tulis di daftar izinnya, jadi data TokoMedia tidak mungkin
+     berubah lewat jalur ini. Berkas tm-bridge.php milik aplikasi
+     TokoMedia tidak disentuh sama sekali.
 
    KAPAN JALAN
      Hanya saat tombol [Update] ditekan. Tidak ada penarikan otomatis dan
-     tidak ada permintaan berulang — supaya tokomedia.org tidak dibebani.
+     tidak ada permintaan berulang — supaya server tidak dibebani.
 
    KOORDINAT
-     tokomedia.org tidak menyimpan lokasi. Titik dihitung dari nama bahasa
+     API TokoMedia tidak menyimpan lokasi. Titik dihitung dari nama bahasa
      -> provinsi (cloudflare/peta-bahasa.js). Bila nama bahasanya belum
      terpetakan, dipakai titik tengah gugus pulaunya. Ini PERKIRAAN dan
      ditulis apa adanya di keterangan anggota.
 
    HASIL
-     window.PD_TOKOMEDIA = { tarik(), siap(), keadaan() }
+     window.PD_TOKOMEDIA = { tarik(), siap() }
 */
 
 (function () {
@@ -68,18 +80,19 @@
     }
 
     if (!window.confirm(
-      'Ambil data terbaru dari tokomedia.org?\n\n' +
-      'Data anggota yang berasal dari tokomedia.org akan diperbarui ' +
-      '(ditambah bila baru, diubah bila berubah). Anggota yang Anda isi ' +
-      'sendiri tidak disentuh.'
+      'Ambil data media terbaru dari API TokoMedia (Rumahweb)?\n\n' +
+      'Data anggota yang berasal dari TokoMedia akan diperbarui (ditambah ' +
+      'bila baru, diubah bila berubah). Anggota yang Anda isi sendiri ' +
+      'tidak disentuh.\n\n' +
+      'Data diambil BACA SAJA — tidak ada yang diubah di server TokoMedia.'
     )) {
       return Promise.resolve(null);
     }
 
     kunciTombol(true);
-    pesan('Mengambil 5 halaman tokomedia.org\u2026');
+    pesan('Mengambil data dari API TokoMedia\u2026');
 
-    return Simpanan.tarikTokomedia()
+    return Simpanan.tarikRumahweb()
       .then(function (hasil) {
         if (!hasil || !hasil.ok) {
           throw new Error((hasil && hasil.pesan) || 'Worker tidak menjawab.');
@@ -90,9 +103,9 @@
         });
       })
       .then(function (h) {
-        var teks = h.tersimpan + ' anggota tersimpan dari tokomedia.org.';
+        var teks = h.tersimpan + ' anggota tersimpan dari API TokoMedia.';
         if (h.gagal.length) {
-          teks += ' ' + h.gagal.length + ' kategori gagal: ' + h.gagal.join('; ');
+          teks += ' ' + h.gagal.length + ' kelompok gagal: ' + h.gagal.join('; ');
         }
         pesan(teks, h.gagal.length ? 'salah' : '');
         if (window.PD_ANGGOTA && PD_ANGGOTA.muat) {
@@ -122,7 +135,7 @@
 
   var coba = 0;
   (function ulang() {
-    if (typeof Simpanan !== 'undefined' && Simpanan.tarikTokomedia) {
+    if (typeof Simpanan !== 'undefined' && Simpanan.tarikRumahweb) {
       mulai();
       return;
     }

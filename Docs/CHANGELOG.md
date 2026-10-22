@@ -18,18 +18,69 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 | Hal | Jumlah |
 |---|---|
-| Commit | 69 |
-| Orderan selesai | 26 |
+| Commit | 70 |
+| Orderan selesai | 27 |
 | Berkas data | 1.110 (81,4 MB) |
-| Modul JavaScript | 12 (267 KB) |
+| Modul JavaScript | 12 (270 KB) |
 | Baris tampilan (`gaya.css`) | ~2.673 |
 | Rentang waktu | 2026-10-12 → 2026-10-22 |
 
 **Sebaran commit:** 2026-10-12 → 14 commit · 2026-10-16 → 25 commit ·
-2026-10-17 → 22 commit · 2026-10-18 → 4 commit · 2026-10-22 → 4 commit.
+2026-10-17 → 22 commit · 2026-10-18 → 4 commit · 2026-10-22 → 5 commit.
 ---
 
 ## 2026-10-22
+
+### Orderan 27 — Pemetaan memakai 2 server (Neon + Rumahweb)
+
+**Baru.** Pemetaan sekarang memakai **dua server** sekaligus, sesuai permintaan
+pemilik proyek:
+
+| Server | Dipakai untuk | Sifat |
+|---|---|---|
+| **Neon** (lewat Worker `pemetaan-api`) | data anggota, kategori, pengaturan | baca **dan** tulis |
+| **Rumahweb** (lewat `pemetaan-bridge.php`) | data media TokoMedia | **baca saja** |
+
+- **Jembatan baru `pemetaan-bridge.php`** di cPanel
+  (`/home/suwj4466/public_html/`). **Terpisah sama sekali** dari `tm-bridge.php`
+  milik aplikasi TokoMedia — berkas itu **tidak disentuh satu baris pun**.
+- **Hanya endpoint baca.** Daftar izinnya memuat 25 endpoint, tidak ada satu pun
+  endpoint tulis. Data TokoMedia tidak mungkin berubah lewat jalur ini.
+- **Kunci jembatan** wajib di header `X-Pemetaan-Kunci`, dibandingkan dengan
+  `hash_equals` → **401** bila salah atau kosong. CORS hanya untuk
+  `https://suwandhih.github.io`.
+- **Token API TokoMedia disimpan di sisi server**, tidak pernah dikirim ke
+  peramban. Karena itu penarikan harus lewat perantara.
+- **Aksi baru `tarikRumahweb` di Worker.** Memanggil jembatan 9 kali, lalu
+  menghitung koordinat memakai `cloudflare/peta-bahasa.js` yang sudah ada.
+  Kunci jembatan disimpan sebagai **secret Worker** (`RUMAHWEB_KUNCI`).
+- **Tombol [↻ Update] beralih ke API.** `js/tokomedia.js` sekarang memanggil
+  `Simpanan.tarikRumahweb()`. Cara lama (membaca halaman tokomedia.org) tidak
+  dipakai lagi oleh tombol, tetapi fungsinya masih ada di Worker sebagai
+  cadangan.
+- **Ukuran label media mengikuti pembesaran** — `interpolate` z4 → 10 px,
+  z7 → 12,5 px, dan `text-padding` dinaikkan ke 8 supaya label tidak berdesakan
+  saat peta dilihat dari jauh.
+- **Panduan bertambah satu bagian:** "Perbarui data media" (kini 13 bagian).
+
+**Hasil penarikan:** 300 anggota dari 5 kelompok media — Film Isa Al-Masih 177,
+Video Kitab Suci 107, Film Ikatan Ilahi 10, Aplikasi Kitab Suci 5, Clip Kitab
+Suci 1. **0 gagal.** Database menjadi 303 anggota (300 media + 3 lama), dan
+**35 provinsi** kini berlabel.
+
+**Bukti uji:** jembatan + kunci benar → HTTP 200 · tanpa kunci → **401** · kunci
+salah → **401** · endpoint tulis → `{"status":404,"message":"Endpoint tidak
+diizinkan"}` · `tm-bridge.php` masih hidup (HTTP 200, 68.819 byte) · Worker
+`tarikRumahweb` → `ok:true`, 300 anggota, 0 gagal · tombol [↻ Update] di situs →
+"300 anggota tersimpan dari API TokoMedia." · 24 jangkar + 24 label tampil pada
+z4,6 · ketuk jangkar Maluku Utara → garis merah provinsi · matikan "Video Kitab
+Suci" → label berubah `Film Isa · Video` → `Film Isa` · semua hidup kembali → 35
+fitur · **0 galat konsol**.
+
+**Catatan:** kunci jembatan dan token API sempat dikirim lewat chat selama
+pengerjaan — sebaiknya **diganti** setelah pekerjaan selesai.
+
+---
 
 ### Orderan 26 — jangkar & label media per provinsi
 

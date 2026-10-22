@@ -294,6 +294,26 @@ const Simpanan = (function () {
     return panggil({ aksi: 'tarikTokomedia' }, 90000);
   }
 
+  /* ---------- tarik data dari API TokoMedia (Rumahweb) ---------- */
+
+  /* Sejak orderan 27 data media diambil dari API TokoMedia yang ada di
+     Rumahweb, bukan lagi dengan membaca halaman tokomedia.org. Hasilnya
+     JSON terstruktur: nama bahasa + gugus pulau datang langsung dari
+     database, jadi tidak perlu menebak dari HTML.
+
+     Jalurnya: peramban -> Worker -> pemetaan-bridge.php -> API TokoMedia.
+     Token API disimpan di sisi server, tidak pernah sampai ke peramban.
+     Sifatnya BACA SAJA — tidak ada satu pun endpoint tulis di jembatan. */
+  function tarikRumahweb(kategori) {
+    if (!MENYALA || !adaKunci()) {
+      return Promise.resolve({ ok: false, pesan: 'Kode database belum diisi.' });
+    }
+    var isi = { aksi: 'tarikRumahweb' };
+    if (Array.isArray(kategori) && kategori.length) { isi.kategori = kategori; }
+    /* 90 detik: Worker memanggil jembatan Rumahweb 9 kali. */
+    return panggil(isi, 90000);
+  }
+
   /* Simpan banyak anggota sekaligus. Dipakai setelah penarikan supaya
      tidak mengirim 699 permintaan satu per satu. */
   function simpanAnggotaBanyak(daftar) {
@@ -525,6 +545,7 @@ const Simpanan = (function () {
     simpanAnggota: simpanAnggota,
     simpanAnggotaBanyak: simpanAnggotaBanyak,
     tarikTokomedia: tarikTokomedia,
+    tarikRumahweb: tarikRumahweb,
     hapusAnggota: hapusAnggota,
     hitungAnggota: hitungAnggota,
     semuaKategori: semuaKategori,

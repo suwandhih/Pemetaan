@@ -206,14 +206,16 @@
       layout: {
         'text-field': ['get', 'label'],
         'text-font': ['Open Sans Bold'],
-        'text-size': 11,
+        /* Kecil saat peta dilihat dari jauh (banyak provinsi), membesar
+           saat diperbesar supaya tetap terbaca. */
+        'text-size': ['interpolate', ['linear'], ['zoom'], 4, 10, 7, 12.5],
         'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
         'text-radial-offset': 1.1,
         'text-justify': 'auto',
         'text-max-width': 12,
         'text-allow-overlap': false,
         'text-ignore-placement': false,
-        'text-padding': 4
+        'text-padding': 8
       },
       paint: {
         'text-color': '#f2f7fc',

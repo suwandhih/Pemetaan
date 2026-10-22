@@ -34,6 +34,8 @@
        simpanAtur     { nama, nilai }
        kosongkan                                  (hapus semua anggota)
        tarikTokomedia { kategori? }               (ambil data tokomedia.org)
+       tarikRumahweb  { kategori? }               (ambil data API TokoMedia
+                                                   di Rumahweb — baca saja)
        cek                                        (uji sambungan)
 */
 
@@ -324,6 +326,226 @@ async function tarikTokomedia(pilih) {
   return { anggota: anggota, gagal: gagal };
 }
 
+/* ==================================================================
+   TARIK DATA DARI RUMAHWEB (API TokoMedia) — BACA SAJA
+   ------------------------------------------------------------------
+   Sejak orderan 27, data media diambil dari API TokoMedia di Rumahweb,
+   bukan lagi dengan membaca halaman tokomedia.org. Bedanya:
+
+     - Hasilnya JSON terstruktur, bukan tebakan dari HTML.
+     - Nama bahasa + gugus pulau datang langsung dari database.
+     - Sekali jalan hanya perlu 5 permintaan (1 per kelompok media).
+
+   Jalurnya: peramban -> Worker ini -> pemetaan-bridge.php (Rumahweb)
+             -> API TokoMedia.
+
+   Kenapa tidak langsung dari peramban? Karena token API TokoMedia harus
+   disimpan di sisi server. Kalau ditaruh di JavaScript, siapa pun bisa
+   membacanya lewat "View Source".
+
+   KUNCI: env.RUMAHWEB_KUNCI (secret Worker). Berkas pemetaan-bridge.php
+   memeriksa kunci ini; tanpa kunci yang benar jawabannya 401.
+   ================================================================== */
+
+const ALAMAT_RUMAHWEB = 'https://suwandhih.my.id/pemetaan-bridge.php';
+
+/* Kelompok media yang dipakai dashboard Pemetaan -> id kategori TokoMedia.
+   Urutannya sama dengan MEDIA di js/media.js.
+
+   Clip Kitab Suci tidak ada di sini karena kategorinya (127) tidak punya
+   daftar bahasa — isinya daftar video. Ditangani terpisah di bawah. */
+const GRUP_RUMAHWEB = [
+  { id: 1, nama: 'Film Isa Al-Masih', ikon: 'ikon-orang' },
+  { id: 304, nama: 'Film Ikatan Ilahi', ikon: 'ikon-rantai' },
+  { id: 126, nama: 'Video Kitab Suci', ikon: 'ikon-kamera' }
+];
+
+/* Aplikasi Kitab Suci tidak punya daftar bahasa — API hanya memberi
+   daftar aplikasi per gugus pulau. Titiknya ditaruh di satu provinsi
+   wakil tiap gugus, supaya ikut muncul di peta bersama labelnya. */
+const AREA_APLIKASI = [
+  { id: 'sumatera', gugus: 'Sumatera', kode: '11' },
+  { id: 'jawa', gugus: 'Jawa, Bali, Nusa Tenggara', kode: '31' },
+  { id: 'kalimantan', gugus: 'Kalimantan', kode: '61' },
+  { id: 'sulawesi', gugus: 'Sulawesi', kode: '71' },
+  { id: 'maluku', gugus: 'Maluku, Papua', kode: '94' }
+];
+
+/* Clip Kitab Suci juga tidak punya daftar bahasa — isinya 39 video
+   pendek berbahasa Indonesia. Titiknya di Jakarta (pusat nasional). */
+const KODE_CLIP = '31';
+
+async function panggilRumahweb(env, jalur, isi) {
+  const badan = new URLSearchParams();
+  badan.set('path', jalur);
+  Object.keys(isi || {}).forEach(function (k) { badan.set(k, isi[k]); });
+
+  const jawab = await fetch(ALAMAT_RUMAHWEB, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-Pemetaan-Kunci': env.RUMAHWEB_KUNCI || ''
+    },
+    body: badan.toString()
+  });
+  if (!jawab.ok) {
+    throw new Error('Rumahweb HTTP ' + jawab.status);
+  }
+  return jawab.json();
+}
+
+async function tarikRumahweb(env, pilih) {
+  const dipakai = pilih && pilih.length
+    ? GRUP_RUMAHWEB.filter(function (g) { return pilih.indexOf(g.nama) >= 0; })
+    : GRUP_RUMAHWEB;
+
+  const anggota = [];
+  const gagal = [];
+  let urut = 0;
+
+  for (let i = 0; i < dipakai.length; i++) {
+    const grup = dipakai[i];
+    let jawab;
+    try {
+      jawab = await panggilRumahweb(env, 'category/languages', { id: grup.id });
+    } catch (e) {
+      gagal.push(grup.nama + ': ' + e.message);
+      continue;
+    }
+    if (!jawab || jawab.status !== 200 || !Array.isArray(jawab.data)) {
+      gagal.push(grup.nama + ': ' + ((jawab && jawab.message) || 'tidak ada data'));
+      continue;
+    }
+
+    const awal = anggota.length;
+    jawab.data.forEach(function (b) {
+      const t = titikUntuk(b.name, b.region);
+      /* Bahasa yang tidak punya provinsi dan tidak punya gugus asli
+         (mis. "Clip Kitab Suci Indonesia") dilewati — titiknya akan
+         jatuh di tengah laut dan menyesatkan. */
+      if (t.cara === 'indonesia') { return; }
+
+      urut += 1;
+      anggota.push({
+        id: 'tm-' + grup.id + '-' + b.id,
+        nama: b.name + ' - ' + grup.nama,
+        kategori: grup.nama,
+        ikon: grup.ikon,
+        inisial: inisialDari(b.name),
+        rincian: [
+          { label: 'Bahasa', nilai: b.name },
+          { label: 'Kategori', nilai: grup.nama },
+          { label: 'Gugus', nilai: b.region || '' },
+          { label: 'Provinsi', nilai: t.provinsi || '(perkiraan gugus)' },
+          { label: 'Sumber', nilai: 'https://tokomedia.org/' + (b.slug || '') }
+        ],
+        lon: t.lon,
+        lat: t.lat,
+        kodeProvinsi: t.kodeProvinsi,
+        kodeKabkota: '',
+        kodeKecamatan: '',
+        kodeDesa: '',
+        provinsi: t.provinsi,
+        kabkota: '',
+        kecamatan: '',
+        desa: ''
+      });
+    });
+
+    if (anggota.length === awal) {
+      gagal.push(grup.nama + ': tidak ada bahasa yang bisa dipetakan');
+      continue;
+    }
+    sebarPerProvinsi(anggota.slice(awal), i / dipakai.length, 0.12 + i * 0.06);
+  }
+
+  /* Aplikasi Kitab Suci — satu titik per gugus pulau, ditaruh di
+     provinsi wakil gugus supaya labelnya ikut muncul di peta. */
+  if (!pilih || !pilih.length || pilih.indexOf('Aplikasi Kitab Suci') >= 0) {
+    for (let j = 0; j < AREA_APLIKASI.length; j++) {
+      const area = AREA_APLIKASI[j];
+      let jawab;
+      try {
+        jawab = await panggilRumahweb(env, 'aplikasi/area', { id: area.id });
+      } catch (e) {
+        gagal.push('Aplikasi Kitab Suci (' + area.gugus + '): ' + e.message);
+        continue;
+      }
+      if (!jawab || jawab.status !== 200 || !Array.isArray(jawab.data) || !jawab.data.length) {
+        continue;
+      }
+      const titik = PROVINSI[area.kode];
+      if (!titik) { continue; }
+      urut += 1;
+      anggota.push({
+        id: 'tm-aplikasi-' + area.id,
+        nama: 'Aplikasi Kitab Suci - ' + area.gugus,
+        kategori: 'Aplikasi Kitab Suci',
+        ikon: 'ikon-ponsel',
+        inisial: 'AP',
+        rincian: [
+          { label: 'Wilayah', nilai: area.gugus },
+          { label: 'Kategori', nilai: 'Aplikasi Kitab Suci' },
+          { label: 'Jumlah aplikasi', nilai: String(jawab.data.length) },
+          { label: 'Sumber', nilai: 'https://tokomedia.org/koleksi-aplikasi' }
+        ],
+        lon: titik.lon,
+        lat: titik.lat,
+        kodeProvinsi: area.kode,
+        kodeKabkota: '',
+        kodeKecamatan: '',
+        kodeDesa: '',
+        provinsi: titik.n,
+        kabkota: '',
+        kecamatan: '',
+        desa: ''
+      });
+    }
+  }
+
+  /* Clip Kitab Suci — 39 video pendek berbahasa Indonesia. Tidak ada
+     daftar bahasa, jadi satu titik di Jakarta. */
+  if (!pilih || !pilih.length || pilih.indexOf('Clip Kitab Suci') >= 0) {
+    let jawab = null;
+    try {
+      jawab = await panggilRumahweb(env, 'ckitab/index', { per_page: 100 });
+    } catch (e) {
+      gagal.push('Clip Kitab Suci: ' + e.message);
+    }
+    const titik = PROVINSI[KODE_CLIP];
+    if (jawab && jawab.status === 200 && Array.isArray(jawab.data) && jawab.data.length && titik) {
+      urut += 1;
+      anggota.push({
+        id: 'tm-clip-indonesia',
+        nama: 'Clip Kitab Suci - Indonesia',
+        kategori: 'Clip Kitab Suci',
+        ikon: 'ikon-putar',
+        inisial: 'CL',
+        rincian: [
+          { label: 'Bahasa', nilai: 'Indonesia' },
+          { label: 'Kategori', nilai: 'Clip Kitab Suci' },
+          { label: 'Jumlah video', nilai: String(jawab.data.length) },
+          { label: 'Sumber', nilai: 'https://tokomedia.org/clip' }
+        ],
+        lon: titik.lon,
+        lat: titik.lat,
+        kodeProvinsi: KODE_CLIP,
+        kodeKabkota: '',
+        kodeKecamatan: '',
+        kodeDesa: '',
+        provinsi: titik.n,
+        kabkota: '',
+        kecamatan: '',
+        desa: ''
+      });
+    } else if (!jawab || jawab.status !== 200) {
+      gagal.push('Clip Kitab Suci: tidak ada data');
+    }
+  }
+
+  return { anggota: anggota, gagal: gagal };
+}
+
 export default {
   async fetch(permintaan, env) {
     const asal = permintaan.headers.get('Origin') || '';
@@ -490,6 +712,30 @@ export default {
           return balas({
             ok: false,
             pesan: 'Tidak ada data yang berhasil ditarik.',
+            gagal: hasil.gagal
+          }, asalDikenal, 502);
+        }
+        return balas({
+          ok: true,
+          anggota: hasil.anggota,
+          jumlah: hasil.anggota.length,
+          gagal: hasil.gagal
+        }, asalDikenal);
+      }
+
+      if (aksi === 'tarikRumahweb') {
+        if (!env.RUMAHWEB_KUNCI) {
+          return balas({
+            ok: false,
+            pesan: 'Kunci jembatan Rumahweb belum dipasang di Worker.'
+          }, asalDikenal, 500);
+        }
+        const pilih = Array.isArray(isi.kategori) ? isi.kategori : null;
+        const hasil = await tarikRumahweb(env, pilih);
+        if (!hasil.anggota.length) {
+          return balas({
+            ok: false,
+            pesan: 'Tidak ada data yang berhasil ditarik dari Rumahweb.',
             gagal: hasil.gagal
           }, asalDikenal, 502);
         }

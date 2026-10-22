@@ -298,6 +298,28 @@
       ]
     },
     {
+      id: 'update-media',
+      judul: 'Perbarui data media',
+      untuk: 'Mengambil daftar bahasa media terbaru dari server TokoMedia ' +
+        '(Rumahweb) supaya peta selalu memakai data yang paling baru.',
+      langkah: [
+        'Buka daftar anggota dengan tombol [[Anggota|tekan:#tombol-anggota]].',
+        'Ketuk tombol [[\u21BB Update|tekan:#anggota-update]] di kepala daftar.',
+        'Baca pertanyaan konfirmasi, lalu ketuk OK.',
+        'Tunggu sampai muncul tulisan berapa anggota yang tersimpan.'
+      ],
+      hasil: [
+        'Anggota dari TokoMedia ditambah bila baru dan diubah bila berubah.',
+        'Peta langsung diperbarui: penanda, jangkar, dan label media ikut menyesuaikan.'
+      ],
+      catatan: [
+        'Data diambil BACA SAJA. Tidak ada satu pun data di server TokoMedia yang diubah, ditambah, atau dihapus lewat tombol ini.',
+        'Anggota yang Anda isi sendiri tidak disentuh — hanya anggota yang berasal dari TokoMedia yang diperbarui.',
+        'Penarikan hanya berjalan saat tombol ditekan. Tidak ada penarikan otomatis, jadi server tidak dibebani.',
+        'Token API TokoMedia disimpan di sisi server, bukan di berkas situs. Karena itu penarikan harus lewat perantara, tidak bisa langsung dari peramban.'
+      ]
+    },
+    {
       id: 'ikon',
       judul: 'Arti ikon di bilah atas',
       untuk: 'Mengenal tombol-tombol di bilah atas, karena semuanya memakai ' +
