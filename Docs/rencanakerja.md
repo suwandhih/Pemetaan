@@ -2906,3 +2906,114 @@ Bukti pengukuran langsung dari peta (jarak piksel dari titik lokasi):
 | Icon setelah ganti ke Satelit | ✅ tetap terpasang & sejajar |
 | Tombol sembunyikan penanda | ✅ `visibility` → `none` lalu `visible` |
 | Galat konsol | ✅ **0** |
+
+---
+
+## Orderan 24 — menu "Media on/off" (perintah 2026-10-22)
+
+Pemilik proyek: *"ada tokomedia.. di petakan dengan menu 'Media on/off' di
+bawahnya media Isa Al Masih, Kitab Suci, Clip Kitab Suci dan Aplikasi Kitab
+Suci .. sudah ada di kab/desa/kota mana saja .. masing diberi pin menurut icon"*
+
+Lalu ditambah: *"jadi peranan menu media on/off artinya semua kategori dihide
+atau unhide pada pilihan user.. user bisa pilih kategori mana untuk dilihat atau
+di hide"* dan *"hanya 4 kelompok .. tapi jika hidup hanya tombol user yg pilih
+mana yg hidup user yg atur mana yg mau di hidupkan dan matikan secara serempak"*
+dan *"mau diganti menu baru tapi syarat konsep harus tetap sama"*.
+
+### Keputusan pemilik proyek (ditanyakan sebelum dikerjakan)
+
+| Pertanyaan | Jawaban |
+|---|---|
+| Berapa kelompok media? | **5** — Ikatan Ilahi ikut (semula terlupa) |
+| Sumber lokasi | **Data yang ada** (provinsi). Bila perlu, dicari dulu provinsi asal bahasanya |
+| Tombol bilah atas | **Diganti ikon saja** supaya semuanya muat; arti ikon masuk panduan |
+| Tombol mata (👁) | **Diganti** menu baru, konsep tetap sama |
+| "Rumah Sakit" | Sama dengan **Kesehatan** |
+
+### Yang dikerjakan
+
+| Berkas | Perubahan |
+|---|---|
+| `js/media.js` | **Berkas baru.** Menu Media on/off: daftar kelompok, tombol hidup/mati per baris, tombol serempak, simpan keadaan |
+| `js/member.js` | Properti `kategori` ikut ke GeoJSON penanda; `terapkanTampil()` menyaring 7 lapisan penanda. Tombol mata & `pasangTampil()` dihapus |
+| `js/ikon.js` | `PD_IKON.gambar(id, warna)` — data URI SVG berwarna terang untuk dipakai di HTML |
+| `index.html` | Tombol `#tombol-media` + wadah `#pemilih-media`; tombol mata dihapus; versi naik ke `?v=20261022-01` |
+| `css/gaya.css` | Gaya menu Media on/off; bilah atas menjadi ikon saja |
+| `js/panduan.js` | Dua bagian baru: "Media on/off" dan "Arti ikon di bilah atas"; aksi `media:hidup` / `media:mati` |
+
+### Ukuran bilah atas (diukur 22 Okt 2026)
+
+Delapan tombol bertulisan penuh butuh **536 px**, sedangkan bingkai HP selalu
+hanya **430 px** — tombol paling kanan terpotong. Setelah menjadi ikon saja:
+
+| Lebar layar | Lebar bilah | Butuh | Muat? |
+|---|---|---|---|
+| 320 px | 256 px | 282 px | ✅ (jaring pengaman < 300 px: 253 px) |
+| 360 px | 288 px | 288 px | ✅ |
+| 430 px | 344 px | 344 px | ✅ |
+| 900 px | 428 px | 428 px | ✅ |
+| 1400 px | 1120 px | 1120 px | ✅ |
+
+### Bukti uji
+
+| Uji | Hasil |
+|---|---|
+| Penyaringan penanda (hanya Kesehatan hidup) | ✅ hanya "Rsud mata" tampil |
+| Bertahan setelah ganti jenis peta | ✅ filter tetap terpasang |
+| Bertahan setelah halaman dimuat ulang | ✅ pilihan tersimpan di database |
+| Tombol Semua hidup / Semua mati | ✅ bekerja pada seluruh daftar |
+| Menu di layar pendek (320 px) | ✅ bisa digulir, tidak terpotong |
+| Galat konsol | ✅ **0** |
+
+---
+
+## Orderan 25 — seluruh kategori bisa dihidupkan / dimatikan (perintah 2026-10-22)
+
+Pemilik proyek: *"hanya 4 kelompok .. tapi jika hidup hanya tombol user yg pilih
+mana yg hidup user yg atur mana yg mau di hidupkan dan matikan secara serempak"*
+
+Menu Media on/off awalnya hanya menampilkan kategori yang sedang dipakai anggota.
+Orderan 25 meminta **semua** kategori bisa diatur.
+
+### Yang dikerjakan
+
+| Berkas | Perubahan |
+|---|---|
+| `js/media.js` | Daftar kelompok digabung dari dua sumber: kategori yang dipakai anggota **dan** daftar kategori resmi (`Simpanan.semuaKategori`). Dibaca ulang setiap kali menu dibuka |
+| `js/panduan.js` | Catatan bagian "Media on/off" disesuaikan |
+
+Kategori yang belum dipakai anggota tetap muncul supaya bisa diatur lebih dulu.
+Kategori yang baru ditambah atau dihapus langsung ikut terlihat tanpa perlu
+memuat ulang halaman.
+
+### Bukti uji
+
+| Uji | Hasil |
+|---|---|
+| Jumlah baris | ✅ 12 (5 media + 7 kategori) |
+| Kategori baru "Panti Asuhan" | ✅ langsung muncul setelah ditambah |
+| Kategori dihapus | ✅ langsung hilang dari menu |
+| Tombol serempak pada daftar penuh | ✅ Semua hidup → `null`, Semua mati → `[]` |
+| Galat konsol | ✅ **0** |
+
+---
+
+## Orderan 1–3 (pemulihan data, perintah 2026-10-22)
+
+Pemilik proyek: *"saya mau data yg sudah dimasukkan dalam kategori di hapus ..
+tentu di backup terlebih dahulu.. tapi kalau masih ada backup kategori yayasan
+sekolah rumah sakit dsb kalau masih ada di restore ke data member"*
+
+### Yang dikerjakan
+
+| Langkah | Hasil |
+|---|---|
+| Backup data tokomedia | ✅ `backup-tokomedia-20261022.json` (699 anggota, 430.964 byte) |
+| Hapus 699 anggota + 5 kategori | ✅ `jumlah: 0` |
+| Pulihkan 6 kategori lama | ✅ Kesehatan, Lainnya, Pemerintahan, Sekolah, Sosial, Yayasan |
+| Pulihkan 3 anggota lama | ✅ yayasan obi, Rsud mata, paud |
+| Pulihkan pengaturan | ✅ `anggota_tingkat=kabkota`, `anggota_tampil=1` |
+
+**Catatan:** kunci aplikasi sempat dikirim lewat chat atas permintaan pemilik
+proyek. Sebaiknya **diganti** setelah pekerjaan selesai.

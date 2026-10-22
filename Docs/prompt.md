@@ -90,6 +90,7 @@ C:\data\Pemetaan\
 │   ├── simpanan.js             penyimpanan: Neon → IndexedDB → antrean
 │   ├── ikon.js                 icon penanda kategori (14 icon SVG)
 │   ├── member.js               daftar anggota, form, kategori, penanda (1.860 baris)
+│   ├── media.js                menu "Media on/off" — pilih kelompok yang tampil (orderan 24)
 │   ├── tokomedia.js            tombol [Update] — tarik data tokomedia.org
 │   ├── cari.js                 pencarian wilayah / anggota / nama jalan (orderan 19)
 │   └── panduan.js              panduan pemakaian interaktif (tombol ?)
@@ -214,8 +215,9 @@ sebagai skrip biasa supaya bisa jalan dari GitHub Pages tanpa build.
 | `PD_WARNA` | `warna.js` | `ganti(id)`, `matikan()`, `aktif()`, `PETA`, `siapkanLapisan()` |
 | `PD_AGAMA` | `agama.js` | `ganti(tingkat, agama)`, `matikan()`, `aktif()`, `untukWilayah()`, `ringkas()`, `AGAMA`, `TINGKAT` |
 | `PD_SUKU` | `suku.js` | `ganti(i)`, `matikan()`, `aktif()`, `tutupPanel()`, `SUKU` |
-| `PD_ANGGOTA` | `member.js` | `muat()`, `gambarPenanda()`, `bukaPanel()`, `bukaForm()`, `tutupPanel()`, `tutupForm()`, `ambilAnggota()`, `sorotWilayah()`, `tunjukTitik()` |
-| `PD_IKON` | `ikon.js` | `DAFTAR`, `KATEGORI`, `untukKategori()`, `pasang()`, `lengkap()` |
+| `PD_ANGGOTA` | `member.js` | `muat()`, `gambarPenanda()`, `bukaPanel()`, `bukaForm()`, `tutupPanel()`, `tutupForm()`, `terapkanTampil()`, `ambilAnggota()`, `sorotWilayah()`, `tunjukTitik()` |
+| `PD_IKON` | `ikon.js` | `DAFTAR`, `KATEGORI`, `untukKategori()`, `gambar()`, `pasang()`, `lengkap()` |
+| `PD_MEDIA` | `media.js` | `MEDIA`, `siap()`, `hidup(nama)`, `saring()`, `semua(nyala)`, `terapkan()`, `bukaTutup(buka)`, `segarkan()` |
 | `PD_TOKOMEDIA` | `tokomedia.js` | `tarik()`, `siap()` |
 | `PD_CARI` | `cari.js` | `buka()`, `tutup()`, `setAnggotaSiap()` |
 | `PD_PANDUAN` | `panduan.js` | `buka()`, `tutup()`, `aktif()`, `keadaan()`, `PANDUAN` |
@@ -225,8 +227,8 @@ karena modul lain menunggu `PD.peta` siap:
 
 ```html
 maplibre-gl.js → prop-nasional.js → kab-nasional.js → inti.js → warna.js
-→ agama.js → suku.js → simpanan.js → ikon.js → member.js → tokomedia.js
-→ cari.js → panduan.js
+→ agama.js → suku.js → simpanan.js → ikon.js → member.js → media.js
+→ tokomedia.js → cari.js → panduan.js
 ```
 
 Modul yang butuh peta memakai pola tunggu:
@@ -262,20 +264,36 @@ var coba = 0;
 | **Panduan jadi kolom kanan di PC** | form/daftar di kiri tetap terlihat dan bisa langsung dicoba sambil membaca |
 | **Form anggota: peta 45% atas, form 55% bawah (HP)** | peta tetap terlihat saat mengisi; peta benar-benar menyusut (tingginya dipangkas) sehingga MapLibre menghitung ulang ukurannya |
 | **Tombol Satelit/Map bergantian** | hanya ada 2 pilihan, jadi satu tombol lebih enak daripada daftar melayang |
-| **Susunan bilah atas** | `[Anggota][👁]` di paling kiri, lalu `[Satelit]`, `[Populasi 👁]`, `[Agama]`, `[Suku]`, `[⌕]`, `[?]` |
+| **Bilah atas ikon saja** | 8 tombol bertulisan penuh butuh 536 px, bingkai HP hanya 430 px. Arti tiap ikon dijelaskan di panduan (bagian "Arti ikon di bilah atas") |
 
-### Bilah atas — 8 tombol
+### Bilah atas — 8 tombol, ikon saja (orderan 24)
 
 ```
-[Anggota][👁]  [🛰️Satelit]  [Populasi 👁]  [Agama 🙏]  [Suku 🧬]  [⌕]  [?]
+[☰]  [📺]  [🛰️]  [👁]  [🙏]  [🧬]  [⌕]  [?]
 ```
+
+| Ikon | Arti |
+|---|---|
+| `☰` | daftar anggota |
+| `📺` | menu **Media on/off** — pilih kelompok data yang tampil di peta |
+| `🛰️` | ganti jenis peta (Satelit ⇄ Map) |
+| `👁` | peta tematik jumlah penduduk |
+| `🙏` | peta tematik penduduk menurut agama |
+| `🧬` | titik lokasi suku bangsa |
+| `⌕` | cari wilayah / anggota / nama jalan |
+| `?` | panduan pemakaian |
 
 ⚠️ **Jebakan yang sudah pernah terjadi:** bingkai HP **selalu** 430 px
-(`--lebar-hp`), sedangkan 7 tombol bertulisan penuh butuh **536 px**. Tombol
-paling kanan jadi terpotong dan tidak bisa diklik. Karena itu aturan perapatan
-bilah (gap 5 px, padding 7 px, tombol jadi ikon) berlaku di **seluruh
-`@media (max-width: 899px)`**, bukan hanya di bawah 400 px. Setelah dirapatkan
-bilah butuh **387 px**.
+(`--lebar-hp`), sedangkan tombol bertulisan penuh butuh **536 px**. Tombol paling
+kanan jadi terpotong dan tidak bisa diklik. Orderan 24 menambah tombol kedelapan,
+sehingga tulisan penuh tidak mungkin lagi muat — **seluruh tombol menjadi ikon
+saja**. Diukur 22 Okt 2026: 8 tombol × 30 px + 7 jarak × 5 px = **275 px**, muat
+di 320 px sekalipun. Jaring pengaman `@media (max-width: 299px)` mengecilkan
+tombol ke 28 px (butuh 253 px).
+
+⚠️ **Jebakan CSS:** aturan `#tombol-anggota { font-size: 0 }` (untuk menyembunyikan
+tulisan) **kalah** dari aturan `#tombol-anggota { font-size: 12px }` yang ada di
+bagian bawah berkas. Karena itu penulisannya harus `#bilah-atas #tombol-anggota`.
 
 ---
 
@@ -293,6 +311,8 @@ bilah butuh **387 px**.
 | 21 | Peta agama 4 tingkat | `agama.js` | disajikan dalam **persentase** supaya tidak mengulang peta penduduk; Konghucu & Kepercayaan tetap dalam angka jumlah |
 | 22 | Tampilan PC lebar (responsive) | `gaya.css` | PC lebar penuh, HP seperti semula |
 | 23 | Data anggota dari tokomedia.org + tombol [Update] | `tokomedia.js`, `worker.js` | 699 anggota · 5 kategori · koordinat otomatis · icon kategori |
+| 24 | Menu "Media on/off" | `media.js` | pilih kelompok data yang tampil di peta; keadaan disimpan di database; bilah atas menjadi ikon saja |
+| 25 | Seluruh kategori bisa dihidupkan / dimatikan | `media.js` | daftar digabung dari kategori yang dipakai anggota + daftar kategori resmi |
 | — | Panduan pemakaian interaktif | `panduan.js` | tombol `?` mengenali posisi pemakai; kata kunci jadi tautan yang benar-benar menjalankan aksinya |
 
 ### Detail yang mudah terlewat
@@ -457,7 +477,7 @@ Kalau proyek ini harus dibangun ulang di tempat lain:
 4. **Tulis `index.html`** dengan urutan skrip seperti di bagian 5.
 5. **Tulis `js/inti.js`** — peta, batas geser, jenis peta, bilah bawah.
 6. **Tulis modul fitur** satu per satu: `warna.js` → `agama.js` → `suku.js` →
-   `simpanan.js` → `member.js` → `cari.js` → `panduan.js`.
+   `simpanan.js` → `member.js` → `media.js` → `cari.js` → `panduan.js`.
 7. **Siapkan Worker Cloudflare** (`cloudflare/worker.js`) + database Neon.
    Isi secret `DATABASE_URL` dan `KUNCI` lewat `wrangler secret put`.
 8. **Aktifkan GitHub Pages** dari cabang `main`.
@@ -474,19 +494,19 @@ Kalau proyek ini harus dibangun ulang di tempat lain:
 
 ---
 
-## 12. Ukuran proyek (diukur 2026-10-17)
+## 12. Ukuran proyek (diukur 2026-10-22)
 
 | Bagian | Jumlah | Ukuran |
 |---|---|---|
-| Berkas data | 1.110 | 85,3 MB |
-| Modul JavaScript | 10 | 247 KB |
+| Berkas data | 1.110 | 81,4 MB |
+| Modul JavaScript | 11 | 254 KB |
 | Pustaka peta (lokal) | 2 | 1,0 MB |
-| Tampilan (`gaya.css`) | 1 | 55 KB |
-| Halaman (`index.html`) | 1 | 12 KB |
+| Tampilan (`gaya.css`) | 1 | 2.594 baris |
+| Halaman (`index.html`) | 1 | 13 KB |
 | Worker Cloudflare | 2 | 22 KB |
 | Skrip alat | 5 | 32 KB |
 | Dokumen | 4 | — |
-| Commit | 61 | — |
+| Commit | 67 | — |
 
 ---
 

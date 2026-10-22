@@ -18,15 +18,87 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 | Hal | Jumlah |
 |---|---|
-| Commit | 64 |
-| Orderan selesai | 22 (+1 menunggu konfirmasi) |
-| Berkas data | 1.110 (85,3 MB) |
-| Modul JavaScript | 10 (247 KB) |
-| Baris tampilan (`gaya.css`) | ~2.400 |
-| Rentang waktu | 2026-10-12 → 2026-10-18 |
+| Commit | 67 |
+| Orderan selesai | 25 |
+| Berkas data | 1.110 (81,4 MB) |
+| Modul JavaScript | 11 (254 KB) |
+| Baris tampilan (`gaya.css`) | ~2.594 |
+| Rentang waktu | 2026-10-12 → 2026-10-22 |
 
 **Sebaran commit:** 2026-10-12 → 14 commit · 2026-10-16 → 25 commit ·
-2026-10-17 → 21 commit · 2026-10-18 → 4 commit.
+2026-10-17 → 22 commit · 2026-10-18 → 4 commit · 2026-10-22 → 2 commit.
+---
+
+## 2026-10-22
+
+### Orderan 24 — menu "Media on/off" + bilah atas ikon saja
+
+**Baru.** Tombol mata (👁) di sebelah tombol Anggota **dihapus**. Gantinya menu
+**Media on/off** — pemakai bisa memilih kelompok data mana yang tampil di peta,
+bukan hanya menyembunyikan semuanya sekaligus.
+
+- **Modul baru `js/media.js`.** Daftar kelompok dibaca dari data yang ada, bukan
+  ditulis tetap di kode. Lima kelompok media tokomedia.org selalu muncul lebih
+  dulu, lalu seluruh kategori anggota menyusul di bawahnya.
+- **Tiap baris bisa dihidupkan / dimatikan.** Baris yang menyala berarti
+  penandanya tampil di peta. Ditambah dua tombol serempak: **Semua hidup** dan
+  **Semua mati**.
+- **Keadaan disimpan di database** lewat `Simpanan.simpanAtur('media_nyala')`,
+  jadi sama di PC maupun HP dan tetap tersimpan setelah halaman ditutup.
+- **Penyaringan penanda** dilakukan di `js/member.js` — properti `kategori` ikut
+  dikirim ke GeoJSON penanda, lalu `terapkanTampil()` memasang `setFilter` pada
+  ketujuh lapisan penanda. Bila semua kelompok hidup, penyaringan dibuang
+  (`null`) supaya peta tidak menghitung apa-apa.
+- **Bilah atas menjadi IKON SAJA.** Delapan tombol bertulisan penuh tidak
+  mungkin muat di bingkai HP 430 px. Diukur 22 Okt 2026: 8 tombol × 30 px +
+  7 jarak × 5 px = **275 px** — muat di 320 px sekalipun.
+- **`PD_IKON.gambar(id, warna)`** — fungsi baru yang mengembalikan data URI SVG
+  berwarna terang, dipakai menu yang berlatar gelap.
+- **Panduan bertambah dua bagian:** "Media on/off" dan "Arti ikon di bilah atas"
+  (menjelaskan arti kedelapan ikon). Ditambah aksi panduan `media:hidup` dan
+  `media:mati`.
+
+**Bukti uji:**
+
+| Uji | Hasil |
+|---|---|
+| Lebar bilah atas di 280/320/360/430/900/1400 px | ✅ tidak ada tombol terpotong |
+| Penyaringan penanda (hanya Kesehatan hidup) | ✅ hanya "Rsud mata" tampil |
+| Bertahan setelah ganti jenis peta | ✅ filter tetap terpasang |
+| Bertahan setelah halaman dimuat ulang | ✅ pilihan tersimpan |
+| Tombol Semua hidup / Semua mati | ✅ bekerja pada seluruh daftar |
+| Menu di layar pendek (320 px) | ✅ bisa digulir, tidak terpotong |
+| Galat konsol | ✅ **0** |
+
+### Orderan 25 — seluruh kategori bisa dihidupkan / dimatikan
+
+Menu Media on/off awalnya hanya menampilkan kategori yang sedang dipakai
+anggota. Orderan 25 meminta **semua** kategori bisa diatur, jadi daftarnya
+sekarang digabung dari dua sumber: kategori yang dipakai anggota **dan** daftar
+kategori resmi (`Simpanan.semuaKategori`). Kategori yang belum dipakai anggota
+tetap muncul supaya bisa diatur lebih dulu.
+
+Daftarnya dibaca ulang setiap kali menu dibuka, jadi kategori yang baru ditambah
+atau dihapus langsung ikut terlihat tanpa perlu memuat ulang halaman.
+
+**Bukti uji:** 12 kategori tampil (5 media + 7 kategori) · kategori baru
+"Panti Asuhan" langsung muncul setelah ditambah, lalu hilang lagi setelah
+dihapus · 0 galat konsol.
+
+### Orderan 1–3 (pemulihan data)
+
+Data tokomedia (699 anggota + 5 kategori) **di-backup lalu dihapus**, dan data
+lama **dipulihkan** dari `backup-anggota-20261018.json`:
+
+| Hal | Jumlah |
+|---|---|
+| Anggota | **3** — yayasan obi (Yayasan, Jepara) · Rsud mata (Kesehatan, Mamuju Tengah) · paud (Sekolah, Karimun) |
+| Kategori | **6** — Kesehatan, Lainnya, Pemerintahan, Sekolah, Sosial, Yayasan |
+| Pengaturan | `anggota_tingkat=kabkota`, `anggota_tampil=1` |
+
+Backup sebelum penghapusan: `backup-tokomedia-20261022.json` (699 anggota,
+430.964 byte) di folder sesi.
+
 ---
 
 ## 2026-10-18
