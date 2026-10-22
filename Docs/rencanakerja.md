@@ -19,7 +19,7 @@ Aturan pengelolaan:
 > | Ringkasan | Jumlah |
 > |---|---|
 > | Orderan selesai | **27** |
-> | Commit | 70 |
+> | Commit | 72 |
 > | Berkas data | 1.110 (81,4 MB) |
 > | Modul JavaScript | 12 (270 KB) |
 > | Rentang waktu | 2026-10-12 → 2026-10-22 |
@@ -440,7 +440,7 @@ Berdasarkan orderan 9–12. **Seluruh berkas sudah ada** (2026-10-17):
 | **`Docs/agents.md`** | asisten (AI) | Aturan main + catatan agar diingatkan setiap mulai | ✅ Ada — nama & isi sudah diperbarui |
 | **`Docs/rencanakerja.md`** | asisten + manusia | Daftar orderan: belum selesai & sudah selesai | ✅ Ada |
 | **`Docs/prompt.md`** | manusia / AI lain | Konsep proyek — supaya dapat dibuat ulang **persis sama** | ✅ Ada — 13 bagian |
-| **`Docs/CHANGELOG.md`** | manusia | Catatan semua perkembangan, perbaikan, hal baru | ✅ Ada — 69 commit tercatat |
+| **`Docs/CHANGELOG.md`** | manusia | Catatan semua perkembangan, perbaikan, hal baru | ✅ Ada — 72 commit tercatat |
 
 ### Isi `Docs/prompt.md` (13 bagian)
 
@@ -454,7 +454,7 @@ Berdasarkan orderan 9–12. **Seluruh berkas sudah ada** (2026-10-17):
 | 6 | Tampilan — ambang responsif, keputusan yang dikunci, bilah atas, jangkar & label |
 | 7 | Fitur — daftar lengkap + detail yang mudah terlewat |
 | 8 | Penyimpanan data anggota (Worker + Neon + IndexedDB) |
-| 9 | **Jebakan teknis yang sudah pernah terjadi** (25 butir) |
+| 9 | **Jebakan teknis yang sudah pernah terjadi** (29 butir) |
 | 10 | Alur kerja yang wajib diikuti |
 | 11 | Cara membangun ulang dari nol |
 | 12 | Ukuran proyek |
@@ -462,12 +462,12 @@ Berdasarkan orderan 9–12. **Seluruh berkas sudah ada** (2026-10-17):
 
 ### Isi `Docs/CHANGELOG.md`
 
-Riwayat **69 commit** dikelompokkan per tanggal (terbaru di atas), masing-masing
+Riwayat **72 commit** dikelompokkan per tanggal (terbaru di atas), masing-masing
 menyebut **berkas yang berubah** dan **hash commit** supaya bisa ditelusuri.
 
 | Tanggal | Isi |
 |---|---|
-| 2026-10-22 | Orderan 24, 25, 26 · pemulihan data (orderan 1–3) |
+| 2026-10-22 | Orderan 24, 25, 26, 27 · pemulihan data (orderan 1–3) |
 | 2026-10-18 | Orderan 23 — data anggota dari tokomedia.org |
 | 2026-10-17 | Panduan interaktif · panduan pemakaian · revisi panel Suku · orderan 20, 21, 22, 18, 19 · 3 perbaikan |
 | 2026-10-16 | Orderan 7, 16, 15, 17, 14 · GitHub Pages aktif · kelola kategori · perbaikan penanda & tampilan |
@@ -806,7 +806,7 @@ Bagian ini hanya memuat ide/opsi. Tidak ada satu pun yang dikerjakan sampai
 pemilik proyek memerintahkan secara eksplisit.
 
 **Proyek dinyatakan selesai 2026-10-17.** Setelah itu pemilik proyek menambah
-orderan 23–26 (2026-10-18 dan 2026-10-22) — semuanya sudah selesai.
+orderan 23–27 (2026-10-18 dan 2026-10-22) — semuanya sudah selesai.
 
 | No | Usulan | Perkiraan Waktu | Catatan |
 |----|--------|-----------------|---------|
