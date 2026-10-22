@@ -269,7 +269,7 @@
         'Pilihan Anda tersimpan di database, jadi tetap sama saat halaman dibuka lagi — baik di PC maupun di HP.'
       ],
       catatan: [
-        'Daftar kelompok disusun dari data yang benar-benar ada. Lima kelompok media tokomedia.org selalu muncul lebih dulu, lalu kategori lain menyusul di bawahnya.',
+        'Daftar kelompok disusun dari data yang benar-benar ada. Lima kelompok media tokomedia.org selalu muncul lebih dulu, lalu seluruh kategori anggota menyusul di bawahnya — termasuk kategori yang belum dipakai anggota, supaya bisa diatur lebih dulu.',
         'Tombol di bilah atas menjadi redup bila seluruh kelompok dimatikan.',
         'Menu ini menggantikan tombol mata (\uD83D\uDC41) yang dulu hanya bisa menyembunyikan seluruh penanda sekaligus.'
       ]

@@ -49,21 +49,26 @@
   var nyala = {};        /* nama kategori -> true / false */
   var terpasang = false;
   var siap = false;
+  var kategoriTersedia = [];   /* seluruh kategori yang terdaftar */
 
   /* ---------- daftar kelompok ---------- */
 
-  /* Lima kelompok media selalu ada; kategori lain menyusul bila dipakai
-     anggota. Dibaca ulang setiap kali menu dibuka supaya kategori baru
-     langsung muncul tanpa perlu memuat ulang halaman. */
+  /* Lima kelompok media selalu ada; kategori lain menyusul. Daftarnya
+     diambil dari dua tempat: kategori yang benar-benar dipakai anggota,
+     dan daftar kategori resmi (Simpanan.semuaKategori). Kategori yang
+     belum dipakai anggota tetap ditampilkan supaya pemakai bisa
+     mengaturnya lebih dulu — orderan 24 meminta SEMUA kategori bisa
+     dihidupkan / dimatikan. */
   function daftarKategori() {
     var hasil = [];
     var ada = {};
+
     var anggota = (window.PD_ANGGOTA && window.PD_ANGGOTA.ambilAnggota)
       ? window.PD_ANGGOTA.ambilAnggota() : [];
-
     anggota.forEach(function (a) {
       if (a.kategori) { ada[a.kategori] = true; }
     });
+    kategoriTersedia.forEach(function (n) { ada[n] = true; });
 
     MEDIA.forEach(function (m) {
       hasil.push(m.nama);
@@ -72,6 +77,17 @@
 
     Object.keys(ada).sort().forEach(function (n) { hasil.push(n); });
     return hasil;
+  }
+
+  /* Dibaca ulang setiap kali menu dibuka, supaya kategori yang baru
+     ditambah atau dihapus langsung ikut terlihat. */
+  function segarkanKategori() {
+    if (typeof Simpanan === 'undefined' || !Simpanan.semuaKategori) {
+      return Promise.resolve();
+    }
+    return Simpanan.semuaKategori().then(function (d) {
+      kategoriTersedia = (d || []).slice();
+    }).catch(function () { /* diabaikan — pakai daftar yang sudah ada */ });
   }
 
   function ikonUntuk(nama) {
@@ -232,7 +248,14 @@
 
   function bukaTutup(buka) {
     if (!elPemilih || !elTombol) { return; }
-    if (buka) { bangun(); tandai(); }
+    if (buka) {
+      /* Kategori bisa berubah sejak menu terakhir dibuka — dibaca ulang
+         dulu, baru digambar. */
+      segarkanKategori().then(function () {
+        bangun();
+        tandai();
+      });
+    }
     elPemilih.hidden = !buka;
     elTombol.setAttribute('aria-expanded', buka ? 'true' : 'false');
     if (buka) {
@@ -274,7 +297,7 @@
     if (terpasang) { return; }
     terpasang = true;
     pasang();
-    muat().then(function () {
+    segarkanKategori().then(muat).then(function () {
       siap = true;
       bangun();
       tandai();
