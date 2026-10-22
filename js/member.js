@@ -52,19 +52,20 @@
   var elKunciIsian = document.getElementById('anggota-kunci-isian');
   var elKunciSimpan = document.getElementById('anggota-kunci-simpan');
   var elKunciPesan = document.getElementById('anggota-kunci-pesan');
-  var elTampil = document.getElementById('anggota-tampil');
 
   /* Semua lapisan penanda anggota. Dipakai untuk menyembunyikan /
      menampilkan penanda tanpa perlu membuang datanya (orderan lanjutan
      16 Okt 2026). Penggabungan (cluster) sudah dihapus 18 Okt 2026 —
-     pemilik proyek memutuskan angka tumpukan sulit dipahami. */
+     pemilik proyek memutuskan angka tumpukan sulit dipahami.
+
+     Orderan 24: tombol mata (👁) dihapus dan diganti menu Media on/off
+     (js/media.js). Lapisan-lapisan ini sekarang disaring per kategori,
+     bukan disembunyikan sekaligus. */
   var LAPISAN_PENANDA = [
     'anggota-titik', 'anggota-putus-1', 'anggota-putus-2', 'anggota-putus-3',
     'anggota-putus-4', 'anggota-lingkaran', 'anggota-huruf'
   ];
 
-  var KUNCI_TAMPIL = 'anggota_tampil';
-  var penandaTampil = true;
   var jamPenanda = null;
 
   /* ---------- bantu ---------- */
@@ -1587,7 +1588,10 @@
             nama: a.nama,
             inisial: a.inisial || (a.nama || '?').slice(0, 2).toUpperCase(),
             ikon: (window.PD_IKON ? PD_IKON.untukKategori(a.kategori) : 'ikon-pin'),
-            warna: warnaKategori(a.kategori)
+            warna: warnaKategori(a.kategori),
+            /* Orderan 24: kategori ikut dikirim ke peta supaya menu
+               Media on/off bisa menyaring penanda per kelompok. */
+            kategori: a.kategori || ''
           },
           geometry: { type: 'Point', coordinates: [a.lon, a.lat] }
         };
@@ -1749,34 +1753,25 @@
     elPanel.setAttribute('aria-hidden', 'true');
   }
 
-    /* ---------- tombol tampil / sembunyi penanda ---------- */
+    /* ---------- menyaring penanda menurut menu Media on/off ---------- */
 
-    function pasangTampil() {
-      if (!elTampil) { return; }
-      elTampil.addEventListener('click', function () {
-        penandaTampil = !penandaTampil;
-        terapkanTampil();
-        Simpanan.simpanAtur(KUNCI_TAMPIL, penandaTampil ? '1' : '0');
-      });
-      /* Keadaan terakhir diingat, jadi tidak perlu diatur ulang tiap dibuka. */
-      Simpanan.ambilAtur(KUNCI_TAMPIL).then(function (v) {
-        if (v === '0') { penandaTampil = false; }
-        terapkanTampil();
-      });
-    }
-
+    /* Orderan 24: tombol mata (👁) dihapus. Yang menentukan penanda mana
+       yang tampil sekarang adalah menu Media on/off (js/media.js).
+       `null` dari PD_MEDIA.saring() berarti semua kelompok hidup, jadi
+       penyaringan dibuang supaya peta tidak menghitung apa-apa. */
     function terapkanTampil() {
       if (!peta) { return; }
-      if (elTampil) {
-        elTampil.setAttribute('aria-pressed', penandaTampil ? 'true' : 'false');
-        elTampil.title = penandaTampil
-          ? 'Sembunyikan penanda anggota di peta'
-          : 'Tampilkan penanda anggota di peta';
-      }
+
+      var saring = (window.PD_MEDIA && PD_MEDIA.saring) ? PD_MEDIA.saring() : null;
+      var tapis = saring
+        ? ['in', ['get', 'kategori'], ['literal', saring]]
+        : null;
+
       LAPISAN_PENANDA.forEach(function (id) {
-        if (peta.getLayer(id)) {
-          peta.setLayoutProperty(id, 'visibility', penandaTampil ? 'visible' : 'none');
-        }
+        if (!peta.getLayer(id)) { return; }
+        try {
+          peta.setFilter(id, tapis);
+        } catch (e) { /* lapisan belum siap — dilewati */ }
       });
     }
 
@@ -1792,7 +1787,6 @@
         siapkanKategori();
         bangunPemilih();
         siapkanKunci();
-        pasangTampil();
 
     document.getElementById('tombol-anggota').addEventListener('click', function () {
       if (elPanel.hidden) { bukaPanel(); } else { tutupPanel(); }

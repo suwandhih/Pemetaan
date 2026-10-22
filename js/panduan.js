@@ -250,6 +250,53 @@
         'Kartu hanya muncul kalau peta Populasi atau peta Agama sedang menyala.',
         'Di PC kartu dibuat ringkas dan lebarnya dibatasi supaya tidak menutupi peta.'
       ]
+    },
+    {
+      id: 'media',
+      judul: 'Media on/off',
+      untuk: 'Memilih kelompok data mana yang tampil di peta. Berguna saat ' +
+        'penanda terlalu rapat — matikan kelompok yang tidak sedang dicari, ' +
+        'sisanya tetap terlihat.',
+      langkah: [
+        'Ketuk tombol [[\uD83D\uDCFA|tekan:#tombol-media]] di bilah atas untuk membuka daftar kelompok.',
+        'Ketuk satu baris untuk menghidupkan atau mematikannya. Baris yang menyala berarti penandanya tampil di peta.',
+        'Ketuk [[Semua hidup|media:hidup]] untuk menampilkan seluruh kelompok sekaligus.',
+        'Ketuk [[Semua mati|media:mati]] untuk menyembunyikan seluruh kelompok sekaligus.',
+        'Ketuk di luar daftar, atau tekan tombol [[Esc|tekan:#tombol-media]], untuk menutupnya.'
+      ],
+      hasil: [
+        'Penanda di peta langsung menyesuaikan: hanya kelompok yang menyala yang tampil.',
+        'Pilihan Anda tersimpan di database, jadi tetap sama saat halaman dibuka lagi — baik di PC maupun di HP.'
+      ],
+      catatan: [
+        'Daftar kelompok disusun dari data yang benar-benar ada. Lima kelompok media tokomedia.org selalu muncul lebih dulu, lalu kategori lain menyusul di bawahnya.',
+        'Tombol di bilah atas menjadi redup bila seluruh kelompok dimatikan.',
+        'Menu ini menggantikan tombol mata (\uD83D\uDC41) yang dulu hanya bisa menyembunyikan seluruh penanda sekaligus.'
+      ]
+    },
+    {
+      id: 'ikon',
+      judul: 'Arti ikon di bilah atas',
+      untuk: 'Mengenal tombol-tombol di bilah atas, karena semuanya memakai ' +
+        'ikon saja supaya muat di layar HP.',
+      langkah: [
+        '[[\u2630|tekan:#tombol-anggota]] \u2014 membuka daftar anggota.',
+        '[[\uD83D\uDCFA|tekan:#tombol-media]] \u2014 menu Media on/off: pilih kelompok data yang tampil di peta.',
+        '[[\uD83D\uDEF0|tekan:#tombol-jenis]] \u2014 berganti jenis peta: citra satelit \u21C4 peta jalan.',
+        '[[\uD83D\uDC41|tekan:#tombol-warna]] \u2014 peta tematik jumlah penduduk.',
+        '[[\uD83D\uDE4F|tekan:#tombol-agama]] \u2014 peta tematik penduduk menurut agama.',
+        '[[\uD83E\uDDEC|tekan:#tombol-suku]] \u2014 titik lokasi suku bangsa.',
+        '[[\u2315|tekan:#tombol-cari]] \u2014 mencari wilayah, anggota, atau nama jalan.',
+        '[[?|tekan:#tombol-panduan]] \u2014 membuka panduan ini.'
+      ],
+      hasil: [
+        'Setiap tombol membuka fiturnya masing-masing; panduan ini berpindah ke bagian yang sesuai.'
+      ],
+      catatan: [
+        'Tombol yang sedang menyala diberi garis dan latar biru muda.',
+        'Tombol yang redup berarti fiturnya sedang mati.',
+        'Di PC tombolnya sama saja \u2014 hanya jaraknya lebih lega.'
+      ]
     }
   ];
 
@@ -282,6 +329,7 @@
     if (terlihat('panel-suku')) { return 'suku'; }
     if (terlihat('pemilih-warna')) { return 'populasi'; }
     if (terlihat('pemilih-agama')) { return 'agama'; }
+    if (terlihat('pemilih-media')) { return 'media'; }
     if (terlihat('cari')) { return 'cari'; }
     if (terlihat('kartu')) { return 'kartu'; }
     return 'peta';
@@ -470,6 +518,11 @@
     if (nama === 'agama-tingkat') {
       bukaDaftar('tombol-agama', 'pemilih-agama',
         '[data-agama-tingkat="' + arg + '"]', tombol);
+      return;
+    }
+    if (nama === 'media') {
+      bukaDaftar('tombol-media', 'pemilih-media',
+        '.media-serempak-tombol[data-serempak="' + arg + '"]', tombol);
     }
   }
 

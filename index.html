@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261018-06">
-<link rel="stylesheet" href="css/gaya.css?v=20261018-06">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261022-01">
+<link rel="stylesheet" href="css/gaya.css?v=20261022-01">
 </head>
 <body>
 
@@ -18,9 +18,8 @@
 
   <header id="bilah-atas">
     <div id="grup-anggota">
-      <button id="tombol-anggota" type="button" aria-label="Daftar anggota">Anggota</button>
-      <button id="anggota-tampil" type="button" aria-pressed="true"
-              title="Tampilkan / sembunyikan penanda anggota di peta">&#128065;</button>
+      <button id="tombol-anggota" type="button" aria-label="Daftar anggota"
+              title="Daftar anggota">Anggota</button>
     </div>
     <button id="tombol-jenis" type="button" title="Ganti jenis peta">
       <span id="jenis-ikon">&#128752;</span>
@@ -39,6 +38,13 @@
             title="Titik lokasi suku bangsa">
       <span id="suku-nama-tombol">Suku</span>
       <span id="suku-ikon">&#129516;</span>
+    </button>
+    <!-- Orderan 24: menu Media on/off. Menggantikan tombol mata (👁) yang
+         dulu hanya bisa menyembunyikan seluruh penanda sekaligus. -->
+    <button id="tombol-media" type="button" aria-haspopup="listbox" aria-expanded="false"
+            aria-pressed="true" aria-label="Media on/off"
+            title="Media on/off — pilih kelompok media yang tampil di peta">
+      <span id="media-ikon">&#128250;</span>
     </button>
     <button id="tombol-cari" type="button" aria-label="Cari wilayah, anggota, atau nama jalan"
             title="Cari wilayah, anggota, atau nama jalan">&#9906;</button>
@@ -63,6 +69,9 @@
 
     <!-- Orderan 21: peta tematik penduduk menurut agama (Dukcapil Kemendagri) -->
     <div id="pemilih-agama" role="listbox" aria-label="Peta agama" hidden></div>
+
+    <!-- Orderan 24: daftar kelompok media yang bisa dihidupkan / dimatikan -->
+    <div id="pemilih-media" role="listbox" aria-label="Media on/off" hidden></div>
 
     <!-- Orderan 20: titik lokasi suku bangsa (BPS Sensus Penduduk 2010).
          Disusun seperti panel Anggota — di PC jadi kolom kiri sehingga peta
@@ -220,18 +229,19 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261018-06"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261018-06"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261018-06"></script>
-<script src="js/inti.js?v=20261018-06"></script>
-<script src="js/warna.js?v=20261018-06"></script>
-<script src="js/agama.js?v=20261018-06"></script>
-<script src="js/suku.js?v=20261018-06"></script>
-<script src="js/simpanan.js?v=20261018-06"></script>
-<script src="js/ikon.js?v=20261018-06"></script>
-<script src="js/member.js?v=20261018-06"></script>
-<script src="js/tokomedia.js?v=20261018-06"></script>
-<script src="js/cari.js?v=20261018-06"></script>
-<script src="js/panduan.js?v=20261018-06"></script>
+<script src="js/lib/maplibre-gl.js?v=20261022-01"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261022-01"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261022-01"></script>
+<script src="js/inti.js?v=20261022-01"></script>
+<script src="js/warna.js?v=20261022-01"></script>
+<script src="js/agama.js?v=20261022-01"></script>
+<script src="js/suku.js?v=20261022-01"></script>
+<script src="js/simpanan.js?v=20261022-01"></script>
+<script src="js/ikon.js?v=20261022-01"></script>
+<script src="js/member.js?v=20261022-01"></script>
+<script src="js/media.js?v=20261022-01"></script>
+<script src="js/tokomedia.js?v=20261022-01"></script>
+<script src="js/cari.js?v=20261022-01"></script>
+<script src="js/panduan.js?v=20261022-01"></script>
 </body>
 </html>

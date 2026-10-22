@@ -159,6 +159,16 @@
     KATEGORI: KATEGORI,
     untukKategori: untukKategori,
     pasang: pasang,
+    /* Mengembalikan gambar SVG siap pakai (data URI) untuk dipakai di
+       HTML — bukan di peta. Dipakai menu Media on/off (orderan 24).
+       Warna gelap bawaan diganti warna terang karena menunya berlatar
+       gelap. */
+    gambar: function (id, warna) {
+      var isi = DAFTAR[id] || DAFTAR['ikon-pin'];
+      var w = warna || '#f2f7fc';
+      return 'data:image/svg+xml;charset=utf-8,' +
+        encodeURIComponent(isi.split(WARNA).join(w));
+    },
     /* Diperiksa ulang setiap kali penanda digambar — gambar hilang saat
        gaya peta diganti, dan objek petanya tetap sama. */
     lengkap: function (peta) {
