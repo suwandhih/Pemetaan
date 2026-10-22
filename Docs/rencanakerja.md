@@ -13,13 +13,16 @@ Aturan pengelolaan:
 > Pemilik proyek menyatakan **proyek Pemetaan selesai** pada 2026-10-17.
 > Seluruh **22 orderan** berstatus `SELESAI`.
 >
+> Setelah itu pemilik proyek menambah **4 orderan baru** (23–26) pada
+> 2026-10-18 dan 2026-10-22. Keadaan terkini:
+>
 > | Ringkasan | Jumlah |
 > |---|---|
-> | Orderan selesai | **22 dari 22** |
-> | Commit | 60 |
-> | Berkas data | 1.110 (85,3 MB) |
-> | Modul JavaScript | 8 (236 KB) |
-> | Rentang waktu | 2026-10-12 → 2026-10-17 |
+> | Orderan selesai | **26** |
+> | Commit | 69 |
+> | Berkas data | 1.110 (81,4 MB) |
+> | Modul JavaScript | 12 (267 KB) |
+> | Rentang waktu | 2026-10-12 → 2026-10-22 |
 >
 > **Situs live:** https://suwandhih.github.io/Pemetaan/
 > **Repo:** https://github.com/suwandhih/Pemetaan
@@ -48,7 +51,7 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 9 | `aturan.md` diganti nama menjadi **`agents.md`** — berisi aturan + catatan agar asisten diingatkan setiap mulai proyek | **SELESAI** ✅ | 5 mnt | 2026-10-16 |
 | 10 | Pastikan `rencanakerja.md` berfungsi sebagai **daftar orderan**: yang belum selesai dan yang sudah selesai | **SELESAI** ✅ | 5 mnt | 2026-10-17 |
 | 11 | Buat **`prompt.md`** — konsep proyek, supaya AI lain dapat membuat ulang **persis sama** | **SELESAI** ✅ — `Docs/prompt.md` (22,8 KB, 13 bagian) | 30–45 mnt | 2026-10-17 |
-| 12 | Buat **`CHANGELOG.md`** — catatan semua perkembangan, perbaikan, dan hal baru | **SELESAI** ✅ — `Docs/CHANGELOG.md` (19,4 KB, 60 commit tercatat) | 15–20 mnt | 2026-10-17 |
+| 12 | Buat **`CHANGELOG.md`** — catatan semua perkembangan, perbaikan, dan hal baru | **SELESAI** ✅ — `Docs/CHANGELOG.md` (riwayat lengkap, terbaru di atas) | 15–20 mnt | 2026-10-17 |
 | 13 | Jawab & siapkan: apakah GitHub sudah siap kerja untuk proyek pemetaan | **SELESAI** ✅ — repo publik + Pages aktif + push berjalan | 20–30 mnt | 2026-10-16 |
 | 14 | **Peta Indonesia + negara tetangga** — fokus Indonesia, tetangga tetap tampil supaya tidak kosong; beberapa pulau Indonesia berbatasan langsung dengan negara lain | **SELESAI** ✅ | 45–60 mnt | 2026-10-16 |
 | 15 | **Fitur citra satelit atau peta** — peta memakai citra satelit, tetapi bisa juga dalam bentuk peta (contoh acuan: `petadunia`) | **SELESAI** ✅ — 2 pilihan, satu tombol bergantian | 30–45 mnt | 2026-10-16 |
@@ -59,7 +62,10 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 20 | **Titik lokasi suku-suku** — data dari `c:\data\datapeta` dipelajari & **diolah ulang**, disajikan menurut konsep Pemetaan (bukan meniru cara saji DataPeta) | **SELESAI** ✅ — 28 suku BPS SP2010, panel seperti panel Anggota | 60–90 mnt | 2026-10-17 |
 | 21 | **Jumlah beragama berjenjang** — provinsi → kabupaten/kota → kecamatan → desa/kelurahan; data dari `c:\data\datapeta` dipelajari, **angka diolah & disajikan** menurut konsep Pemetaan | **SELESAI** ✅ — 7 agama, disajikan dalam persentase | 90–120 mnt | 2026-10-17 |
 | 22 | **Ralat orderan 14d — tampilan PC lebar (responsive)**: PC lebar penuh, peta **memenuhi tinggi layar tanpa ruang kosong**; HP tetap seperti sekarang (bila layar HP lebih lebar, peta ikut lebih lebar, tidak mengecil; tidak muat → geser kiri-kanan) | **SELESAI** ✅ | 45–60 mnt | 2026-10-17 |
-| 23 | **Data anggota dari tokomedia.org** — 5 kategori (Film Isa Al-Masih, Film Ikatan Ilahi, Video Kitab Suci, Clip Kitab Suci, Aplikasi Kitab Suci), masing-masing berisi bahasa daerah. Data lama dihapus termasuk kategori. Tombol **[↻ Update]** menarik data terbaru dari tokomedia.org lewat Worker, **selalu disertai koordinat**. Icon kategori menggantikan 2 digit di bulatan peta. Penggabungan penanda (cluster) **dihapus** atas permintaan pemilik proyek — 699 penanda tampil satu per satu | **MENUNGGU KONFIRMASI** — 699 anggota masuk database, 5 kategori baru, 699 titik unik, 7 lapisan penanda, icon tepat di dalam bulatan | 100–140 mnt | — |
+| 23 | **Data anggota dari tokomedia.org** — 5 kategori (Film Isa Al-Masih, Film Ikatan Ilahi, Video Kitab Suci, Clip Kitab Suci, Aplikasi Kitab Suci), masing-masing berisi bahasa daerah. Data lama dihapus termasuk kategori. Tombol **[↻ Update]** menarik data terbaru dari tokomedia.org lewat Worker, **selalu disertai koordinat**. Icon kategori menggantikan 2 digit di bulatan peta. Penggabungan penanda (cluster) **dihapus** atas permintaan pemilik proyek — 699 penanda tampil satu per satu | **SELESAI** ✅ — 699 anggota masuk database, 5 kategori baru, 699 titik unik, 7 lapisan penanda, icon tepat di dalam bulatan. Datanya kemudian **dihapus atas perintah pemilik proyek** (orderan 1–3, 2026-10-22); backup tersimpan | 100–140 mnt | 2026-10-18 |
+| 24 | **Menu "Media on/off"** — tombol mata (👁) dihapus, diganti menu yang bisa memilih kelompok data mana yang tampil di peta. Bilah atas menjadi **ikon saja** supaya 8 tombol muat di HP | **SELESAI** ✅ — `js/media.js` baru, keadaan disimpan di database, 2 bagian panduan baru | 60–90 mnt | 2026-10-22 |
+| 25 | **Seluruh kategori bisa dihidupkan / dimatikan** — bukan hanya kategori yang sedang dipakai anggota | **SELESAI** ✅ — daftar digabung dari kategori terpakai + daftar kategori resmi, dibaca ulang setiap menu dibuka | 20–30 mnt | 2026-10-22 |
+| 26 | **Jangkar & label media per provinsi** — setiap provinsi yang punya data media harus jelas media apa saja isinya, memakai jangkar + label | **SELESAI** ✅ — `js/label.js` baru, 1 jangkar + 1 label per provinsi, label mengikuti menu Media on/off, ketuk → garis merah provinsi | 90–120 mnt | 2026-10-22 |
 
 ### Orderan di luar daftar bernomor (perintah langsung pemilik proyek)
 
@@ -71,6 +77,10 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | **Revisi bilah atas** — `[Anggota][👁]` dipindah ke paling kiri | **SELESAI** ✅ | 2026-10-17 |
 | **Perbaikan popup "Save password?" Chrome** | **SELESAI** ✅ | 2026-10-17 |
 | **Perbaikan cari desa/kecamatan** yang poligonnya belum dimuat | **SELESAI** ✅ | 2026-10-17 |
+| **Pemulihan data (orderan 1–3, 2026-10-22)** — data kategori dihapus setelah di-backup; kategori lama (Yayasan, Sekolah, Rumah Sakit/Kesehatan, dll.) dipulihkan ke data anggota | **SELESAI** ✅ | 2026-10-22 |
+| **Bilah atas ikon saja** — `[Anggota][👁][Satelit][Populasi][Agama][Suku][⌕][?]` diganti ikon supaya 8 tombol muat di layar HP; keterangan ikon masuk panduan | **SELESAI** ✅ | 2026-10-22 |
+| **Panduan ikon bilah atas** — bagian panduan baru yang menjelaskan arti setiap ikon | **SELESAI** ✅ | 2026-10-22 |
+| **Panduan label media** — bagian panduan baru yang menjelaskan jangkar & label media di peta | **SELESAI** ✅ | 2026-10-22 |
 
 
 ### Rincian Orderan 14 (perintah 2026-10-16)
@@ -426,8 +436,8 @@ Berdasarkan orderan 9–12. **Seluruh berkas sudah ada** (2026-10-17):
 |---|---|---|---|
 | **`Docs/agents.md`** | asisten (AI) | Aturan main + catatan agar diingatkan setiap mulai | ✅ Ada — nama & isi sudah diperbarui |
 | **`Docs/rencanakerja.md`** | asisten + manusia | Daftar orderan: belum selesai & sudah selesai | ✅ Ada |
-| **`Docs/prompt.md`** | manusia / AI lain | Konsep proyek — supaya dapat dibuat ulang **persis sama** | ✅ Ada — 22,8 KB, 13 bagian |
-| **`Docs/CHANGELOG.md`** | manusia | Catatan semua perkembangan, perbaikan, hal baru | ✅ Ada — 19,4 KB, 60 commit tercatat |
+| **`Docs/prompt.md`** | manusia / AI lain | Konsep proyek — supaya dapat dibuat ulang **persis sama** | ✅ Ada — 13 bagian |
+| **`Docs/CHANGELOG.md`** | manusia | Catatan semua perkembangan, perbaikan, hal baru | ✅ Ada — 69 commit tercatat |
 
 ### Isi `Docs/prompt.md` (13 bagian)
 
@@ -438,10 +448,10 @@ Berdasarkan orderan 9–12. **Seluruh berkas sudah ada** (2026-10-17):
 | 3 | Susunan berkas |
 | 4 | **Struktur data** — poligon, angka agama, sumber data |
 | 5 | Jembatan antar modul (`window.PD_*`) |
-| 6 | Tampilan — ambang responsif, keputusan yang dikunci, bilah atas |
+| 6 | Tampilan — ambang responsif, keputusan yang dikunci, bilah atas, jangkar & label |
 | 7 | Fitur — daftar lengkap + detail yang mudah terlewat |
 | 8 | Penyimpanan data anggota (Worker + Neon + IndexedDB) |
-| 9 | **Jebakan teknis yang sudah pernah terjadi** (14 butir) |
+| 9 | **Jebakan teknis yang sudah pernah terjadi** (25 butir) |
 | 10 | Alur kerja yang wajib diikuti |
 | 11 | Cara membangun ulang dari nol |
 | 12 | Ukuran proyek |
@@ -449,11 +459,13 @@ Berdasarkan orderan 9–12. **Seluruh berkas sudah ada** (2026-10-17):
 
 ### Isi `Docs/CHANGELOG.md`
 
-Riwayat **60 commit** dikelompokkan per tanggal (terbaru di atas), masing-masing
+Riwayat **69 commit** dikelompokkan per tanggal (terbaru di atas), masing-masing
 menyebut **berkas yang berubah** dan **hash commit** supaya bisa ditelusuri.
 
 | Tanggal | Isi |
 |---|---|
+| 2026-10-22 | Orderan 24, 25, 26 · pemulihan data (orderan 1–3) |
+| 2026-10-18 | Orderan 23 — data anggota dari tokomedia.org |
 | 2026-10-17 | Panduan interaktif · panduan pemakaian · revisi panel Suku · orderan 20, 21, 22, 18, 19 · 3 perbaikan |
 | 2026-10-16 | Orderan 7, 16, 15, 17, 14 · GitHub Pages aktif · kelola kategori · perbaikan penanda & tampilan |
 | 2026-10-12 | Fondasi teknologi dikunci · aturan kerja 1–9 · berkas `.md` ke `Docs/` · repo GitHub dibuat |
@@ -790,11 +802,13 @@ tidak hilang saat sesi panjang. Pengerjaan menunggu orderan resmi.
 Bagian ini hanya memuat ide/opsi. Tidak ada satu pun yang dikerjakan sampai
 pemilik proyek memerintahkan secara eksplisit.
 
-**Proyek dinyatakan selesai 2026-10-17.** Tidak ada usulan yang tertunda.
+**Proyek dinyatakan selesai 2026-10-17.** Setelah itu pemilik proyek menambah
+orderan 23–26 (2026-10-18 dan 2026-10-22) — semuanya sudah selesai.
 
 | No | Usulan | Perkiraan Waktu | Catatan |
 |----|--------|-----------------|---------|
-| —  | —      | —               | —       |
+| U1 | **Tarik ulang data media dari tokomedia.org** (699 anggota, 5 kategori) | 5–10 mnt | Orderan 23 pernah mengisinya, lalu dihapus atas perintah pemilik proyek (orderan 1–3). Akibatnya fitur **jangkar & label media** (orderan 26) belum menampilkan apa pun — database hanya berisi 3 anggota lama tanpa data media. Backup 699 anggota tersimpan di berkas sesi `backup-tokomedia-20261022.json`. Menunggu keputusan pemilik proyek: tarik ulang, gabung dengan 3 anggota lama, atau biarkan kosong. |
+| U2 | **Rotasi kunci aplikasi (`KUNCI`)** | 5 mnt | Kunci `PMA-…` sempat tertulis di riwayat percakapan. Sebaiknya diganti di Worker (`env.KUNCI`) lalu diperbarui di peramban. Tidak mendesak, tetapi baik dilakukan. |
 
 ---
 

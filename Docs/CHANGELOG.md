@@ -18,7 +18,7 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 | Hal | Jumlah |
 |---|---|
-| Commit | 68 |
+| Commit | 69 |
 | Orderan selesai | 26 |
 | Berkas data | 1.110 (81,4 MB) |
 | Modul JavaScript | 12 (267 KB) |
@@ -26,7 +26,7 @@ Repo: https://github.com/suwandhih/Pemetaan
 | Rentang waktu | 2026-10-12 → 2026-10-22 |
 
 **Sebaran commit:** 2026-10-12 → 14 commit · 2026-10-16 → 25 commit ·
-2026-10-17 → 22 commit · 2026-10-18 → 4 commit · 2026-10-22 → 3 commit.
+2026-10-17 → 22 commit · 2026-10-18 → 4 commit · 2026-10-22 → 4 commit.
 ---
 
 ## 2026-10-22
@@ -64,6 +64,21 @@ keterangan bergeser · tanpa data media → tidak ada yang ditampilkan · **0 ga
 konsol**. Seluruh anggota uji dihapus kembali; database tetap 3 anggota.
 
 ---
+
+### Orderan 25 — seluruh kategori bisa dihidupkan / dimatikan
+
+Menu Media on/off awalnya hanya menampilkan kategori yang sedang dipakai
+anggota. Orderan 25 meminta **semua** kategori bisa diatur, jadi daftarnya
+sekarang digabung dari dua sumber: kategori yang dipakai anggota **dan** daftar
+kategori resmi (`Simpanan.semuaKategori`). Kategori yang belum dipakai anggota
+tetap muncul supaya bisa diatur lebih dulu.
+
+Daftarnya dibaca ulang setiap kali menu dibuka, jadi kategori yang baru ditambah
+atau dihapus langsung ikut terlihat tanpa perlu memuat ulang halaman.
+
+**Bukti uji:** 12 kategori tampil (5 media + 7 kategori) · kategori baru
+"Panti Asuhan" langsung muncul setelah ditambah, lalu hilang lagi setelah
+dihapus · 0 galat konsol.
 
 ### Orderan 24 — menu "Media on/off" + bilah atas ikon saja
 
@@ -103,21 +118,6 @@ bukan hanya menyembunyikan semuanya sekaligus.
 | Tombol Semua hidup / Semua mati | ✅ bekerja pada seluruh daftar |
 | Menu di layar pendek (320 px) | ✅ bisa digulir, tidak terpotong |
 | Galat konsol | ✅ **0** |
-
-### Orderan 25 — seluruh kategori bisa dihidupkan / dimatikan
-
-Menu Media on/off awalnya hanya menampilkan kategori yang sedang dipakai
-anggota. Orderan 25 meminta **semua** kategori bisa diatur, jadi daftarnya
-sekarang digabung dari dua sumber: kategori yang dipakai anggota **dan** daftar
-kategori resmi (`Simpanan.semuaKategori`). Kategori yang belum dipakai anggota
-tetap muncul supaya bisa diatur lebih dulu.
-
-Daftarnya dibaca ulang setiap kali menu dibuka, jadi kategori yang baru ditambah
-atau dihapus langsung ikut terlihat tanpa perlu memuat ulang halaman.
-
-**Bukti uji:** 12 kategori tampil (5 media + 7 kategori) · kategori baru
-"Panti Asuhan" langsung muncul setelah ditambah, lalu hilang lagi setelah
-dihapus · 0 galat konsol.
 
 ### Orderan 1–3 (pemulihan data)
 

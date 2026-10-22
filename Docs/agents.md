@@ -158,9 +158,19 @@ berkas aplikasi & konfigurasi.
 Seluruh **22 orderan** berstatus `SELESAI`. Situs live:
 https://suwandhih.github.io/Pemetaan/
 
-**2026-10-18 — orderan 23** (data anggota dari tokomedia.org + tombol
-`[↻ Update]` + icon kategori) berstatus `MENUNGGU KONFIRMASI`. 699 anggota
-sudah masuk database, 5 kategori baru, 699 titik unik.
+**Setelah itu pemilik proyek menambah 4 orderan baru — semuanya sudah selesai:**
+
+| Orderan | Isi | Tanggal |
+|---|---|---|
+| 23 | Data anggota dari tokomedia.org + tombol `[↻ Update]` + icon kategori | 2026-10-18 |
+| 24 | Menu **Media on/off** + bilah atas menjadi ikon saja | 2026-10-22 |
+| 25 | Seluruh kategori bisa dihidupkan / dimatikan | 2026-10-22 |
+| 26 | Jangkar & label media per provinsi | 2026-10-22 |
+
+Data tokomedia (orderan 23) **dihapus atas perintah pemilik proyek** pada
+2026-10-22 (orderan 1–3), setelah di-backup. Database kini berisi 3 anggota
+lama. Akibatnya fitur jangkar & label media belum menampilkan apa pun sampai
+data media diisi kembali — lihat usulan **U1** di `rencanakerja.md`.
 
 Kalau ada pekerjaan baru, perlakukan sebagai **orderan baru** — catat dulu di
 `rencanakerja.md`, sebut perkiraan waktu, lalu tunggu aba-aba (aturan 2, 4, 6).
