@@ -58,8 +58,11 @@ bahasa/gugus, peringatan suku, serta fokus setelah panel ditutup. Uji drawer
 HP pada CSS viewport 344 px: toolbar 344 px, tombol dashboard di dalam bingkai;
 0 galat runtime baru.
 
-**Status implementasi:** selesai di workspace, belum dipublikasikan atau diuji
-terhadap sesi data produksi pengguna pada deployment.
+**Deployment & verifikasi situs (2026-10-23):** commit `87b2663` dipush ke
+`main`; GitHub Pages deployment `39975536374` berhasil. Situs live menampilkan
+ikon Dashboard tepat di kanan Media on/off; klik membuka report dan status
+Neon tersambung. Pada data produksi saat diperiksa: 299 record media berbahasa,
+35 provinsi dengan media, 3 tanpa record media, dan 3 anggota non-media.
 
 ---
 
