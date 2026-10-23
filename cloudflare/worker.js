@@ -74,6 +74,7 @@ function teks(v, maks) {
 }
 
 function angka(v) {
+  if (v === null || v === undefined || v === '') { return null; }
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
 }
@@ -204,7 +205,8 @@ function inisialDari(nama) {
    provinsi. Tidak ada offset geometri yang bisa menggeser penanda ke laut. */
 function geser(titik, urutan, jumlah, geserSudut, jari) {
   const posisi = titik.posisi || [[titik.lon, titik.lat]];
-  const dipilih = posisi[(urutan + Math.floor((geserSudut || 0) * posisi.length / (2 * Math.PI))) % posisi.length];
+  const putaran = Math.floor((geserSudut || 0) * posisi.length / (2 * Math.PI));
+  const dipilih = posisi[(urutan + putaran) % posisi.length];
   return { lon: dipilih[0], lat: dipilih[1] };
 }
 
@@ -396,8 +398,7 @@ async function tarikRumahweb(env, pilih) {
     jawab.data.forEach(function (b) {
       const t = titikUntuk(b.name);
       if (t.cara !== 'provinsi') {
-        gagal.push(grup.nama + ' / ' + b.name + ': bahasa belum terpetakan ke provinsi; titik tidak ditampilkan');
-        return;
+        gagal.push(grup.nama + ' / ' + b.name + ': bahasa belum terpetakan ke provinsi; tanpa titik pada peta');
       }
 
       urut += 1;
@@ -414,9 +415,9 @@ async function tarikRumahweb(env, pilih) {
           { label: 'Provinsi', nilai: t.provinsi },
           { label: 'Sumber', nilai: 'https://tokomedia.org/' + (b.slug || '') }
         ],
-        lon: t.lon,
-        lat: t.lat,
-        posisi: t.posisi,
+        lon: t.cara === 'provinsi' ? t.lon : null,
+        lat: t.cara === 'provinsi' ? t.lat : null,
+        posisi: t.cara === 'provinsi' ? t.posisi : null,
         kodeProvinsi: t.kodeProvinsi,
         kodeKabkota: '',
         kodeKecamatan: '',
