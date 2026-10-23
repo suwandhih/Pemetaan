@@ -443,14 +443,17 @@ server. Kalau ditaruh di JavaScript, siapa pun bisa membacanya lewat
 **Sifatnya baca saja.** Daftar izin jembatan memuat 25 endpoint, **tidak ada
 satu pun endpoint tulis**. Data TokoMedia tidak mungkin berubah lewat jalur ini.
 
-**Koordinat:** API TokoMedia **tidak menyimpan lokasi**. Titik dihitung dari
-nama bahasa → provinsi (`cloudflare/peta-bahasa.js`, 430 bahasa). Bila belum
-terpetakan → titik tengah gugus pulau. Titik digeser dalam lingkaran kecil per
-provinsi dan per kategori supaya tidak bertumpuk.
+**Koordinat:** API TokoMedia **tidak menyimpan lokasi**. Titik bahasa dihitung
+dari nama bahasa → provinsi (`cloudflare/peta-bahasa.js`, 430 bahasa). Setiap
+provinsi memiliki kandidat titik yang diverifikasi berada **di dalam poligon
+daratan**; penanda tiap bahasa memilih salah satu kandidat, tanpa menggeser
+titik ke laut. Bahasa yang belum terpetakan tidak ditampilkan sebagai titik dan
+muncul dalam daftar gagal, bukan diberi lokasi perkiraan gugus.
 
-**Kelompok yang tidak punya daftar bahasa** ditangani khusus: Clip Kitab Suci
-(39 video, satu titik di Jakarta) dan Aplikasi Kitab Suci (satu titik per gugus
-pulau, di provinsi wakil gugus).
+**Kelompok yang tidak menyediakan provinsi per bahasa** ditangani secara
+terbatas: Clip Kitab Suci berbahasa Indonesia memakai titik daratan di Jakarta;
+Aplikasi Kitab Suci memakai satu titik daratan wakil untuk setiap gugus API.
+Keduanya tidak diklaim sebagai lokasi bahasa tertentu.
 
 **Tidak ada penarikan otomatis** — hanya saat tombol ditekan.
 
@@ -472,6 +475,15 @@ header `X-Pemetaan-Kunci`, dan dibandingkan dengan `hash_equals` di sisi PHP.
 Tanpa kunci yang benar → **401**.
 
 ---
+
+### Validasi titik media (perbaikan 2026-10-23)
+
+Titik anggota media dan label jangkar wajib berada di daratan provinsi yang
+sesuai. Worker memakai kandidat koordinat dari `cloudflare/peta-bahasa.js`
+yang dibangkitkan dengan menguji poligon di `data/wilayah-warna/prop-nasional.js`.
+Jangan menggeser titik memakai offset yang tidak diperiksa terhadap poligon.
+Jika nama bahasa tidak punya pemetaan provinsi, jangan memakai titik gugus/laut;
+lewati titik dan laporkan kegagalan secara eksplisit.
 
 ## 9. Jebakan teknis yang sudah pernah terjadi
 

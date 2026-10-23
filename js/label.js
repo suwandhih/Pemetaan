@@ -52,7 +52,7 @@
   var jam = null;
   var siap = false;
 
-  /* ---------- titik tengah provinsi ---------- */
+  /* ---------- titik daratan provinsi ---------- */
 
   /* Poligon Dukcapil berbentuk Polygon (satu cincin) atau MultiPolygon
      (banyak cincin). Keduanya diratakan jadi daftar cincin dulu. */
@@ -70,9 +70,19 @@
     return a / 2;
   }
 
-  /* Titik berat satu cincin (rumus titik berat poligon). Dipakai supaya
-     label jatuh di daratan utama, bukan di tengah kotak pembatas yang
-     bisa jatuh di laut — penting untuk provinsi kepulauan. */
+  function dalamRing(titik, ring) {
+    var dalam = false;
+    for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      var a = ring[i], b = ring[j];
+      if ((a[1] > titik[1]) !== (b[1] > titik[1]) &&
+          titik[0] < (b[0] - a[0]) * (titik[1] - a[1]) / (b[1] - a[1]) + a[0]) {
+        dalam = !dalam;
+      }
+    }
+    return dalam;
+  }
+
+  /* Titik berat satu cincin (rumus titik berat poligon). */
   function titikBeratRing(ring) {
     var x = 0, y = 0, a = 0;
     for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
@@ -86,7 +96,8 @@
     return [x / (6 * a), y / (6 * a)];
   }
 
-  /* Cincin terluas = daratan utama provinsi. */
+  /* Cari titik-titik di dalam poligon daratan terbesar provinsi. Grid
+     deterministik ini menghindari titik berat di laut untuk bentuk bulan sabit. */
   function titikProvinsi(d) {
     var ring = [];
     kumpulRing(d.g, ring);
@@ -96,7 +107,30 @@
       var l = Math.abs(luasRing(r));
       if (l > terluas) { terluas = l; terbaik = r; }
     });
-    return terbaik ? titikBeratRing(terbaik) : null;
+    if (!terbaik) { return null; }
+
+    var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    terbaik.forEach(function (p) {
+      minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]);
+      minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]);
+    });
+    var titik = [];
+    for (var x = 0; x < 36; x++) {
+      for (var y = 0; y < 36; y++) {
+        var p = [minX + (x + 0.5) * (maxX - minX) / 36,
+          minY + (y + 0.5) * (maxY - minY) / 36];
+        if (dalamRing(p, terbaik)) { titik.push(p); }
+      }
+    }
+    if (!titik.length) { return titikBeratRing(terbaik); }
+    var pusat = titik.reduce(function (s, p) {
+      s[0] += p[0] / titik.length; s[1] += p[1] / titik.length; return s;
+    }, [0, 0]);
+    titik.sort(function (a, b) {
+      return Math.pow(a[0] - pusat[0], 2) + Math.pow(a[1] - pusat[1], 2) -
+        (Math.pow(b[0] - pusat[0], 2) + Math.pow(b[1] - pusat[1], 2));
+    });
+    return titik[0];
   }
 
   function kodeProv(d) {
@@ -122,9 +156,12 @@
       if (URUT.indexOf(a.kategori) < 0) { return; }
       if (!hidup(a.kategori)) { return; }
       if (!hasil[kode]) {
-        hasil[kode] = { nama: a.provinsi || '', media: {} };
+        hasil[kode] = { nama: a.provinsi || '', media: {}, titik: null };
       }
       hasil[kode].media[a.kategori] = true;
+      if (!hasil[kode].titik && Number.isFinite(Number(a.lon)) && Number.isFinite(Number(a.lat))) {
+        hasil[kode].titik = [Number(a.lon), Number(a.lat)];
+      }
     });
 
     return hasil;
@@ -148,7 +185,7 @@
       var media = URUT.filter(function (n) { return p.media[n]; });
       if (!media.length) { return; }
 
-      var titik = titikProvinsi(d);
+      var titik = p.titik || titikProvinsi(d);
       if (!titik) { return; }
 
       fitur.push({

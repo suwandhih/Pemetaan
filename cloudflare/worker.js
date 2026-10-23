@@ -40,7 +40,7 @@
 */
 
 import { neon } from '@neondatabase/serverless';
-import { BAHASA, PROVINSI, GUGUS } from './peta-bahasa.js';
+import { BAHASA, PROVINSI } from './peta-bahasa.js';
 
 /* Asal yang diizinkan memanggil Worker ini. Tambahkan alamat lain
    (misal alamat uji lokal) di sini, jangan di berkas situs. */
@@ -126,9 +126,9 @@ function keSitus(b) {
    Yang diambil: 5 halaman kategori, masing-masing berisi tabel bahasa
    per gugus pulau. Cukup 5 permintaan sekali tekan tombol [Update].
 
-   Koordinat: tokomedia.org TIDAK menyimpan lokasi. Jadi titik dihitung
-   dari nama bahasa -> provinsi (cloudflare/peta-bahasa.js). Bila nama
-   bahasanya belum terpetakan, dipakai titik tengah gugus pulaunya.
+   Koordinat: tokomedia.org TIDAK menyimpan lokasi. Titik dihitung dari
+   nama bahasa -> provinsi (cloudflare/peta-bahasa.js). Jika bahasa tidak
+   terpetakan, titik dilewati dan dicatat sebagai gagal; bukan ditebak.
    ================================================================== */
 
 const KATEGORI_TM = [
@@ -143,17 +143,6 @@ const KATEGORI_TM = [
   { id: 'aplikasi', nama: 'Aplikasi Kitab Suci', ikon: 'ikon-ponsel',
     url: 'https://tokomedia.org/koleksi-aplikasi' }
 ];
-
-/* Gugus pulau -> nama yang dipakai di peta-bahasa.js */
-const GUGUS_ALIAS = {
-  'sumatera': 'Sumatera',
-  'jawa, bali, nusa tenggara': 'Jawa, Bali, Nusa Tenggara',
-  'jawa - bali - nusa tenggara': 'Jawa, Bali, Nusa Tenggara',
-  'kalimantan': 'Kalimantan',
-  'sulawesi': 'Sulawesi',
-  'maluku, papua': 'Maluku, Papua',
-  'maluku - papua': 'Maluku, Papua'
-};
 
 function bukaEntitas(t) {
   return String(t)
@@ -188,29 +177,22 @@ function bacaHalaman(html) {
   return hasil;
 }
 
-/* Titik untuk satu bahasa. Urutan: provinsi -> gugus -> tengah Indonesia. */
-function titikUntuk(nama, gugus) {
+/* Titik untuk satu bahasa. Bahasa harus punya provinsi yang terverifikasi;
+   tidak memakai titik gugus/Indonesia karena dapat jatuh di laut. */
+function titikUntuk(nama) {
   const kode = BAHASA[nama];
-  if (kode && PROVINSI[kode]) {
-    return {
-      lon: PROVINSI[kode].lon,
-      lat: PROVINSI[kode].lat,
-      kodeProvinsi: kode,
-      provinsi: PROVINSI[kode].n,
-      cara: 'provinsi'
-    };
+  const provinsi = kode && PROVINSI[kode];
+  if (!provinsi) {
+    return { lon: null, lat: null, kodeProvinsi: '', provinsi: '', cara: 'tidak-terpetakan' };
   }
-  const kunci = GUGUS_ALIAS[String(gugus || '').toLowerCase()];
-  if (kunci && GUGUS[kunci]) {
-    return {
-      lon: GUGUS[kunci].lon,
-      lat: GUGUS[kunci].lat,
-      kodeProvinsi: '',
-      provinsi: '',
-      cara: 'gugus'
-    };
-  }
-  return { lon: 118, lat: -2.5, kodeProvinsi: '', provinsi: '', cara: 'indonesia' };
+  return {
+    lon: provinsi.lon,
+    lat: provinsi.lat,
+    kodeProvinsi: kode,
+    provinsi: provinsi.n,
+    posisi: provinsi.p || [[provinsi.lon, provinsi.lat]],
+    cara: 'provinsi'
+  };
 }
 
 function inisialDari(nama) {
@@ -218,26 +200,16 @@ function inisialDari(nama) {
   return (bersih.slice(0, 2) || '??').toUpperCase();
 }
 
-/* Geser titik sedikit supaya anggota dari provinsi yang sama tidak
-   bertumpuk tepat di satu titik. Jari-jari 0,12 derajat ≈ 13 km —
-   masih di dalam provinsi. */
+/* Pilih titik penanda dari titik-titik yang telah diverifikasi di daratan
+   provinsi. Tidak ada offset geometri yang bisa menggeser penanda ke laut. */
 function geser(titik, urutan, jumlah, geserSudut, jari) {
-  if (jumlah <= 1 && !jari) { return titik; }
-  const sudut = (2 * Math.PI * urutan) / Math.max(jumlah, 1) - Math.PI / 2 + (geserSudut || 0);
-  const r = jari || 0.12;
-  return {
-    lon: Math.round((titik.lon + r * Math.cos(sudut)) * 10000) / 10000,
-    lat: Math.round((titik.lat + r * Math.sin(sudut)) * 10000) / 10000
-  };
+  const posisi = titik.posisi || [[titik.lon, titik.lat]];
+  const dipilih = posisi[(urutan + Math.floor((geserSudut || 0) * posisi.length / (2 * Math.PI))) % posisi.length];
+  return { lon: dipilih[0], lat: dipilih[1] };
 }
 
-/* Sebar anggota satu kategori yang berada di provinsi sama ke lingkaran
-   kecil. Tanpa ini, semua bahasa dari satu provinsi menumpuk di satu
-   titik dan hanya terlihat sebagai satu penanda.
-
-   `putaran` (0..1) menggeser sudut lingkaran per kategori, dan `jari`
-   membuat jari-jari berbeda per kategori — supaya anggota dari kategori
-   berbeda tidak bertumpuk di titik yang sama. */
+/* Sebar bahasa pada kandidat daratan provinsinya agar tidak menumpuk.
+   Tiap kategori menggunakan urutan kandidat yang berbeda. */
 function sebarPerProvinsi(daftar, putaran, jari) {
   const grup = {};
   daftar.forEach(function (a) {
@@ -249,7 +221,7 @@ function sebarPerProvinsi(daftar, putaran, jari) {
   Object.keys(grup).forEach(function (k) {
     const isi = grup[k];
     isi.forEach(function (a, i) {
-      const t = geser({ lon: a.lon, lat: a.lat }, i, isi.length, geserSudut, jari);
+      const t = geser({ lon: a.lon, lat: a.lat, posisi: a.posisi }, i, isi.length, geserSudut, jari);
       a.lon = t.lon;
       a.lat = t.lat;
     });
@@ -290,7 +262,11 @@ async function tarikTokomedia(pilih) {
     }
 
     daftar.forEach(function (b) {
-      const t = titikUntuk(b.nama, b.gugus);
+      const t = titikUntuk(b.nama);
+      if (t.cara !== 'provinsi') {
+        gagal.push(kat.nama + ' / ' + b.nama + ': bahasa belum terpetakan ke provinsi; titik tidak ditampilkan');
+        return;
+      }
       urut += 1;
       anggota.push({
         id: 'tm-' + kat.id + '-' + String(urut).padStart(4, '0'),
@@ -302,11 +278,12 @@ async function tarikTokomedia(pilih) {
           { label: 'Bahasa', nilai: b.nama },
           { label: 'Kategori', nilai: kat.nama },
           { label: 'Gugus', nilai: b.gugus },
-          { label: 'Provinsi', nilai: t.provinsi || '(perkiraan gugus)' },
+          { label: 'Provinsi', nilai: t.provinsi },
           { label: 'Sumber', nilai: 'https://tokomedia.org' + b.url }
         ],
         lon: t.lon,
         lat: t.lat,
+        posisi: t.posisi,
         kodeProvinsi: t.kodeProvinsi,
         kodeKabkota: '',
         kodeKecamatan: '',
@@ -318,9 +295,7 @@ async function tarikTokomedia(pilih) {
       });
     });
 
-    /* Sebar anggota kategori ini supaya tidak menumpuk per provinsi.
-       Sudut dan jari lingkaran berbeda per kategori. */
-    sebarPerProvinsi(anggota.slice(-daftar.length), i / dipakai.length, 0.12 + i * 0.06);
+    sebarPerProvinsi(anggota.slice(awal), i / dipakai.length, 0);
   }
 
   return { anggota: anggota, gagal: gagal };
@@ -360,9 +335,9 @@ const GRUP_RUMAHWEB = [
   { id: 126, nama: 'Video Kitab Suci', ikon: 'ikon-kamera' }
 ];
 
-/* Aplikasi Kitab Suci tidak punya daftar bahasa — API hanya memberi
-   daftar aplikasi per gugus pulau. Titiknya ditaruh di satu provinsi
-   wakil tiap gugus, supaya ikut muncul di peta bersama labelnya. */
+/* Aplikasi Kitab Suci tidak memberi provinsi tiap bahasa. Untuk saat ini
+   tampilkan satu titik per gugus di provinsi wakil yang berada di daratan;
+   jangan mengklaimnya sebagai lokasi bahasa tertentu. */
 const AREA_APLIKASI = [
   { id: 'sumatera', gugus: 'Sumatera', kode: '11' },
   { id: 'jawa', gugus: 'Jawa, Bali, Nusa Tenggara', kode: '31' },
@@ -371,8 +346,8 @@ const AREA_APLIKASI = [
   { id: 'maluku', gugus: 'Maluku, Papua', kode: '94' }
 ];
 
-/* Clip Kitab Suci juga tidak punya daftar bahasa — isinya 39 video
-   pendek berbahasa Indonesia. Titiknya di Jakarta (pusat nasional). */
+/* Clip Kitab Suci yang saat ini tersedia berupa konten berbahasa Indonesia;
+   karena sumber tidak memberi provinsi, titik wakil diletakkan di Jakarta. */
 const KODE_CLIP = '31';
 
 async function panggilRumahweb(env, jalur, isi) {
@@ -419,11 +394,11 @@ async function tarikRumahweb(env, pilih) {
 
     const awal = anggota.length;
     jawab.data.forEach(function (b) {
-      const t = titikUntuk(b.name, b.region);
-      /* Bahasa yang tidak punya provinsi dan tidak punya gugus asli
-         (mis. "Clip Kitab Suci Indonesia") dilewati — titiknya akan
-         jatuh di tengah laut dan menyesatkan. */
-      if (t.cara === 'indonesia') { return; }
+      const t = titikUntuk(b.name);
+      if (t.cara !== 'provinsi') {
+        gagal.push(grup.nama + ' / ' + b.name + ': bahasa belum terpetakan ke provinsi; titik tidak ditampilkan');
+        return;
+      }
 
       urut += 1;
       anggota.push({
@@ -436,11 +411,12 @@ async function tarikRumahweb(env, pilih) {
           { label: 'Bahasa', nilai: b.name },
           { label: 'Kategori', nilai: grup.nama },
           { label: 'Gugus', nilai: b.region || '' },
-          { label: 'Provinsi', nilai: t.provinsi || '(perkiraan gugus)' },
+          { label: 'Provinsi', nilai: t.provinsi },
           { label: 'Sumber', nilai: 'https://tokomedia.org/' + (b.slug || '') }
         ],
         lon: t.lon,
         lat: t.lat,
+        posisi: t.posisi,
         kodeProvinsi: t.kodeProvinsi,
         kodeKabkota: '',
         kodeKecamatan: '',
@@ -459,8 +435,8 @@ async function tarikRumahweb(env, pilih) {
     sebarPerProvinsi(anggota.slice(awal), i / dipakai.length, 0.12 + i * 0.06);
   }
 
-  /* Aplikasi Kitab Suci — satu titik per gugus pulau, ditaruh di
-     provinsi wakil gugus supaya labelnya ikut muncul di peta. */
+  /* Aplikasi Kitab Suci — sumber hanya memberi gugus pulau, bukan provinsi
+     bahasa. Titik wakil setiap gugus berada di daratan provinsi wakil. */
   if (!pilih || !pilih.length || pilih.indexOf('Aplikasi Kitab Suci') >= 0) {
     for (let j = 0; j < AREA_APLIKASI.length; j++) {
       const area = AREA_APLIKASI[j];
@@ -491,6 +467,7 @@ async function tarikRumahweb(env, pilih) {
         ],
         lon: titik.lon,
         lat: titik.lat,
+        posisi: titik.p,
         kodeProvinsi: area.kode,
         kodeKabkota: '',
         kodeKecamatan: '',
@@ -503,8 +480,8 @@ async function tarikRumahweb(env, pilih) {
     }
   }
 
-  /* Clip Kitab Suci — 39 video pendek berbahasa Indonesia. Tidak ada
-     daftar bahasa, jadi satu titik di Jakarta. */
+  /* Clip Kitab Suci — sumber saat ini menyajikan konten Indonesia, bukan
+     pemetaan provinsi. Titik wakil memakai kandidat daratan Jakarta. */
   if (!pilih || !pilih.length || pilih.indexOf('Clip Kitab Suci') >= 0) {
     let jawab = null;
     try {
@@ -529,6 +506,7 @@ async function tarikRumahweb(env, pilih) {
         ],
         lon: titik.lon,
         lat: titik.lat,
+        posisi: titik.p,
         kodeProvinsi: KODE_CLIP,
         kodeKabkota: '',
         kodeKecamatan: '',

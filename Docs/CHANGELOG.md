@@ -29,6 +29,42 @@ Repo: https://github.com/suwandhih/Pemetaan
 2026-10-17 → 22 commit · 2026-10-18 → 4 commit · 2026-10-22 → 7 commit.
 ---
 
+## 2026-10-23
+
+### Orderan 28 — media diposisikan di daratan provinsi
+
+**Perbaikan.** Titik media sebelumnya memakai tengah kotak batas provinsi dan
+digeser dengan jarak tetap; untuk provinsi kepulauan/bentuk pesisir, hasilnya
+bisa berada di laut. Penempatan Film Isa Al-Masih, Film Ikatan Ilahi, Video
+Kitab Suci, Clip Kitab Suci, dan Aplikasi Kitab Suci kini memakai kandidat
+titik daratan hasil pemeriksaan geometri provinsi. Label jangkar memakai
+koordinat anggota yang sama.
+
+- `alat/buat-peta-bahasa.js` membangkitkan 48 kandidat titik daratan per provinsi
+  dari poligon Dukcapil, memvalidasi kandidat setelah pembulatan, serta memilih
+  lokasi yang tersebar untuk bahasa-bahasa di provinsi yang sama.
+- `cloudflare/worker.js` tidak lagi memakai titik gugus/Indonesia untuk bahasa
+  yang tidak cocok dengan provinsi; bahasa tersebut tidak ditampilkan dan
+  dicatat sebagai gagal, bukan ditempatkan secara perkiraan.
+- `js/label.js` memakai titik anggota sebagai jangkar label bila tersedia.
+- `cloudflare/peta-bahasa.js` dibangkitkan ulang: 430 nama bahasa dan 38
+  provinsi.
+
+**Verifikasi lokal:** 1.824 kandidat di 38 provinsi diuji terhadap poligon
+masing-masing; 0 titik di luar daratan. `node --check` untuk Worker, generator,
+dan label lulus; `wrangler deploy --config cloudflare/wrangler.toml --dry-run`
+lulus (272,58 KiB, tanpa publikasi).
+
+**Batas verifikasi sumber:** endpoint Rumahweb memerlukan kunci yang tidak
+tersedia pada sesi ini (401), jadi data baru lima kategori belum ditarik dan
+belum diunggah ke Worker produksi/Neon. Halaman publik yang dapat diakses
+menunjukkan kategori tertentu tidak menerbitkan pemetaan bahasa-provinsi
+lengkap; bahasa tanpa pemetaan eksplisit akan ditandai gagal, bukan dikarang.
+Orderan berstatus **DIKERJAKAN** sampai penarikan data dan verifikasi produksi
+bisa dilakukan.
+
+---
+
 ## 2026-10-22
 
 ### Orderan 27 — Pemetaan memakai 2 server (Neon + Rumahweb)
