@@ -201,7 +201,14 @@ const isi = [
 const tujuan = path.join(AKAR, 'cloudflare', 'peta-bahasa.js');
 fs.writeFileSync(tujuan, isi, 'utf8');
 
+const tujuanSitus = path.join(AKAR, 'data', 'peta-bahasa.js');
+fs.writeFileSync(tujuanSitus,
+  '/* Daftar bahasa -> kode provinsi untuk laporan dashboard. Dibangkitkan oleh alat/buat-peta-bahasa.js. */\n' +
+  'window.PETA_BAHASA = ' + JSON.stringify(bahasa) + ';\n', 'utf8');
+
 console.log('OK  ' + Object.keys(bahasa).length + ' bahasa · ' +
   Object.keys(PROVINSI).length + ' provinsi · ' + Object.keys(GUGUS).length + ' gugus');
 console.log('    -> ' + path.relative(AKAR, tujuan) +
   ' (' + Math.round(fs.statSync(tujuan).size / 1024) + ' KB)');
+console.log('    -> ' + path.relative(AKAR, tujuanSitus) +
+  ' (' + Math.round(fs.statSync(tujuanSitus).size / 1024) + ' KB)');

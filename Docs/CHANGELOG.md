@@ -31,6 +31,38 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 ## 2026-10-23
 
+### Orderan 29 — Dashboard laporan cakupan layanan
+
+**Baru.** Tombol Dashboard pada bilah atas membuka report manajemen dengan
+filter seluruh Indonesia atau lima gugus pulau.
+
+- Kartu ringkasan, jumlah per kategori media, tabel rincian 38 provinsi, serta
+  kategori anggota non-media per provinsi.
+- Perbandingan katalog baca-saja API Rumahweb dengan record per kategori untuk
+  menampilkan bahasa referensi yang belum tercatat. Bahasa sumber yang tidak
+  memiliki provinsi ditampilkan pada tingkat gugus dan tidak ditebak sebagai
+  titik/provinsi tertentu.
+- Matriks indikasi cakupan suku memakai pemetaan kawasan BPS SP2010 yang sama
+  dengan panel Suku, dengan peringatan bahwa irisan wilayah bukan bukti layanan
+  diterima oleh suku atau individu.
+- Katalog nama bahasa 430 entri dibangkitkan sebagai `data/peta-bahasa.js`
+  untuk pemakaian report di situs statis.
+- Panel responsif untuk HP/PC, dapat ditutup lewat Escape/klik luar, dan fokus
+  keyboard dikembalikan ke tombol Dashboard.
+- Definisi metrik: [`dashboard-cakupan.md`](./dashboard-cakupan.md).
+
+**Verifikasi lokal:** `node --check` untuk `js/dashboard.js`, `js/suku.js`, dan
+`alat/buat-peta-bahasa.js`; pembangkit menghasilkan 430 bahasa; uji browser
+memverifikasi tombol, semua kartu, tabel 38 provinsi, filter pulau, rincian
+bahasa/gugus, peringatan suku, serta fokus setelah panel ditutup. Uji drawer
+HP pada CSS viewport 344 px: toolbar 344 px, tombol dashboard di dalam bingkai;
+0 galat runtime baru.
+
+**Status implementasi:** selesai di workspace, belum dipublikasikan atau diuji
+terhadap sesi data produksi pengguna pada deployment.
+
+---
+
 ### Orderan 28 — media diposisikan di daratan provinsi
 
 **Perbaikan.** Titik media sebelumnya memakai tengah kotak batas provinsi dan

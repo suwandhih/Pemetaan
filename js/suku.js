@@ -631,7 +631,8 @@
     matikan: matikan,
     aktif: function () { return aktif !== null; },
     tutupPanel: function () { bukaTutup(false); },
-    SUKU: SUKU
+    SUKU: SUKU,
+    kodeUntukKawasan: kodeKawasan
   };
 
   /* ---------- mulai ---------- */

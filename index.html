@@ -8,8 +8,8 @@
 <!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
      tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
      sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
-<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261023-01">
-<link rel="stylesheet" href="css/gaya.css?v=20261023-01">
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261023-05">
+<link rel="stylesheet" href="css/gaya.css?v=20261023-05">
 </head>
 <body>
 
@@ -46,6 +46,8 @@
             title="Media on/off — pilih kelompok media yang tampil di peta">
       <span id="media-ikon">&#128250;</span>
     </button>
+    <button id="tombol-dashboard" type="button" aria-label="Dashboard cakupan layanan"
+            title="Dashboard cakupan layanan">&#9635;</button>
     <button id="tombol-cari" type="button" aria-label="Cari wilayah, anggota, atau nama jalan"
             title="Cari wilayah, anggota, atau nama jalan">&#9906;</button>
     <button id="tombol-panduan" type="button" aria-haspopup="dialog" aria-expanded="false"
@@ -100,6 +102,31 @@
           titik penanda ditaruh di titik tengah kawasan.</p>
         <button id="suku-mati" type="button" hidden>Matikan peta suku</button>
       </div>
+    </aside>
+
+    <!-- Orderan 29: report manajemen cakupan media, anggota, dan suku. -->
+    <aside id="panel-dashboard" hidden aria-hidden="true" aria-label="Dashboard cakupan layanan">
+      <div id="dashboard-kepala">
+        <div>
+          <p class="dashboard-eyebrow">LAPORAN MANAJEMEN</p>
+          <h2 id="dashboard-judul">Cakupan layanan</h2>
+          <p id="dashboard-subjudul">Ringkasan berdasarkan data yang tercatat</p>
+        </div>
+        <button id="dashboard-tutup" type="button" aria-label="Tutup dashboard">&#10005;</button>
+      </div>
+      <div id="dashboard-filter">
+        <label for="dashboard-pulau">Wilayah laporan</label>
+        <select id="dashboard-pulau" aria-label="Pilih gugus pulau">
+          <option value="semua">Seluruh Indonesia</option>
+          <option value="sumatera">Sumatera</option>
+          <option value="jawa">Jawa, Bali &amp; Nusa Tenggara</option>
+          <option value="kalimantan">Kalimantan</option>
+          <option value="sulawesi">Sulawesi</option>
+          <option value="maluku">Maluku &amp; Papua</option>
+        </select>
+      </div>
+      <div id="dashboard-status" role="status" aria-live="polite"></div>
+      <div id="dashboard-isi"></div>
     </aside>
 
     <!-- Orderan 16: keterangan angka saat satu wilayah diklik -->
@@ -236,20 +263,22 @@
   <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
 </div>
 
-<script src="js/lib/maplibre-gl.js?v=20261023-01"></script>
-<script src="data/wilayah-warna/prop-nasional.js?v=20261023-01"></script>
-<script src="data/wilayah-warna/kab-nasional.js?v=20261023-01"></script>
-<script src="js/inti.js?v=20261023-01"></script>
-<script src="js/warna.js?v=20261023-01"></script>
-<script src="js/agama.js?v=20261023-01"></script>
-<script src="js/suku.js?v=20261023-01"></script>
-<script src="js/simpanan.js?v=20261023-01"></script>
-<script src="js/ikon.js?v=20261023-01"></script>
-<script src="js/member.js?v=20261023-01"></script>
-<script src="js/media.js?v=20261023-01"></script>
-<script src="js/label.js?v=20261023-01"></script>
-<script src="js/tokomedia.js?v=20261023-01"></script>
-<script src="js/cari.js?v=20261023-01"></script>
-<script src="js/panduan.js?v=20261023-01"></script>
+<script src="js/lib/maplibre-gl.js?v=20261023-05"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261023-05"></script>
+<script src="data/peta-bahasa.js?v=20261023-05"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261023-05"></script>
+<script src="js/inti.js?v=20261023-05"></script>
+<script src="js/warna.js?v=20261023-05"></script>
+<script src="js/agama.js?v=20261023-05"></script>
+<script src="js/suku.js?v=20261023-05"></script>
+<script src="js/simpanan.js?v=20261023-05"></script>
+<script src="js/ikon.js?v=20261023-05"></script>
+<script src="js/member.js?v=20261023-05"></script>
+<script src="js/media.js?v=20261023-05"></script>
+<script src="js/label.js?v=20261023-05"></script>
+<script src="js/tokomedia.js?v=20261023-05"></script>
+<script src="js/cari.js?v=20261023-05"></script>
+<script src="js/panduan.js?v=20261023-05"></script>
+<script src="js/dashboard.js?v=20261023-05"></script>
 </body>
 </html>
