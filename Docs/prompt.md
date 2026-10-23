@@ -448,7 +448,9 @@ dari nama bahasa → provinsi (`cloudflare/peta-bahasa.js`, 430 bahasa). Setiap
 provinsi memiliki kandidat titik yang diverifikasi berada **di dalam poligon
 daratan**; penanda tiap bahasa memilih salah satu kandidat, tanpa menggeser
 titik ke laut. Bahasa yang belum terpetakan tidak ditampilkan sebagai titik dan
-muncul dalam daftar gagal, bukan diberi lokasi perkiraan gugus.
+muncul dalam daftar gagal, bukan diberi lokasi perkiraan gugus. Catatan kategori
+wilayah seperti `Indonesia`, `Kalimantan` atau `Maluku - Papua` yang bukan bahasa
+provinsi disimpan tanpa koordinat sehingga tidak menghasilkan penanda laut.
 
 **Kelompok yang tidak menyediakan provinsi per bahasa** ditangani secara
 terbatas: Clip Kitab Suci berbahasa Indonesia memakai titik daratan di Jakarta;

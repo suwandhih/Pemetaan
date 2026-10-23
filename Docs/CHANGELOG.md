@@ -55,13 +55,19 @@ masing-masing; 0 titik di luar daratan. `node --check` untuk Worker, generator,
 dan label lulus; `wrangler deploy --config cloudflare/wrangler.toml --dry-run`
 lulus (272,58 KiB, tanpa publikasi).
 
-**Batas verifikasi sumber:** endpoint Rumahweb memerlukan kunci yang tidak
-tersedia pada sesi ini (401), jadi data baru lima kategori belum ditarik dan
-belum diunggah ke Worker produksi/Neon. Halaman publik yang dapat diakses
-menunjukkan kategori tertentu tidak menerbitkan pemetaan bahasa-provinsi
-lengkap; bahasa tanpa pemetaan eksplisit akan ditandai gagal, bukan dikarang.
-Orderan berstatus **DIKERJAKAN** sampai penarikan data dan verifikasi produksi
-bisa dilakukan.
+**Batas verifikasi sumber:** data sumber tidak menyediakan provinsi untuk enam
+entri: Indonesia (Film Isa, Film Ikatan Ilahi, Video Kitab Suci, dan Video
+Kitab Suci Indonesia), Kalimantan (Film Ikatan Ilahi), serta Maluku - Papua
+(Film Ikatan Ilahi). Enam entri dipertahankan untuk jejak sumber tetapi disimpan
+tanpa koordinat dan tidak tampil sebagai titik; provinsinya tidak ditebak.
+
+**Uji produksi (2026-10-23):** tombol [↻ Update] → 300 record awal diterima.
+Setelah Worker terbaru dideploy, penarikan ulang menyimpan **304 record**
+(178 Film Isa, 11 Film Ikatan Ilahi, 109 Video Kitab Suci, 1 Clip, 5 Aplikasi),
+dengan enam entri di atas tanpa titik. Pemeriksaan setiap koordinat media yang
+memiliki provinsi terhadap poligon provinsinya menghasilkan **0 titik di luar
+daratan**. Sambungan Neon aktif. Token aplikasi dan kunci jembatan tidak
+ditampilkan; API Rumahweb dipakai hanya baca.
 
 ---
 
