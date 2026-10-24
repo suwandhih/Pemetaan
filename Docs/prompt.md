@@ -292,6 +292,16 @@ selalu disertai angka tekstual. Modul `hitung()` murni dapat diuji di Node;
 modul tidak mengambil API sendiri dan hanya menerima hasil read-only dari
 `js/datapemetaan.js`.
 
+**Snapshot live (2026-10-24):** `data/datapemetaan/snapshot-media.json` berisi
+304 rekaman katalog bahasa/produk yang dibaca read-only melalui koneksi
+Pemetaan → Worker → Rumahweb → API TokoMedia. Pembacaan selesai dalam 4,272
+detik. Report memuat snapshot bersama indeks/bahasa; tidak memanggil API secara
+otomatis setiap halaman dibuka. Tombol pembaruan manual tetap membaca katalog
+terbaru dan mengganti tampilan selama sesi tersebut. Enam catatan lokasi
+nasional/gugus sudah termasuk dalam 304 rekaman dan bukan kegagalan kategori.
+Hasil: 212/341 target ada isi (62,2%), 129 belum, 6 lengkap, 206 sebagian,
+731 pasangan produk inti kurang. Ini bukan inventaris seluruh judul video.
+
 ### 4.5 Sumber data
 
 | Data | Sumber | Cara ambil |

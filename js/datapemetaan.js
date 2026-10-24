@@ -8,7 +8,7 @@
   var URL_WORKER = 'https://pemetaan-api.suwandhih.workers.dev';
   var KUNCI = 'pemetaan_kunci';
   var dasar = new URL('.', location.href).href;
-  var indeks = null, tersimpan = [], katalog = null, gagalMedia = [];
+  var indeks = null, tersimpan = [], katalog = null, gagalMedia = [], waktuSnapshot = '';
   var cache = {}, bahasaSuku = {}, tab = 'wilayah', fokusSebelum = null, bahasaTerbuka = {}, tokenDetail = 0;
   var elStatus = document.getElementById('status');
   var elDetail = document.getElementById('detail');
@@ -250,9 +250,10 @@
     if (!window.AnalisisMedia || !indeks) { return; }
     window.AnalisisMedia.perbarui({ indeks: indeks, bahasaSuku: bahasaSuku, katalog: katalog, tersimpan: tersimpan, gagalMedia: gagalMedia });
     var statusAnalisis = document.getElementById('status-analisis');
-    if (statusAnalisis) { statusAnalisis.textContent = katalog ? gagalMedia.length ? 'Sebagian katalog gagal dibaca: ' + gagalMedia.join(' · ') + '. Hasil bersifat sementara; tidak ada data yang ditulis.' : 'Katalog API terbaru sudah dibandingkan; tidak ada data yang ditulis.' : 'Target 341 bahasa unik dari 430 entri katalog. Baca katalog untuk menghitung kekurangan produk.'; }
+    if (statusAnalisis) { statusAnalisis.textContent = katalog ? gagalMedia.length ? 'Sebagian katalog gagal dibaca: ' + gagalMedia.join(' · ') + '. Hasil bersifat sementara; tidak ada data yang ditulis.' : (waktuSnapshot ? 'Snapshot live ' + new Date(waktuSnapshot).toLocaleString('id-ID') + ' · ' : 'Katalog API terbaru · ') + katalog.length + ' rekaman katalog; tanpa penulisan data.' : 'Target 341 bahasa unik dari 430 entri katalog. Baca katalog untuk menghitung kekurangan produk.'; }
   }
   function muatMedia(manual) {
+    waktuSnapshot = '';
     return mintaKunci().then(function (ok) {
       if (!ok) { pesanMedia('Kode database diperlukan untuk membaca media.'); return null; }
       pesanMedia('Membaca data tersimpan…'); document.getElementById('muat-media').disabled = true;
@@ -467,11 +468,10 @@
     });
   }
   function mulai() {
-    pasang(); Promise.all([ambil('indeks.json'), ambil('bahasa-suku.json')]).then(function (d) {
-      indeks = d[0]; bahasaSuku = d[1]; status('');
+    pasang(); Promise.all([ambil('indeks.json'), ambil('bahasa-suku.json'), ambil('snapshot-media.json')]).then(function (d) {
+      indeks = d[0]; bahasaSuku = d[1]; katalog = bersihkanDaftar(d[2].katalog); gagalMedia = d[2].gagal || []; waktuSnapshot = d[2].diambil; status('');
       document.getElementById('status-sumber').textContent = 'Dukcapil ' + indeks.sumber.wilayah + ' · rincian dimuat saat diklik';
       daftarProvinsi(); gambarAgama(); gambarSumber(); perbaruiAnalisis(); gantiTab('wilayah');
-      if (dapatKunci()) { muatMedia(false); }
     }).catch(function (e) { status('Laporan tidak dapat dimuat: ' + e.message, true); });
   }
   mulai();

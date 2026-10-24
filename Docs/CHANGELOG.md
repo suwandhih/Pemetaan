@@ -31,6 +31,35 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 ## 2026-10-24
 
+### Orderan 32 — Snapshot live langsung ke report inti
+
+Atas persetujuan pemilik 18:17 WIB, pendekatan langsung menggantikan proses yang
+sebelumnya dihentikan. Katalog live dibaca sekali melalui koneksi browser
+Pemetaan yang sudah ada, tanpa membangun jalur server baru dan tanpa menulis ke
+produksi. Pembacaan selesai dalam **4,272 detik**.
+
+- Snapshot: **304 rekaman** (178 Film Isa, 11 Film Ikatan Ilahi, 109 Video
+  Kitab Suci, 1 Clip, 5 Aplikasi), disimpan pada
+  `data/datapemetaan/snapshot-media.json` tanpa koordinat peta berulang.
+- Enam entri nasional/gugus sudah termasuk 304 rekaman; catatan “tanpa titik
+  pada peta” bukan kegagalan membaca kategori dan tidak membuat hasil parsial.
+- Hasil perbandingan: **341 target unik; 212 ada isi (62,2%); 129 belum;
+  6 lengkap; 206 sebagian; 731 pasangan bahasa × produk inti belum tersedia**.
+  Film Isa memenuhi 177 target, Film Ikatan Ilahi 8, Video Kitab Suci 107.
+- Angka adalah ketersediaan pada katalog bahasa/produk live, bukan inventaris
+  seluruh judul video dan bukan jumlah desa yang harus memiliki produk.
+- `datapemetaan.html` membaca snapshot bersama indeks/bahasa; tidak ada panggilan
+  API otomatis setiap halaman dibuka. Pembaruan manual tetap tersedia dan
+  menggantikan tampilan dengan hasil katalog terbaru selama sesi tersebut.
+  Pemeriksaan browser live-snapshot lulus 12 pemeriksaan dalam 3,170 detik:
+  angka nasional, grafik, 38 provinsi, rincian bahasa, tampilan ponsel, 0 galat
+  runtime, dan 0 panggilan API otomatis. Server pratinjau dihentikan setelah uji.
+- Hasil sebelumnya belum dikonfirmasi dan order sempat `DITUNDA`; setelah
+  pendekatan langsung disetujui status menjadi **MENUNGGU KONFIRMASI**, bukan
+  `SELESAI`. Tidak ada push dalam pekerjaan ini.
+
+---
+
 ### Orderan 32 — Dasbor Target vs Produk & Kesenjangan Media
 
 **Baru.** Tab **Target & produk** pada `datapemetaan.html` mengukur sejauh
