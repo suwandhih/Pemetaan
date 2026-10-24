@@ -44,7 +44,7 @@
   function ambil(nama) {
     if (cache[nama]) { return cache[nama]; }
     status('Memuat rincian ' + nama.replace(/\.json$/, '') + '…');
-    cache[nama] = fetch(dasar + 'data/datapemetaan/' + nama + '?v=20261024-04', { cache: 'no-cache' }).then(function (r) {
+    cache[nama] = fetch(dasar + 'data/datapemetaan/' + nama + '?v=20261024-05', { cache: 'no-cache' }).then(function (r) {
       if (!r.ok) { throw new Error('Berkas ' + nama + ' tidak ditemukan (' + r.status + ').'); }
       return r.json();
     }).then(function (d) { status(''); return d; }).catch(function (e) {
@@ -127,7 +127,11 @@
       }); w.appendChild(ringkas);
       var h = el('section', 'kelompok'); h.appendChild(el('h3', '', 'Penduduk & agama')); h.appendChild(agama(d.provinsi.agama)); w.appendChild(h);
       var b = el('section', 'kelompok'); b.appendChild(el('h3', '', 'Bahasa & media')); b.appendChild(el('p', '', d.provinsi.bahasa.length + ' bahasa dalam katalog Pemetaan.'));
-      var tombol = el('button', 'tombol utama', 'Bandingkan ' + d.provinsi.bahasa.length + ' bahasa'); tombol.type = 'button'; tombol.addEventListener('click', function () { tutupDetail(); gantiTab('bahasa'); bahasaTerbuka[pk] = true; gambarBahasa(); document.getElementById('bahasa-' + pk).scrollIntoView(); }); b.appendChild(tombol); w.appendChild(b);
+      var tombol = el('button', 'tombol utama', 'Bandingkan ' + d.provinsi.bahasa.length + ' bahasa'); tombol.type = 'button'; tombol.addEventListener('click', function () { tutupDetail(); gantiTab('bahasa'); bahasaTerbuka[pk] = true; gambarBahasa(); document.getElementById('bahasa-' + pk).scrollIntoView(); }); b.appendChild(tombol);
+      if (window.AnalisisMedia && window.AnalisisMedia.bukaProvinsi) {
+        var analisis = el('button', 'tombol', 'Lihat target & produk'); analisis.type = 'button'; analisis.addEventListener('click', function () { tutupDetail(); window.AnalisisMedia.bukaProvinsi(pk); }); b.appendChild(analisis);
+      }
+      w.appendChild(b);
       var s = el('section', 'kelompok'); s.appendChild(el('h3', '', 'Kawasan suku BPS SP2010'));
       d.provinsi.suku.forEach(function (x) { s.appendChild(el('p', '', x.nama + ' — ' + x.kawasan.join(', '))); });
       s.appendChild(el('p', 'catatan', 'Kawasan utama bukan batas sebaran pasti atau tempat tinggal setiap anggota suku. Tidak ada jumlah penduduk suku per provinsi pada sumber ini.')); w.appendChild(s);
@@ -242,14 +246,20 @@
       if (!h.ok) { throw new Error(h.pesan || 'Worker menolak permintaan.'); } return h;
     }).finally(function () { clearTimeout(timer); });
   }
+  function perbaruiAnalisis() {
+    if (!window.AnalisisMedia || !indeks) { return; }
+    window.AnalisisMedia.perbarui({ indeks: indeks, bahasaSuku: bahasaSuku, katalog: katalog, tersimpan: tersimpan, gagalMedia: gagalMedia });
+    var statusAnalisis = document.getElementById('status-analisis');
+    if (statusAnalisis) { statusAnalisis.textContent = katalog ? gagalMedia.length ? 'Sebagian katalog gagal dibaca: ' + gagalMedia.join(' · ') + '. Hasil bersifat sementara; tidak ada data yang ditulis.' : 'Katalog API terbaru sudah dibandingkan; tidak ada data yang ditulis.' : 'Target 341 bahasa unik dari 430 entri katalog. Baca katalog untuk menghitung kekurangan produk.'; }
+  }
   function muatMedia(manual) {
     return mintaKunci().then(function (ok) {
       if (!ok) { pesanMedia('Kode database diperlukan untuk membaca media.'); return null; }
       pesanMedia('Membaca data tersimpan…'); document.getElementById('muat-media').disabled = true;
       var janjiTersimpan = panggilWorker('ambilSemua').then(function (h) { tersimpan = bersihkanDaftar(h.anggota); }).catch(function (e) { tersimpan = []; pesanMedia(e.message, true); });
-      var janjiKatalog = panggilWorker('tarikRumahweb').then(function (h) { katalog = h.anggota; gagalMedia = h.gagal || []; }).catch(function (e) { katalog = null; gagalMedia = []; pesanMedia('Katalog API tidak dapat dibaca: ' + e.message, true); });
+      var janjiKatalog = panggilWorker('tarikRumahweb').then(function (h) { katalog = bersihkanDaftar(h.anggota); gagalMedia = h.gagal || []; }).catch(function (e) { katalog = null; gagalMedia = []; pesanMedia('Katalog API tidak dapat dibaca: ' + e.message, true); });
       return Promise.all([janjiTersimpan, janjiKatalog]).then(function () {
-        gambarMedia(); gambarBahasa(); pesanMedia((katalog ? 'Katalog API diperbarui. ' : 'Katalog API belum tersedia; data tersimpan dimuat. ') + tersimpan.length + ' record media; tidak ada data yang ditulis ke TokoMedia.');
+        gambarMedia(); gambarBahasa(); perbaruiAnalisis(); pesanMedia((katalog ? 'Katalog API diperbarui. ' : 'Katalog API belum tersedia; data tersimpan dimuat. ') + tersimpan.length + ' record media; tidak ada data yang ditulis ke TokoMedia.' + (katalog && gagalMedia.length ? ' Peringatan: sebagian katalog gagal dibaca; hasil analisis bersifat sementara.' : ''));
       }).finally(function () { document.getElementById('muat-media').disabled = false; });
     });
   }
@@ -302,6 +312,7 @@
   }
   function gambarBahasaProvinsi(pk) {
     var d = document.getElementById('daftar-bahasa'), p = indeks.provinsi[pk];
+    if (!p || !bahasaSuku[pk]) { return; }
     var kata = document.getElementById('cari-bahasa').value.toLocaleLowerCase('id-ID').trim();
     var namaBahasa = (bahasaSuku[pk].bahasa || []).filter(function (n) { return !kata || normal(n).includes(kata) || p.nama.toLocaleLowerCase('id-ID').includes(kata); });
     if (kata && !namaBahasa.length && !p.nama.toLocaleLowerCase('id-ID').includes(kata)) { return; }
@@ -364,6 +375,38 @@
         b.addEventListener('click', function () { isi.hidden = !isi.hidden; b.lastChild.textContent = isi.hidden ? '+' : '−'; }); c.append(b, isi); d.appendChild(c);
     });
   }
+  function bukaBahasaAnalisis(b) {
+    var adaKatalog = Array.isArray(katalog), parsial = adaKatalog && gagalMedia.length > 0;
+    var belumDitemukan = parsial ? 'belum ditemukan pada data terbaca' : 'belum tercatat';
+    bukaDetail(b.nama, b.provinsi.toUpperCase() + ' / TARGET BAHASA', !adaKatalog ? 'Katalog belum dibaca; status produk belum dapat disimpulkan.' : parsial ? 'Katalog belum lengkap; kekurangan bersifat sementara.' : b.isi ? 'Cakupan isi tersedia; lihat produk yang sudah dan belum ada.' : 'Belum ada isi film/video pada katalog terbaru.');
+    var w = el('div'), status = !adaKatalog ? 'Belum dibandingkan: baca katalog API untuk memastikan produk yang sudah atau belum tersedia.' : b.status === 'lengkap' ? 'Lengkap: ketiga jenis film/video tersedia.' : b.isi ? 'Sebagian: ada isi, tetapi produk film/video belum lengkap.' : parsial ? 'Belum ditemukan satu pun dari tiga jenis film/video pada data terbaca.' : 'Belum: tidak ada satu pun dari tiga jenis film/video.';
+    w.appendChild(el('p', 'catatan', status));
+    if (parsial) { w.appendChild(el('p', 'catatan', 'Sebagian katalog gagal dibaca: ' + gagalMedia.join(' · ') + '. Verifikasi kembali setelah katalog lengkap.')); }
+    if (b.alternatif && b.alternatif.length > 1) { w.appendChild(el('p', 'kecil', 'Nama alternatif dalam katalog: ' + b.alternatif.join(' · ') + '. Variasi ini dihitung sebagai satu target bahasa unik.')); }
+    var ringkas = el('div', 'ringkas-detail');
+    [['Target bahasa', 1], ['Produk tersedia', b.jumlahInti], [parsial ? 'Belum ditemukan' : 'Kekurangan produk', b.kurang.length]].forEach(function (x) { var a = el('div'); a.append(el('strong', '', angka(x[1])), el('small', '', x[0])); ringkas.appendChild(a); }); w.appendChild(ringkas);
+    if (adaKatalog && b.kurang.length) {
+      var kekurangan = el('section', 'kelompok'); kekurangan.appendChild(el('h3', '', parsial ? 'Belum ditemukan pada data terbaca' : 'Yang perlu dipenuhi'));
+      b.kurang.forEach(function (m) { kekurangan.appendChild(el('p', '', m + ' dalam bahasa ' + b.nama + ' — provinsi ' + b.provinsi + (parsial ? ' · perlu verifikasi katalog lengkap' : '') + '.')); }); w.appendChild(kekurangan);
+    }
+    Object.keys(b.produk).forEach(function (m) {
+      var p = b.produk[m], h = el('section', 'kelompok'); h.appendChild(el('h3', '', m + (!adaKatalog ? ' · belum dibandingkan' : p.ada ? ' · tersedia' : ' · ' + belumDitemukan)));
+      if (p.api.length) { h.appendChild(daftarMedia(p.api, 'Katalog API')); }
+      if (p.simpan.length) { h.appendChild(daftarMedia(p.simpan, 'Data tersimpan Neon')); }
+      if (!p.api.length && !p.simpan.length) { h.appendChild(el('p', 'kecil', parsial ? 'Belum ditemukan rekaman yang cocok pada data terbaca.' : 'Tidak ada rekaman yang cocok dengan bahasa dan provinsi target.')); }
+      w.appendChild(h);
+    });
+    detailSiap(w, tokenDetail);
+  }
+  function bukaMediaAnalisis(daftar, judul) {
+    bukaDetail(judul, 'TARGET & PRODUK / SUMBER TERPISAH', 'Rekaman tidak dipetakan secara perkiraan ke bahasa atau provinsi.');
+    var w = el('div');
+    daftar.forEach(function (x) {
+      var h = daftarMedia([x.media], x.media.nama);
+      h.appendChild(el('p', 'catatan', 'Alasan dipisahkan: ' + x.alasan + '.')); w.appendChild(h);
+    });
+    detailSiap(w, tokenDetail);
+  }
   function gambarSumber() {
     var d = document.getElementById('info-sumber');
     var a = el('article', 'kotak'); a.appendChild(el('h3', '', 'Dukcapil Kemendagri'));
@@ -408,6 +451,8 @@
       }
     });
     document.getElementById('muat-media').addEventListener('click', function () { muatMedia(true); });
+    document.getElementById('analisis-ke-media').addEventListener('click', function (e) { e.preventDefault(); gantiTab('bahasa'); });
+    if (window.AnalisisMedia) { window.AnalisisMedia.pasang({ indeks: indeks, muatMedia: function () { return muatMedia(true); }, bukaBahasa: bukaBahasaAnalisis, bukaMedia: bukaMediaAnalisis }); }
     document.getElementById('cari-bahasa').addEventListener('input', function () {
       var kata = document.getElementById('cari-bahasa').value.toLocaleLowerCase('id-ID').trim();
       Object.keys(indeks.provinsi).forEach(function (pk) {
@@ -418,14 +463,14 @@
     document.getElementById('ganti-kunci').addEventListener('click', function () {
       if (!window.confirm('Ganti kode database pada peramban ini? Kode lama akan dihapus.')) { return; }
       try { localStorage.removeItem(KUNCI); } catch (e) { /* penyimpanan peramban tidak tersedia */ }
-      katalog = null; tersimpan = []; gambarMedia(); muatMedia(true);
+      katalog = null; tersimpan = []; gagalMedia = []; gambarMedia(); perbaruiAnalisis(); muatMedia(true);
     });
   }
   function mulai() {
     pasang(); Promise.all([ambil('indeks.json'), ambil('bahasa-suku.json')]).then(function (d) {
       indeks = d[0]; bahasaSuku = d[1]; status('');
       document.getElementById('status-sumber').textContent = 'Dukcapil ' + indeks.sumber.wilayah + ' · rincian dimuat saat diklik';
-      daftarProvinsi(); gambarAgama(); gambarSumber(); gantiTab('wilayah');
+      daftarProvinsi(); gambarAgama(); gambarSumber(); perbaruiAnalisis(); gantiTab('wilayah');
       if (dapatKunci()) { muatMedia(false); }
     }).catch(function (e) { status('Laporan tidak dapat dimuat: ' + e.message, true); });
   }

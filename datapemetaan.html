@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
-<link rel="stylesheet" href="css/datapemetaan.css?v=20261024-04">
+<link rel="stylesheet" href="css/datapemetaan.css?v=20261024-05">
 </head>
 <body>
 <a class="loncat" href="#isi">Langsung ke isi</a>
@@ -26,6 +26,7 @@
   <div class="tab-dalam" role="tablist">
     <button id="tab-wilayah" class="tab aktif" role="tab" aria-selected="true" aria-controls="panel-wilayah" data-tab="wilayah">Wilayah</button>
     <button id="tab-bahasa" class="tab" role="tab" aria-selected="false" aria-controls="panel-bahasa" data-tab="bahasa" tabindex="-1">Bahasa &amp; media</button>
+    <button id="tab-analisis" class="tab" role="tab" aria-selected="false" aria-controls="panel-analisis" data-tab="analisis" tabindex="-1">Target &amp; produk</button>
     <button id="tab-agama" class="tab" role="tab" aria-selected="false" aria-controls="panel-agama" data-tab="agama" tabindex="-1">Suku &amp; agama</button>
     <button id="tab-sumber" class="tab" role="tab" aria-selected="false" aria-controls="panel-sumber" data-tab="sumber" tabindex="-1">Sumber</button>
   </div>
@@ -47,8 +48,14 @@
     <div id="daftar-bahasa" class="daftar-bahasa"></div>
     <div id="media-tanpa-provinsi"></div>
   </section>
+  <section id="panel-analisis" class="panel" role="tabpanel" aria-labelledby="tab-analisis" hidden>
+    <div class="pengantar-bagian"><p class="eyebrow">03 / TARGET &amp; PRODUK</p><h2>Seberapa jauh bahasa telah terjangkau?</h2><p>Bandingkan target bahasa unik dengan produk film/video. Lihat cakupan isi, kelengkapan produk, kekurangan, dan prioritas berikutnya—tanpa menghitung jumlah rekaman sebagai jumlah bahasa.</p></div>
+    <div class="tindakan"><button id="muat-analisis" class="tombol utama" type="button">Hitung dari katalog terbaru</button><a class="tombol" href="#panel-bahasa" id="analisis-ke-media">Lihat data media</a><span id="status-analisis" class="kecil" role="status" aria-live="polite">Target bahasa tersedia; produk dibandingkan setelah katalog dibaca.</span></div>
+    <div class="catatan analisis-penjelasan"><strong>Dua ukuran yang berbeda.</strong> <b>Cakupan isi</b> berarti minimal satu dari tiga jenis film/video tersedia. <b>Lengkap</b> berarti ketiganya tersedia dalam bahasa tersebut. Clip/Aplikasi dibandingkan bila bahasa tersedia; nasional/gugus ditampilkan terpisah. Kabupaten/desa adalah kerangka wilayah, bukan target satu produk per wilayah. Katalog memuat 430 entri; setelah variasi awalan “Bahasa …” disatukan, terdapat 341 target bahasa unik yang menjadi dasar perhitungan produk.</div>
+    <div id="analisis-isi"></div>
+  </section>
   <section id="panel-agama" class="panel" role="tabpanel" aria-labelledby="tab-agama" hidden>
-    <div class="pengantar-bagian"><p class="eyebrow">03 / SUKU &amp; AGAMA</p><h2>Manusia di balik angka.</h2><p>Agama bersumber dari Dukcapil. Suku adalah 28 kelompok BPS SP2010 dan kawasan utamanya, bukan batas tempat tinggal seluruh anggota suku.</p></div>
+    <div class="pengantar-bagian"><p class="eyebrow">04 / SUKU &amp; AGAMA</p><h2>Manusia di balik angka.</h2><p>Agama bersumber dari Dukcapil. Suku adalah 28 kelompok BPS SP2010 dan kawasan utamanya, bukan batas tempat tinggal seluruh anggota suku.</p></div>
     <div id="ringkasan-agama"></div>
     <div class="baris-judul"><div><p class="eyebrow">KAWASAN UTAMA BPS SP2010</p><h2>28 kelompok suku</h2></div></div>
     <div id="daftar-suku" class="daftar-suku"></div>
@@ -56,7 +63,7 @@
     <div id="agama-provinsi"></div>
   </section>
   <section id="panel-sumber" class="panel" role="tabpanel" aria-labelledby="tab-sumber" hidden>
-    <div class="pengantar-bagian"><p class="eyebrow">04 / SUMBER</p><h2>Data, batas, dan pembaruan.</h2><p>Laporan tidak mengisi kekosongan sumber dengan perkiraan. Setiap perbedaan dicatat agar tidak dianggap sebagai data yang pasti.</p></div>
+    <div class="pengantar-bagian"><p class="eyebrow">05 / SUMBER</p><h2>Data, batas, dan pembaruan.</h2><p>Laporan tidak mengisi kekosongan sumber dengan perkiraan. Setiap perbedaan dicatat agar tidak dianggap sebagai data yang pasti.</p></div>
     <div id="info-sumber"></div>
   </section>
 </main>
@@ -67,7 +74,8 @@
     <div id="isi-detail" class="isi-detail"></div>
   </section>
 </div>
-<footer class="kaki"><span>Data Pemetaan · Tahap 1</span><a href="index.html">Kembali ke peta ↗</a></footer>
-<script src="js/datapemetaan.js?v=20261024-04"></script>
+<footer class="kaki"><span>Data Pemetaan · Tahap 2</span><a href="index.html">Kembali ke peta ↗</a></footer>
+<script src="js/analisis-media.js?v=20261024-05"></script>
+<script src="js/datapemetaan.js?v=20261024-05"></script>
 </body>
 </html>

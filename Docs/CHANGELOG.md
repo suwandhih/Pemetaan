@@ -31,6 +31,54 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 ## 2026-10-24
 
+### Orderan 32 — Dasbor Target vs Produk & Kesenjangan Media
+
+**Baru.** Tab **Target & produk** pada `datapemetaan.html` mengukur sejauh
+mana produk film/video telah memenuhi target bahasa daerah, serta produk apa
+yang masih perlu dipenuhi. Ini adalah tahap analisis dari cermin data lengkap
+pada orderan 31; kabupaten/desa tetap kerangka wilayah, bukan target satu
+produk untuk setiap wilayah.
+
+- **430 entri katalog → 341 target bahasa unik.** Variasi seperti `Aceh` dan
+  `Bahasa Aceh` digabung dalam provinsi yang sama; seluruh nama asli tetap
+  dapat ditelusuri pada rincian dan mode **Entri katalog**. Matriks memiliki
+  mode target unik atau seluruh entri katalog.
+- **Dua ukuran:** cakupan isi berarti minimal satu dari tiga film/video;
+  lengkap berarti ketiganya tersedia. Beberapa rekaman dalam satu bahasa tidak
+  dihitung sebagai beberapa bahasa terpenuhi. Kekurangan dihitung sebagai
+  pasangan bahasa × jenis film/video yang belum tersedia.
+- Grafik donat cakupan isi dan tiga film/video, grafik batang 38 provinsi,
+  daftar prioritas, matriks lengkap/sebagian/belum, pencarian, filter
+  provinsi/status, serta rincian judul media dan kekurangan per bahasa.
+  Tombol pada rincian provinsi langsung membuka analisis provinsi terkait.
+- Clip/Aplikasi dicocokkan bila atribut bahasa tersedia. Rekaman nasional/
+  gugus, bahasa tidak dikenal, provinsi yang salah, dan bahasa yang sama pada
+  beberapa provinsi ditampilkan terpisah beserta alasannya; tidak dipaksakan
+  sebagai cakupan target. Judul kategori tidak dipakai sebagai nama bahasa bila
+  atributnya tidak tersedia.
+- Katalog API dibaca ulang dari jalur read-only yang sama. Kegagalan API
+  menghasilkan status **belum dibandingkan**, bukan klaim produk belum ada;
+  kegagalan sebagian kategori ditampilkan sebagai peringatan dan hasil/prioritas
+  sementara, dengan “belum” berarti belum ditemukan pada data yang terbaca.
+- Grafik SVG lokal, tanpa pustaka baru; semua grafik disertai angka tekstual.
+  Pencarian matriks mempertahankan fokus, dan pilihan provinsi mereset filter
+  agar hasil tidak membingungkan.
+
+**Verifikasi.** Model murni lulus **25 pemeriksaan fixture** (duplikasi,
+provinsi salah, Clip antarbahasa, Aplikasi gugus, kekurangan) dan **13
+pemeriksaan katalog asli** (430 entri, 341 target, 89 kelompok alias,
+aritmetika kekurangan, nama sama antarprovinsi, dan media tanpa provinsi yang
+ambigu). Uji silang seluruh pemetaan katalog **341/341 cocok**.
+Browser lulus **28 pemeriksaan tahap 2 + 18 pengaman tambahan + 49 regresi**, termasuk grafik,
+mode target/entri, filter, rincian bahasa/media luar target, tautan provinsi,
+fokus pencarian, API gagal, read-only, dan 0 galat runtime. Tampilan lulus
+pada 320/390/768/1440 px. Media live belum diverifikasi karena sesi uji tidak
+memiliki kode aplikasi; tidak ada penulisan ke produksi.
+
+**Status:** menunggu konfirmasi pemilik proyek; belum dinyatakan `SELESAI`.
+
+---
+
 ### Orderan 31 — `datapemetaan.html`, cermin data interaktif Indonesia
 
 **Baru.** Laporan data lengkap dengan empat tab: Wilayah, Bahasa & media,

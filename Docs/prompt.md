@@ -98,6 +98,7 @@ C:\data\Pemetaan\
 │   ├── tokomedia.js            tombol [Update] — tarik data media dari API TokoMedia (orderan 27)
 │   ├── cari.js                 pencarian wilayah / anggota / nama jalan (orderan 19)
 │   ├── datapemetaan.js         navigasi laporan dan pembacaan media read-only
+│   ├── analisis-media.js       hitungan target/produk, grafik, prioritas, matriks
 │   └── panduan.js              panduan pemakaian interaktif (tombol ?)
 ├── data\
 │   ├── datapemetaan\          indeks dan rincian laporan, dimuat saat diklik
@@ -252,7 +253,46 @@ terisolasi; `--luring` memerlukan cache sumber eksplisit melalui
 `PEMETAAN_CACHE_SUMBER` bila dipakai alat pembaruan. Cache tidak dipublikasikan.
 Audit terpisah dapat dijalankan dengan `node alat/audit-datapemetaan.js`.
 
-### 4.4 Sumber data
+### 4.4 Dasbor Target vs Produk (`js/analisis-media.js`, orderan 32)
+
+Tab **Target & produk** pada `datapemetaan.html` mengukur apakah produk media
+sudah memenuhi target bahasa, bukan mengukur target satu produk per desa.
+Kabupaten/kecamatan/desa tetap menjadi kerangka rincian wilayah.
+
+- **430 entri katalog** adalah inventaris nama pada `data/peta-bahasa.js`.
+- **341 target bahasa unik** adalah dasar persentase dan kekurangan produk.
+  Awalan `Bahasa ` dihapus untuk pencocokan; variasi nama disatukan **hanya
+  dalam provinsi yang sama**. Nama alternatif tetap tampil pada rincian dan
+  matriks mode **Entri katalog**. Nama yang sama pada provinsi berbeda tidak
+  digabung bila muncul pada pembaruan mendatang.
+- **Cakupan isi:** minimal satu dari Film Isa Al-Masih, Film Ikatan Ilahi,
+  atau Video Kitab Suci tersedia untuk target bahasa tersebut.
+- **Lengkap:** ketiga jenis film/video tersedia. Beberapa rekaman pada satu
+  bahasa tetap dihitung satu bahasa, bukan menambah jumlah bahasa terpenuhi.
+- **Kekurangan produk:** jumlah pasangan target bahasa × tiga film/video yang
+  belum tersedia; bukan jumlah judul atau jumlah desa.
+- **Clip/Aplikasi:** dibandingkan bila atribut bahasa tersedia; kode provinsi
+  dicocokkan bila ada. Rekaman nasional/gugus atau tanpa bahasa ditampilkan
+  terpisah dan tidak dihitung sebagai kekurangan wajib untuk setiap bahasa.
+- Film/video dengan provinsi yang tidak cocok tidak memenuhi target. Media
+  dengan nama bahasa yang tidak ada dalam target juga ditampilkan terpisah.
+- Clip/Aplikasi tanpa provinsi hanya cocok bila nama bahasa memiliki satu
+  target. Nama sama pada beberapa provinsi dipisahkan sebagai ambigu.
+- Jika API gagal, tampilkan **belum dibandingkan**, bukan “belum ada produk”.
+  Kegagalan sebagian kategori ditampilkan sebagai peringatan; hasil dan
+  prioritas disebut sementara dan “belum” berarti belum ditemukan pada data
+  yang berhasil dibaca.
+
+Komponen: kartu ringkasan; grafik donat cakupan isi + tiga produk inti;
+grafik batang cakupan 38 provinsi; daftar prioritas; matriks bahasa × produk
+dengan pencarian, filter provinsi/status, paginasi, dan mode target/entri.
+Klik bahasa/provinsi membuka rincian produk, media yang sudah ada, dan produk
+yang masih kurang. Grafik menggunakan SVG lokal tanpa pustaka tambahan dan
+selalu disertai angka tekstual. Modul `hitung()` murni dapat diuji di Node;
+modul tidak mengambil API sendiri dan hanya menerima hasil read-only dari
+`js/datapemetaan.js`.
+
+### 4.5 Sumber data
 
 | Data | Sumber | Cara ambil |
 |---|---|---|
@@ -412,6 +452,7 @@ tingginya ±11 px + 4 px jarak, jadi keterangan perlu diangkat ke **+18 px**.
 | 26 | Jangkar & label media per provinsi | `label.js` | satu jangkar + satu label per provinsi berdata media; label menyebut nama pendek kelompok yang sedang hidup; ketuk → garis merah provinsi |
 | 27 | Pemetaan memakai 2 server (Neon + Rumahweb) | `worker.js`, `simpanan.js`, `tokomedia.js` | Neon = data anggota (baca/tulis); Rumahweb = data media TokoMedia (**baca saja**) lewat `pemetaan-bridge.php`; 300 anggota · 35 provinsi berlabel |
 | 31 | Laporan Data Pemetaan | `datapemetaan.html`, `js/datapemetaan.js`, `alat/*datapemetaan.js` | rincian Indonesia → desa saat diklik; 430 bahasa, 28 kelompok suku, tujuh agama, perbandingan lima media read-only; pembaruan Dukcapil manual tervalidasi |
+| 32 | Dasbor Target vs Produk | `js/analisis-media.js`, `datapemetaan.html` | 341 target unik dari 430 entri; cakupan isi/kelengkapan, grafik donat/batang, prioritas, matriks, dan rincian kekurangan |
 | — | Panduan pemakaian interaktif | `panduan.js` | tombol `?` mengenali posisi pemakai; kata kunci jadi tautan yang benar-benar menjalankan aksinya |
 
 ### Detail yang mudah terlewat
