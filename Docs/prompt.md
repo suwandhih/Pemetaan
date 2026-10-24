@@ -103,7 +103,8 @@ C:\data\Pemetaan\
 │   └── panduan.js              panduan pemakaian interaktif (tombol ?)
 ├── backup\
 │   ├── laporan-manajemen-20261024\  index, dashboard, dan gaya lama sebelum diganti
-│   └── popup-wilayah-20261024\      kartu Populasi/Agama dan gaya sebelum orderan 33
+│   ├── popup-wilayah-20261024\      kartu Populasi/Agama dan gaya sebelum orderan 33
+│   └── media-akurasi-20261024\      pembaca media lama, snapshot, dan backup database ZIP
 ├── data\
 │   ├── datapemetaan\          indeks, rincian, dan snapshot media; dimuat saat diperlukan
 │   ├── wilayah-warna\          554 berkas poligon + angka penduduk
@@ -482,6 +483,15 @@ Nama di label dipendekkan supaya muat: `Film Isa Al-Masih` → **Film Isa**,
 `Clip Kitab Suci` → **Clip**, `Aplikasi Kitab Suci` → **Ap Kitab**. Peta
 singkatnya ada di `PENDEK` (`js/label.js`) — satu tempat saja.
 
+**Akurasi media (orderan 34):** label hanya memakai anggota yang sudah selesai
+dimuat. Setiap aplikasi adalah rekaman produk tersendiri, bukan bahasa baru.
+Bahasa yang memiliki beberapa aplikasi tetap satu target bahasa; provinsi
+hanya berasal dari katalog bahasa yang sudah disusun, bukan dari gugus atau
+provinsi wakil. Rekaman tanpa provinsi tetap tersedia pada laporan tetapi tidak
+menghasilkan titik/label lokasi. Update media memvalidasi ID dan jumlah,
+mempertahankan anggota pribadi serta kategori yang gagal dibaca, dan baru
+menghapus rekaman TokoMedia kedaluwarsa setelah penyimpanan berhasil.
+
 ⚠️ **Jebakan:** titik tengah **kotak pembatas** provinsi jatuh di laut untuk
 provinsi kepulauan. Jangkar harus dihitung dari **titik berat cincin terluas**
 poligonnya.
@@ -508,8 +518,10 @@ tingginya ±11 px + 4 px jarak, jadi keterangan perlu diangkat ke **+18 px**.
 | 23 | Data anggota dari tokomedia.org + tombol [Update] | `tokomedia.js`, `worker.js` | 699 anggota · 5 kategori · koordinat otomatis · icon kategori |
 | 24 | Menu "Media on/off" | `media.js` | pilih kelompok data yang tampil di peta; pilihan disimpan di database; satu tombol utama On/Off menyembunyikan atau memulihkan hanya pilihan tersebut; bilah atas menjadi ikon saja |
 | 25 | Seluruh kategori bisa dihidupkan / dimatikan | `media.js` | daftar digabung dari kategori yang dipakai anggota + daftar kategori resmi |
+| 33 | Kartu angka Populasi & Agama | `warna.js`, `agama.js`, `gaya.css` | satu wilayah diklik → satu kartu; penduduk/kepadatan dari poligon; tujuh agama; rincian lipat dan responsif |
+| 34 | Akurasi katalog & pemetaan media | `worker.js`, `tokomedia.js`, `datapemetaan.js`, `analisis-media.js` | 269 aplikasi lengkap; 232 terpetakan / 217 bahasa / 28 provinsi; data tanpa lokasi tidak ditebak; 568 media + 3 anggota pribadi |
 | 26 | Jangkar & label media per provinsi | `label.js` | satu jangkar + satu label per provinsi berdata media; label menyebut nama pendek kelompok yang sedang hidup; ketuk → garis merah provinsi |
-| 27 | Pemetaan memakai 2 server (Neon + Rumahweb) | `worker.js`, `simpanan.js`, `tokomedia.js` | Neon = data anggota (baca/tulis); Rumahweb = data media TokoMedia (**baca saja**) lewat `pemetaan-bridge.php`; 300 anggota · 35 provinsi berlabel |
+| 27 | Pemetaan memakai 2 server (Neon + Rumahweb) | `worker.js`, `simpanan.js`, `tokomedia.js` | Neon = data anggota (baca/tulis); Rumahweb = data media TokoMedia (**baca saja**) lewat `pemetaan-bridge.php`; saat orderan 27: 300 anggota · 35 provinsi berlabel |
 | 31 | Laporan Data Pemetaan | `datapemetaan.html`, `js/datapemetaan.js`, `alat/*datapemetaan.js` | rincian Indonesia → desa saat diklik; 430 bahasa, 28 kelompok suku, tujuh agama, perbandingan lima media read-only; pembaruan Dukcapil manual tervalidasi |
 | 32 | Dasbor Target vs Produk | `js/analisis-media.js`, `datapemetaan.html` | 341 target unik dari 430 entri; cakupan isi/kelengkapan, grafik donat/batang, prioritas, matriks, dan rincian kekurangan |
 | — | Panduan pemakaian interaktif | `panduan.js` | tombol `?` mengenali posisi pemakai; kata kunci jadi tautan yang benar-benar menjalankan aksinya |

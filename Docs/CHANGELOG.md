@@ -18,9 +18,9 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 | Hal | Keadaan terkini |
 |---|---|
-| Orderan selesai | 27 (orderan 1–27) |
-| Menunggu konfirmasi | 28–34 |
-| Status kerja | **Orderan 34: audit akurasi media dan sinkronisasi selesai; publikasi akhir diverifikasi** |
+| Orderan selesai | **29 (1–27, 33–34)** |
+| Menunggu konfirmasi | 28–32 |
+| Status kerja | **Orderan 33 dan 34 dinyatakan selesai oleh pemilik pada 2026-10-24; tidak ada proses berjalan** |
 | Publikasi Opsi A | `6b4f319a` · GitHub Pages berhasil · server pratinjau dihentikan |
 | Laporan aktif | Data Pemetaan pada `datapemetaan.html` dan tombol ▣ pada peta |
 | Snapshot media | **568 rekaman** · 269 aplikasi · 44 tanpa provinsi |
@@ -81,13 +81,20 @@ pada `database-20261024.zip` di folder yang sama.
   sintaks, editor, model perhitungan, laporan 269/232/37/44, matriks bahasa,
   dan layout tanpa overflow lulus.
 
-Status **MENUNGGU KONFIRMASI**, bukan `SELESAI` sampai pemilik menyatakannya.
-Commit `b3fde1a3` di-push dan deployment GitHub Pages `40099467497` berhasil
+Status **SELESAI** berdasarkan konfirmasi pemilik 2026-10-24: hasil dinilai
+lebih real dan meyakinkan, lalu pemilik meminta pembaruan dokumentasi dan
+penutupan. Commit `b3fde1a3` di-push dan deployment GitHub Pages `40099467497` berhasil
 pada commit yang sama. Snapshot publik terverifikasi **568 / 269 / 44**;
 laporan online menampilkan 232 terpetakan, 37 belum, dan 217 target bahasa,
 serta lima rincian Muna yang cocok. Peta online terverifikasi 571 anggota =
 568 media + 3 pribadi, 232 aplikasi terpetakan, dan 28 label Ap Kitab. Server
 pratinjau dihentikan setelah verifikasi, bukan dibiarkan berjalan.
+
+**Penutupan 2026-10-24:** pemilik menyatakan hasil lebih real dan meyakinkan
+serta meminta dokumentasi diperbarui dan pekerjaan diselesaikan. Orderan 33 dan
+34 ditandai selesai. Orderan 28–32 tetap menunggu konfirmasi dan tidak
+dianggap selesai secara otomatis. Dokumen kerja diperbarui; tidak ada server
+pratinjau atau pengambilan data yang berjalan.
 
 ---
 
@@ -143,7 +150,7 @@ editor untuk berkas yang berubah lulus. Setelah push `6b4f319a`, deployment
 GitHub Pages run `40095680388` berhasil pada commit yang sama. Pengujian klik
 Populasi (9 pemeriksaan) dan Agama (4 tingkat) diulang pada situs online dan
 lulus, termasuk desa Kenari pada ponsel. Server pratinjau kemudian dihentikan.
-Status **MENUNGGU KONFIRMASI**, bukan `SELESAI` sampai pemilik menyatakannya.
+Status **SELESAI** berdasarkan konfirmasi penutupan pemilik pada 2026-10-24.
 
 ---
 

@@ -13,10 +13,10 @@ Aturan pengelolaan:
 > Pemilik proyek menyatakan **proyek Pemetaan selesai** pada 2026-10-17.
 > Seluruh **22 orderan** berstatus `SELESAI`.
 >
-> Setelah itu pemilik proyek menambah orderan 23–34. Orderan 23–27 sudah
-> selesai; orderan 28–34 masih menunggu konfirmasi akhir pemilik.
+> Setelah itu pemilik proyek menambah orderan 23–34. Orderan 23–27, 33, dan
+> 34 sudah selesai; orderan 28–32 masih menunggu konfirmasi akhir pemilik.
 >
-> ## ✅ AUDIT AKURASI MEDIA ONLINE — ORDERAN 34 MENUNGGU KONFIRMASI
+> ## ✅ ORDERAN 33 & 34 SELESAI — DIKONFIRMASI PEMILIK 2026-10-24
 >
 > Koreksi dipublikasikan pada commit `b3fde1a3`; GitHub Pages berhasil dan
 > peta/laporan online telah diverifikasi. Server pratinjau telah dihentikan.
@@ -31,8 +31,8 @@ Aturan pengelolaan:
 >
 > | Ringkasan terkini | Keterangan |
 > |---|---|
-> | Orderan selesai | **27** (1–27) |
-> | Menunggu konfirmasi | **28–34** |
+> | Orderan selesai | **29** (1–27, 33–34) |
+> | Menunggu konfirmasi | **28–32** |
 > | Report live | `datapemetaan.html` dan tombol **▣ Laporan manajemen** pada peta |
 > | Snapshot media | **568 rekaman** · 269 aplikasi · 44 tanpa provinsi ditampilkan terpisah |
 > | Hasil target–produk | 212/341 ada isi · 129 belum · 6 lengkap · 731 produk inti kurang |
@@ -180,7 +180,7 @@ hanya berisi jumlah wilayah atau jumlah judul media.
   terbatas dari server pratinjau; hentikan server saat tinjauan selesai; berikan
   kemajuan dan waktu secara jujur.** Tidak boleh ada proses baru tanpa aba-aba.
 
-| 33 | **Opsi A — satu wilayah diklik, satu kartu angka pada peta Populasi dan Agama** — warna tetap gambaran umum, tidak menampilkan seluruh angka sekaligus. Pada provinsi/kabupaten/kecamatan/desa, klik membuka/mengganti satu kartu: jumlah penduduk dan kepadatan menonjol untuk Populasi; jumlah/persentase tujuh agama untuk Agama. KK, luas, kode, dan sumber tetap sebagai rincian. Kepadatan dihitung dari poligon resmi bila tersedia; bila tidak tersedia tidak diperkirakan. Disetujui pemilik 2026-10-24 19:09 WIB. | **MENUNGGU KONFIRMASI** — implementasi dan verifikasi lokal lulus: klik nyata pada 4 tingkat Populasi dan 4 tingkat Agama; angka 7 agama cocok dengan sumber; satu kartu menggantikan kartu lama; tutup/rincian/ponsel 390 px lulus; 0 galat runtime pada pemeriksaan akhir. Backup `backup/popup-wilayah-20261024/`; titik pulih `573d39f7` | 15–25 mnt (estimasi awal) | — |
+| 33 | **Opsi A — satu wilayah diklik, satu kartu angka pada peta Populasi dan Agama** — warna tetap gambaran umum, tidak menampilkan seluruh angka sekaligus. Pada provinsi/kabupaten/kecamatan/desa, klik membuka/mengganti satu kartu: jumlah penduduk dan kepadatan menonjol untuk Populasi; jumlah/persentase tujuh agama untuk Agama. KK, luas, kode, dan sumber tetap sebagai rincian. Kepadatan dihitung dari poligon resmi bila tersedia; bila tidak tersedia tidak diperkirakan. Disetujui pemilik 2026-10-24 19:09 WIB. | **SELESAI** ✅ — dikonfirmasi pemilik 2026-10-24 setelah verifikasi online: empat tingkat Populasi dan Agama, satu kartu berganti isi, tutup/rincian/ponsel, 0 galat runtime pada pemeriksaan akhir. Backup `backup/popup-wilayah-20261024/`; titik pulih `573d39f7` | 15–25 mnt (estimasi awal) | 2026-10-24 |
 
 ### Orderan di luar daftar bernomor (perintah langsung pemilik proyek)
 
@@ -914,7 +914,7 @@ tidak hilang saat sesi panjang. Pengerjaan menunggu orderan resmi.
 | 2026-10-12 | Data awal **tidak lengkap** — pemilik proyek akan menyuplai data seadanya. Syarat: **cukup menggambarkan** kondisi, tidak harus utuh. |
 | 2026-10-12 | Data akan **dilengkapi oleh pengguna aplikasi** (kontribusi pengguna). Artinya aplikasi perlu jalur tulis (input data oleh pengguna), bukan hanya baca. |
 
-| 34 | **Audit dan koreksi akurasi data media pada peta dan laporan** — Aplikasi Kitab Suci tidak boleh diringkas menjadi lima bahasa/gugus; Film, Video, dan Clip diperiksa ulang dari sumber. Bedakan rekaman produk, bahasa unik, dan provinsi yang benar-benar dapat dipetakan; jangan menebak data yang tidak tersedia. Perbarui sumber peta dan snapshot laporan setelah backup, pertahankan anggota pribadi. Diperintahkan pemilik 2026-10-24 20:05 WIB. | **MENUNGGU KONFIRMASI** — audit live selesai: 568 rekaman; 269 aplikasi (232 terpetakan / 217 bahasa / 28 provinsi; 37 belum terpetakan); 44 tanpa provinsi termasuk Clip. Database 568 media + 3 anggota pribadi; lima ringkasan lama dihapus. Worker, snapshot, label, Update, dan laporan diuji; backup tersedia. Publikasi GitHub `b3fde1a3` dan deployment `40099467497` berhasil; peta/laporan online terverifikasi; pratinjau dihentikan | 30–60 mnt (estimasi awal) | — |
+| 34 | **Audit dan koreksi akurasi data media pada peta dan laporan** — Aplikasi Kitab Suci tidak boleh diringkas menjadi lima bahasa/gugus; Film, Video, dan Clip diperiksa ulang dari sumber. Bedakan rekaman produk, bahasa unik, dan provinsi yang benar-benar dapat dipetakan; jangan menebak data yang tidak tersedia. Perbarui sumber peta dan snapshot laporan setelah backup, pertahankan anggota pribadi. Diperintahkan pemilik 2026-10-24 20:05 WIB. | **SELESAI** ✅ — pemilik menyatakan data lebih real dan meyakinkan serta meminta penutupan pada 2026-10-24. Hasil online: 568 rekaman; 269 aplikasi (232 terpetakan / 217 bahasa / 28 provinsi; 37 belum terpetakan); 44 tanpa provinsi termasuk Clip. Database 568 media + 3 anggota pribadi; lima ringkasan lama dihapus. Worker, snapshot, label, Update, dan laporan diuji. Publikasi `b3fde1a3`, deployment `40099467497` berhasil; backup tersedia; pratinjau dihentikan | 30–60 mnt (estimasi awal) | 2026-10-24 |
 
 ## Usulan (belum diperintahkan)
 

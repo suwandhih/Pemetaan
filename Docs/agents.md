@@ -226,7 +226,8 @@ Daftar jebakan teknis yang lebih lengkap ada di
 8. **Proyek sudah selesai 2026-10-17.** Untuk melanjutkan, baca dulu
    [`prompt.md`](./prompt.md) (konsep) dan [`CHANGELOG.md`](./CHANGELOG.md)
    (riwayat) supaya tidak mengulang pekerjaan yang sudah ada.
-9. **Pekerjaan yang belum dikonfirmasi:** orderan 28–34 menunggu konfirmasi akhir;
-   jangan melanjutkan tanpa aba-aba. Laporan manajemen kini memakai
+9. **Status penutupan 2026-10-24:** orderan 33 dan 34 dinyatakan selesai oleh
+   pemilik setelah verifikasi online. Orderan 28–32 tetap menunggu konfirmasi
+   akhir; jangan melanjutkan tanpa aba-aba. Laporan manajemen memakai
    `datapemetaan.html`; dashboard lama ada di backup. Tidak ada server/proses
    yang perlu dibiarkan berjalan setelah hasil diverifikasi.
