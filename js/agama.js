@@ -517,18 +517,21 @@
     var penduduk = p.penduduk || 0;
     var may = mayoritasDari(p);
 
-    var isi = '<p class="kartu-judul">' + p.nama + '</p>';
-    isi += '<table class="kartu-tabel">' +
-      '<tr><td>Tingkat</td><td>' + TINGKAT[aktif.tingkat].nama + '</td></tr>' +
-      '<tr><td>Jumlah penduduk</td><td>' +
-      (penduduk > 0 ? angka(penduduk) + ' jiwa' : '\u2014') + '</td></tr>' +
-      '<tr><td>Mayoritas</td><td>' +
-      (penduduk > 0 ? may.g.nama + ' ' + persen(may.p) : '\u2014') + '</td></tr>' +
-      '</table>';
-    isi += '<div class="agama-daftar">' + barisAgama(p, false) + '</div>';
-    isi += '<p class="derajat-catatan">Sumber: Dukcapil Kemendagri \u00B7 ' +
-      'persentase dihitung dari jumlah penduduk</p>';
+    var isi = '<article class="kartu-angka" aria-label="Agama ' + p.nama + '">' +
+      '<p class="kartu-eyebrow">AGAMA · ' + TINGKAT[aktif.tingkat].nama + '</p>' +
+      '<p class="kartu-judul">' + p.nama + '</p>' +
+      '<div class="kartu-angka-utama"><div><span>Jumlah penduduk</span><strong>' +
+      (penduduk > 0 ? angka(penduduk) : '—') + '</strong><small>jiwa</small></div>' +
+      '<div><span>Mayoritas</span><strong class="kartu-angka-teks">' +
+      (penduduk > 0 ? may.g.nama : '—') + '</strong><small>' + (penduduk > 0 ? persen(may.p) + ' penduduk' : 'data tidak tersedia') + '</small></div></div>' +
+      '<p class="kartu-petunjuk">Jumlah dan persentase menurut agama</p>' +
+      '<div class="agama-daftar">' + barisAgama(p, false) + '</div>' +
+      '<details class="kartu-rincian"><summary>Kode wilayah & sumber</summary><table class="kartu-tabel">' +
+      '<tr><td>Kode wilayah</td><td>' + (p.kode || '—') + '</td></tr>' +
+      '<tr><td>Sumber</td><td>Dukcapil Kemendagri · persentase dihitung dari jumlah penduduk</td></tr>' +
+      '</table></details></article>';
 
+    document.getElementById('kartu-isian').replaceChildren();
     document.getElementById('kartu-isian').innerHTML = isi;
     elKartu.hidden = false;
   }

@@ -19,8 +19,8 @@ Repo: https://github.com/suwandhih/Pemetaan
 | Hal | Keadaan terkini |
 |---|---|
 | Orderan selesai | 27 (orderan 1–27) |
-| Menunggu konfirmasi | 28–32 |
-| Status kerja | **Berhenti sementara sejak 2026-10-24 18:57 WIB** |
+| Menunggu konfirmasi | 28–33 |
+| Status kerja | **Orderan 33 selesai diverifikasi lokal; menunggu konfirmasi pemilik** |
 | Laporan aktif | Data Pemetaan pada `datapemetaan.html` dan tombol ▣ pada peta |
 | Snapshot media | 304 rekaman · 2026-10-24 18:19 WIB |
 | Target–produk | 212/341 ada isi · 129 belum · 6 lengkap · 731 produk inti kurang |
@@ -31,6 +31,59 @@ ukuran kemajuan. Status `SELESAI` hanya mengikuti konfirmasi pemilik proyek.
 ---
 
 ## 2026-10-24
+
+### Orderan 33 — Opsi A: satu wilayah diklik, satu kartu angka
+
+Atas persetujuan pemilik 19:09 WIB, peta Populasi dan Agama menyajikan angka
+untuk wilayah yang dipilih tanpa memasang label pada seluruh poligon. Titik
+pulih Git `573d39f7` dibuat sebelum revisi; versi sebelumnya disimpan pada
+`backup/popup-wilayah-20261024/` (`warna.js`, `agama.js`, `gaya.css`, dan
+`index.html`). Orderan ini hanya mengubah penyajian kartu, bukan angka sumber
+Dukcapil atau snapshot media.
+
+- Klik provinsi, kabupaten/kota, kecamatan, atau desa/kelurahan membuka satu
+  kartu bersama. Klik wilayah lain mengganti isinya; tidak ada popup yang
+  menumpuk dan lapisan warna tetap berfungsi sebagai gambaran umum.
+- Kartu Populasi menonjolkan **jumlah penduduk** dan **kepadatan**. Kepala
+  keluarga, luas, kode wilayah lengkap, dan sumber dipindahkan ke rincian lipat.
+- Kartu Agama menonjolkan jumlah penduduk dan agama mayoritas; tujuh kategori
+  tetap tampil dalam jumlah jiwa dan persentase dari jumlah penduduk. Kode
+  wilayah dan sumber tersedia dalam rincian lipat.
+- Kepadatan tidak dibatasi hanya untuk provinsi/kabupaten. Jika poligon
+  tersedia, kepadatan pada kecamatan/desa juga dihitung sebagai
+  $penduduk / luas\_km^2$. Luas dihitung dari poligon resmi Dukcapil melalui
+  `PD.luasKm2()`, bukan kolom `luas_wilayah` mentah yang tidak konsisten.
+  Jika luas tidak tersedia, hasilnya dinyatakan belum tersedia, bukan dikira.
+- Aturan tampilan Opsi A ditempatkan setelah aturan responsif lama, dibatasi
+  pada kartu `.kartu-angka`, sehingga tinggi/lebar baru tidak tertimpa CSS
+  sebelumnya dan kartu Suku/pesan lain tidak ikut berubah. Tinggi kartu dibatasi
+  dengan pengguliran bila isi memerlukannya; versi aset dinaikkan ke
+  `20261024-03`.
+
+**Verifikasi klik nyata pada poligon, bukan hanya membaca data:**
+
+| Modul / tingkat | Contoh yang diklik | Hasil terverifikasi |
+|---|---|---|
+| Populasi — provinsi | DKI Jakarta | 11.038.216 jiwa · 16.940 jiwa/km² |
+| Populasi — kabupaten/kota | Jakarta Pusat | 1.057.270 jiwa · 22.058 jiwa/km² |
+| Populasi — kecamatan | Gambir | 90.638 jiwa · 12.251 jiwa/km² |
+| Populasi — desa/kelurahan | Kenari | 11.188 jiwa · 12.463 jiwa/km² |
+| Agama — provinsi | DKI Jakarta | 11.038.216 jiwa · 7 kategori |
+| Agama — kabupaten/kota | Jakarta Pusat | Islam 869.905 · Kristen 102.884 · Katolik 47.062 · Hindu 3.525 · Budha 33.701 · Konghucu 151 · Kepercayaan 42 |
+| Agama — kecamatan | Gambir | Islam 65.224 · Kristen 11.987 · Katolik 7.641 · Hindu 246 · Budha 5.509 · Konghucu 28 · Kepercayaan 3 |
+| Agama — desa/kelurahan | Kenari | Islam 7.872 · Kristen 2.432 · Katolik 744 · Hindu 51 · Budha 88 · Konghucu 1 · Kepercayaan 0 |
+
+Sembilan pemeriksaan perilaku lulus: peralihan Populasi → Agama, klik melalui
+tombol pengguna, satu kartu tergantikan saat memilih wilayah kedua, tombol
+tutup, rincian Populasi pada ponsel, kartu ponsel 390 px berada dalam layar,
+tanpa overflow halaman, dan 0 galat runtime. Empat pengujian Agama juga
+memastikan tujuh kategori dan nilai sumber pada setiap tingkat; desa Kenari
+diuji langsung dalam viewport ponsel 390 × 844, termasuk rincian sumber dan
+tutup kartu. Pemeriksaan sintaks `warna.js` dan `agama.js` serta pemeriksaan
+editor untuk berkas yang berubah lulus. Status **MENUNGGU KONFIRMASI**, bukan
+`SELESAI` sampai pemilik menyatakannya.
+
+---
 
 ### Orderan 32 — Laporan manajemen memakai Data Pemetaan
 

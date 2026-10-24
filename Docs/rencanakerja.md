@@ -13,8 +13,8 @@ Aturan pengelolaan:
 > Pemilik proyek menyatakan **proyek Pemetaan selesai** pada 2026-10-17.
 > Seluruh **22 orderan** berstatus `SELESAI`.
 >
-> Setelah itu pemilik proyek menambah orderan 23–32. Orderan 23–27 sudah
-> selesai; orderan 28–32 masih menunggu konfirmasi akhir pemilik.
+> Setelah itu pemilik proyek menambah orderan 23–33. Orderan 23–27 sudah
+> selesai; orderan 28–33 masih menunggu konfirmasi akhir pemilik.
 >
 > ## ⏸️ PEKERJAAN BERHENTI SEMENTARA — 2026-10-24 18:57 WIB
 >
@@ -26,7 +26,7 @@ Aturan pengelolaan:
 > | Ringkasan terkini | Keterangan |
 > |---|---|
 > | Orderan selesai | **27** (1–27) |
-> | Menunggu konfirmasi | **28–32** |
+> | Menunggu konfirmasi | **28–33** |
 > | Report live | `datapemetaan.html` dan tombol **▣ Laporan manajemen** pada peta |
 > | Snapshot media | 304 rekaman, diambil 2026-10-24 18:19 WIB |
 > | Hasil target–produk | 212/341 ada isi · 129 belum · 6 lengkap · 731 produk inti kurang |
@@ -173,6 +173,8 @@ hanya berisi jumlah wilayah atau jumlah judul media.
   dahulu; kerjakan dalam bagian kecil yang terlihat hasilnya; bedakan proses
   terbatas dari server pratinjau; hentikan server saat tinjauan selesai; berikan
   kemajuan dan waktu secara jujur.** Tidak boleh ada proses baru tanpa aba-aba.
+
+| 33 | **Opsi A — satu wilayah diklik, satu kartu angka pada peta Populasi dan Agama** — warna tetap gambaran umum, tidak menampilkan seluruh angka sekaligus. Pada provinsi/kabupaten/kecamatan/desa, klik membuka/mengganti satu kartu: jumlah penduduk dan kepadatan menonjol untuk Populasi; jumlah/persentase tujuh agama untuk Agama. KK, luas, kode, dan sumber tetap sebagai rincian. Kepadatan dihitung dari poligon resmi bila tersedia; bila tidak tersedia tidak diperkirakan. Disetujui pemilik 2026-10-24 19:09 WIB. | **MENUNGGU KONFIRMASI** — implementasi dan verifikasi lokal lulus: klik nyata pada 4 tingkat Populasi dan 4 tingkat Agama; angka 7 agama cocok dengan sumber; satu kartu menggantikan kartu lama; tutup/rincian/ponsel 390 px lulus; 0 galat runtime pada pemeriksaan akhir. Backup `backup/popup-wilayah-20261024/`; titik pulih `573d39f7` | 15–25 mnt (estimasi awal) | — |
 
 ### Orderan di luar daftar bernomor (perintah langsung pemilik proyek)
 

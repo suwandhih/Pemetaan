@@ -357,20 +357,20 @@
 
   function bukaKartu(p) {
     if (!elKartu) { return; }
-    var baris = [
-      ['Tingkat', PETA[aktif] ? PETA[aktif].nama : '—'],
-      ['Jumlah penduduk', p.jiwa > 0 ? angka(p.jiwa) + ' jiwa' : '—'],
-      ['Kepala keluarga', p.kk > 0 ? angka(p.kk) : '—'],
-      ['Luas', p.luas > 0 ? angka(Math.round(p.luas)) + ' km²' : '—'],
-      ['Kepadatan', p.padat > 0 ? angka(Math.round(p.padat)) + ' jiwa/km²' : '—'],
-      ['Kode wilayah', (p.kode || '—').split('.')[0]],
-      ['Sumber', 'Dukcapil Kemendagri']
-    ];
-    var isi = '<p class="kartu-judul">' + p.nama + '</p><table class="kartu-tabel">';
-    for (var i = 0; i < baris.length; i++) {
-      isi += '<tr><td>' + baris[i][0] + '</td><td>' + baris[i][1] + '</td></tr>';
-    }
-    isi += '</table>';
+    var tingkat = PETA[aktif] ? PETA[aktif].nama : 'Wilayah';
+    var jiwa = p.jiwa > 0 ? angka(p.jiwa) : '—';
+    var padat = p.padat > 0 ? angka(Math.round(p.padat)) : 'Belum tersedia';
+    var isi = '<article class="kartu-angka" aria-label="Penduduk ' + p.nama + '">' +
+      '<p class="kartu-eyebrow">POPULASI · ' + tingkat + '</p>' +
+      '<p class="kartu-judul">' + p.nama + '</p>' +
+      '<div class="kartu-angka-utama"><div><span>Jumlah penduduk</span><strong>' + jiwa + '</strong><small>jiwa</small></div>' +
+      '<div><span>Kepadatan</span><strong>' + padat + '</strong><small>' + (p.padat > 0 ? 'jiwa/km²' : 'luas wilayah tidak tersedia') + '</small></div></div>' +
+      '<details class="kartu-rincian"><summary>Rincian wilayah & sumber</summary><table class="kartu-tabel">' +
+      '<tr><td>Kepala keluarga</td><td>' + (p.kk > 0 ? angka(p.kk) + ' KK' : '—') + '</td></tr>' +
+      '<tr><td>Luas</td><td>' + (p.luas > 0 ? angka(Math.round(p.luas)) + ' km²' : '—') + '</td></tr>' +
+      '<tr><td>Kode wilayah</td><td>' + (p.kode || '—') + '</td></tr>' +
+      '<tr><td>Sumber</td><td>Dukcapil Kemendagri</td></tr></table></details></article>';
+    document.getElementById('kartu-isian').replaceChildren();
     document.getElementById('kartu-isian').innerHTML = isi;
     elKartu.hidden = false;
   }

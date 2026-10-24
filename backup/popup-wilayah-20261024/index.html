@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f14">
+<title>Pemetaan — Peta Indonesia</title>
+<!-- Penanda versi: dinaikkan setiap kali berkas berubah, supaya peramban
+     tidak memakai berkas lama yang tersimpan di singgahan. Ini cara yang
+     sama dipakai proyek DataPeta (?v=YYYYMMDD-nn). -->
+<link rel="stylesheet" href="js/lib/maplibre-gl.css?v=20261024-01">
+<link rel="stylesheet" href="css/gaya.css?v=20261024-02">
+</head>
+<body>
+
+<div id="bingkai">
+  <div id="peta"></div>
+
+  <header id="bilah-atas">
+    <div id="grup-anggota">
+      <button id="tombol-anggota" type="button" aria-label="Daftar anggota"
+              title="Daftar anggota">Anggota</button>
+    </div>
+    <button id="tombol-jenis" type="button" title="Ganti jenis peta">
+      <span id="jenis-ikon">&#128752;</span>
+      <span id="jenis-nama">Satelit</span>
+    </button>
+    <button id="tombol-warna" type="button" aria-haspopup="listbox" aria-expanded="false" aria-pressed="false">
+      <span id="warna-nama">Populasi</span>
+      <span id="warna-ikon">&#128065;</span>
+    </button>
+    <button id="tombol-agama" type="button" aria-haspopup="listbox" aria-expanded="false" aria-pressed="false"
+            title="Peta penduduk menurut agama">
+      <span id="agama-nama">Agama</span>
+      <span id="agama-ikon">&#128591;</span>
+    </button>
+    <button id="tombol-suku" type="button" aria-haspopup="listbox" aria-expanded="false" aria-pressed="false"
+            title="Titik lokasi suku bangsa">
+      <span id="suku-nama-tombol">Suku</span>
+      <span id="suku-ikon">&#129516;</span>
+    </button>
+    <!-- Orderan 24: menu Media on/off. Menggantikan tombol mata (👁) yang
+         dulu hanya bisa menyembunyikan seluruh penanda sekaligus. -->
+    <button id="tombol-media" type="button" aria-haspopup="listbox" aria-expanded="false"
+            aria-pressed="true" aria-label="Media on/off"
+            title="Media on/off — pilih kelompok media yang tampil di peta">
+      <span id="media-ikon">&#128250;</span>
+    </button>
+    <button id="tombol-dashboard" type="button" aria-label="Dashboard cakupan layanan"
+            title="Dashboard cakupan layanan">&#9635;</button>
+    <button id="tombol-cari" type="button" aria-label="Cari wilayah, anggota, atau nama jalan"
+            title="Cari wilayah, anggota, atau nama jalan">&#9906;</button>
+    <button id="tombol-panduan" type="button" aria-haspopup="dialog" aria-expanded="false"
+            aria-label="Panduan pemakaian" title="Panduan pemakaian">?</button>
+  </header>
+
+    <!-- Orderan 19: kotak cari wilayah / anggota / nama jalan -->
+    <div id="cari" hidden>
+      <div id="cari-baris">
+        <span id="cari-ikon">&#9906;</span>
+        <input id="cari-isian" type="search" autocomplete="off" spellcheck="false"
+               name="cari-pemetaan" data-form-type="other" data-lpignore="true"
+               placeholder="Cari wilayah, anggota, atau nama jalan…" />
+        <button id="cari-tutup" type="button" aria-label="Tutup pencarian">&#10005;</button>
+      </div>
+      <div id="cari-hasil"></div>
+    </div>
+
+    <!-- Orderan 16: peta tematik jumlah penduduk (Dukcapil Kemendagri) -->
+    <div id="pemilih-warna" role="listbox" aria-label="Peta penduduk" hidden></div>
+
+    <!-- Orderan 21: peta tematik penduduk menurut agama (Dukcapil Kemendagri) -->
+    <div id="pemilih-agama" role="listbox" aria-label="Peta agama" hidden></div>
+
+    <!-- Orderan 24: daftar kelompok media yang bisa dihidupkan / dimatikan -->
+    <div id="pemilih-media" role="listbox" aria-label="Media on/off" hidden></div>
+
+    <!-- Orderan 26: keterangan warna jangkar & label media di peta.
+         Hanya muncul kalau ada provinsi yang benar-benar punya data media. -->
+    <div id="keterangan-media" hidden aria-label="Keterangan media di peta">
+      <span id="km-judul">Media</span>
+      <div id="km-daftar"></div>
+    </div>
+
+    <!-- Orderan 20: titik lokasi suku bangsa (BPS Sensus Penduduk 2010).
+         Disusun seperti panel Anggota — di PC jadi kolom kiri sehingga peta
+         tetap terlihat penuh saat terbang, tidak tertutup kotak hitam. -->
+    <aside id="panel-suku" hidden aria-hidden="true" aria-label="Peta suku bangsa">
+      <div id="suku-kepala">
+        <h2 id="suku-judul">Suku bangsa</h2>
+        <span id="suku-jumlah"></span>
+        <button id="suku-tutup" type="button" aria-label="Tutup daftar suku">&#10005;</button>
+      </div>
+      <div id="suku-sumber">BPS &middot; Sensus Penduduk 2010 &middot; 28 kelompok</div>
+      <div id="suku-rincian" hidden></div>
+      <div id="suku-isi">
+        <div id="suku-daftar"></div>
+      </div>
+      <div id="suku-kaki">
+        <p id="suku-petunjuk">Ketuk satu suku &mdash; peta terbang ke kawasan
+          utamanya, provinsi di dalamnya diberi garis merah berkedip, dan satu
+          titik penanda ditaruh di titik tengah kawasan.</p>
+        <button id="suku-mati" type="button" hidden>Matikan peta suku</button>
+      </div>
+    </aside>
+
+    <!-- Orderan 32: laporan manajemen memakai Data Pemetaan. Dashboard lama
+         disimpan di backup/laporan-manajemen-20261024/. -->
+    <aside id="panel-dashboard" hidden aria-hidden="true" aria-label="Laporan manajemen Data Pemetaan">
+      <div id="dashboard-kepala">
+        <div>
+          <p class="dashboard-eyebrow">LAPORAN MANAJEMEN</p>
+          <h2 id="dashboard-judul">Data Pemetaan</h2>
+          <p id="dashboard-subjudul">Target bahasa dan produk media Indonesia</p>
+        </div>
+        <button id="dashboard-tutup" type="button" aria-label="Tutup laporan manajemen">&#10005;</button>
+      </div>
+      <div id="dashboard-status" role="status" aria-live="polite">Buka laporan untuk memuat Data Pemetaan.</div>
+      <iframe id="dashboard-laporan" title="Laporan manajemen Data Pemetaan"
+              data-sumber="datapemetaan.html?di=manajemen" loading="lazy"></iframe>
+    </aside>
+
+    <!-- Orderan 16: keterangan angka saat satu wilayah diklik -->
+    <div id="kartu" hidden>
+      <div id="kartu-isian"></div>
+      <button id="kartu-tutup" type="button" aria-label="Tutup">&#10005;</button>
+    </div>
+
+    <div id="derajat" hidden></div>
+
+        <!-- Orderan 17: daftar anggota / lokasi tersimpan -->
+        <aside id="panel-anggota" hidden aria-hidden="true" aria-label="Daftar anggota">
+          <div id="anggota-kepala">
+            <h2 id="anggota-judul">Anggota</h2>
+            <span id="anggota-jumlah"></span>
+            <button id="anggota-kat-tombol" type="button" title="Tambah, ubah, atau hapus kategori">Kategori</button>
+            <button id="anggota-update" type="button" title="Ambil data media terbaru dari API TokoMedia (baca saja)">&#8635; Update</button>
+            <button id="anggota-tambah" type="button">+ Anggota</button>
+            <button id="anggota-tutup" type="button" aria-label="Tutup daftar anggota">&#10005;</button>
+          </div>
+          <div id="anggota-tingkat" role="group" aria-label="Kelompokkan menurut"></div>
+          <div id="anggota-sambung" title="Keadaan sambungan ke database"></div>
+          <div id="anggota-kategori-panel" hidden>
+            <div class="kat-kepala">
+              <span>Klik kategori untuk Edit / Del, atau ketik nama baru untuk + Tambah</span>
+            </div>
+            <div id="kat-daftar" class="kat-daftar"></div>
+            <div class="kat-tambah-baris">
+              <input class="fa-input" id="kat-baru" type="text" placeholder="Nama kategori baru…"
+                     autocomplete="off" name="kategori-baru" data-form-type="other" />
+              <button id="kat-tambah" type="button">+ Tambah</button>
+              <button id="kat-ubah" type="button" hidden>Edit</button>
+              <button id="kat-hapus" type="button" hidden>Del</button>
+            </div>
+            <p class="fa-catatan fa-peringatan" id="kat-pesan" hidden></p>
+          </div>
+                    <div id="anggota-kunci" hidden>
+                      <p class="anggota-kunci-catatan">
+                        Masukkan KODE DATABASE sekali di perangkat ini (PC dan HP).
+                        Setelah itu data anggota tersimpan bersama dan sama di kedua
+                        perangkat.
+                      </p>
+                      <!-- Kolom ini BUKAN kata sandi login, jadi sengaja tidak
+                           memakai type="password". Diukur 17 Okt 2026: dengan
+                           type="password", Chrome mengabaikan autocomplete="off"
+                           dan menawarkan "Save password?" setiap kali ada isian
+                           lain diisi (mis. kotak cari) — mengganggu. Tulisan
+                           disamarkan sendiri lewat CSS (-webkit-text-security),
+                           jadi tetap tidak terbaca orang di sebelah. -->
+                      <div class="anggota-kunci-baris">
+                        <input class="fa-input anggota-kunci-samar" id="anggota-kunci-isian" type="text"
+                               placeholder="Kode database" autocomplete="off"
+                               autocorrect="off" autocapitalize="off" spellcheck="false"
+                               data-lpignore="true" data-1p-ignore data-form-type="other" />
+                        <button class="anggota-kunci-simpan" id="anggota-kunci-simpan" type="button">Simpan</button>
+                      </div>
+                      <p class="fa-catatan fa-peringatan" id="anggota-kunci-pesan" hidden></p>
+                    </div>
+                    <div id="anggota-daftar"></div>
+        </aside>
+
+        <!-- Orderan 17: form isian anggota (lembar bawah, peta tetap terlihat) -->
+        <div id="form-anggota" hidden>
+          <div class="fa-kepala">
+            <h2 id="fa-judul">Tambah Anggota</h2>
+            <button id="fa-tutup" type="button" aria-label="Tutup form">&#10005;</button>
+          </div>
+
+          <div class="fa-isi">
+            <label class="fa-label" for="fa-nama">Nama anggota</label>
+            <input class="fa-input" id="fa-nama" type="text" placeholder="Contoh: Yayasan Cahaya Nusantara"
+                   autocomplete="off" name="nama-anggota" data-form-type="other" />
+
+            <label class="fa-label">Wilayah (pilih dari tingkat atas ke bawah)</label>
+            <div id="fa-tingkat-wilayah"></div>
+            <input class="fa-input fa-nonaktif" id="fa-wilayah" type="text" readonly
+                   placeholder="Belum dipilih" />
+            <p class="fa-catatan" id="fa-penduduk" hidden></p>
+            <!-- Orderan 21: jumlah penduduk menurut agama untuk wilayah terpilih -->
+            <div id="fa-agama" hidden></div>
+            <p class="fa-catatan" id="fa-pin" hidden></p>
+            <button class="fa-tombol fa-tengah" id="fa-pin-tengah" type="button" hidden>&#8634; Titik tengah wilayah</button>
+            <p class="fa-catatan fa-peringatan" id="fa-pratinjau" hidden></p>
+
+            <div class="fa-baris2">
+              <div>
+                <div class="fa-label-baris">
+                  <label class="fa-label" for="fa-kategori">Kategori</label>
+                  <button id="fa-kat-kelola" type="button" class="fa-tautan-kecil">Kelola</button>
+                </div>
+                <select class="fa-input" id="fa-kategori"></select>
+              </div>
+              <div>
+                <label class="fa-label" for="fa-inisial">Inisial penanda</label>
+                <input class="fa-input" id="fa-inisial" type="text" maxlength="3" placeholder="CN"
+                       autocomplete="off" name="inisial-anggota" data-form-type="other" />
+              </div>
+            </div>
+
+            <label class="fa-label" for="fa-rincian">Keterangan (satu per baris, format: Nama = Isi)</label>
+            <textarea class="fa-input fa-area" id="fa-rincian" rows="4"
+                      autocomplete="off" name="keterangan-anggota" data-form-type="other"
+                      placeholder="Berdiri = 2015&#10;Bidang = Pendidikan anak"></textarea>
+          </div>
+
+          <div class="fa-aksi">
+            <button class="fa-tombol fa-hapus" id="fa-hapus" type="button" hidden>Hapus</button>
+            <button class="fa-tombol" id="fa-batal" type="button">Batal</button>
+            <button class="fa-tombol fa-simpan" id="fa-simpan" type="button">Simpan</button>
+          </div>
+        </div>
+
+        <!-- Panduan pemakaian: satu tombol [?] di bilah atas. Panduan yang
+             tampil menyesuaikan tempat pemakai berada. Di PC jadi kolom
+             kanan supaya form/daftar di kiri tetap terlihat. -->
+        <aside id="panduan" hidden aria-hidden="true" aria-label="Panduan pemakaian">
+          <div id="panduan-kepala">
+            <h2 id="panduan-judul">Panduan</h2>
+            <button id="panduan-tutup" type="button" aria-label="Tutup panduan">&#10005;</button>
+          </div>
+          <div id="panduan-isi"></div>
+          <div id="panduan-kaki">
+            <p class="panduan-kaki-judul">Panduan fitur lain</p>
+            <div id="panduan-daftar"></div>
+          </div>
+        </aside>
+
+      <footer id="bilah-bawah">
+              <button id="geser-kiri" type="button" aria-label="Geser ke kiri">&#9664;</button>
+              <span id="posisi">—</span>
+              <button id="geser-kanan" type="button" aria-label="Geser ke kanan">&#9654;</button>
+      </footer>
+
+  <div id="atribusi">Citra: Esri, Maxar, Earthstar Geographics</div>
+</div>
+
+<script src="js/lib/maplibre-gl.js?v=20261024-01"></script>
+<script src="data/wilayah-warna/prop-nasional.js?v=20261024-01"></script>
+<script src="data/peta-bahasa.js?v=20261024-01"></script>
+<script src="data/wilayah-warna/kab-nasional.js?v=20261024-01"></script>
+<script src="js/inti.js?v=20261024-01"></script>
+<script src="js/warna.js?v=20261024-01"></script>
+<script src="js/agama.js?v=20261024-01"></script>
+<script src="js/suku.js?v=20261024-01"></script>
+<script src="js/simpanan.js?v=20261024-01"></script>
+<script src="js/ikon.js?v=20261024-01"></script>
+<script src="js/member.js?v=20261024-01"></script>
+<script src="js/media.js?v=20261024-01"></script>
+<script src="js/label.js?v=20261024-01"></script>
+<script src="js/tokomedia.js?v=20261024-01"></script>
+<script src="js/cari.js?v=20261024-01"></script>
+<script src="js/panduan.js?v=20261024-01"></script>
+<script src="js/laporan-manajemen.js?v=20261024-02"></script>
+</body>
+</html>

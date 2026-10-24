@@ -102,7 +102,8 @@ C:\data\Pemetaan\
 │   ├── laporan-manajemen.js    tombol ▣ pada peta memuat Data Pemetaan
 │   └── panduan.js              panduan pemakaian interaktif (tombol ?)
 ├── backup\
-│   └── laporan-manajemen-20261024\  index, dashboard, dan gaya lama sebelum diganti
+│   ├── laporan-manajemen-20261024\  index, dashboard, dan gaya lama sebelum diganti
+│   └── popup-wilayah-20261024\      kartu Populasi/Agama dan gaya sebelum orderan 33
 ├── data\
 │   ├── datapemetaan\          indeks, rincian, dan snapshot media; dimuat saat diperlukan
 │   ├── wilayah-warna\          554 berkas poligon + angka penduduk
@@ -199,6 +200,31 @@ window.AGAMA_PROP = [
 
 **Tujuh agama yang disajikan:** Islam, Kristen, Katolik, Hindu, Budha,
 Konghucu, Kepercayaan.
+
+### 4.2a Satu kartu angka untuk wilayah yang diklik (orderan 33)
+
+Pada peta Populasi maupun Agama, warna poligon hanya memberi gambaran umum.
+Angka tidak ditulis pada seluruh poligon. Klik provinsi, kabupaten/kota,
+kecamatan, atau desa/kelurahan membuka **satu kartu bersama** (`#kartu`);
+klik wilayah lain mengganti isi kartu tersebut, bukan menumpuk popup baru.
+Tombol ✕ menutupnya tanpa mematikan lapisan peta.
+
+- **Populasi:** jumlah penduduk dan kepadatan ditonjolkan. Kepala keluarga,
+  luas, kode wilayah lengkap, dan sumber tersedia pada rincian yang dibuka
+  saat diperlukan.
+- **Agama:** jumlah penduduk dan agama mayoritas ditonjolkan; ketujuh
+  agama/kepercayaan ditulis sebagai jumlah jiwa dan persentase. Persentase
+  dihitung dari jumlah penduduk, bukan dari jumlah tujuh kategori.
+- **Kepadatan:** $kepadatan = penduduk / luas\_km^2$. Luas dihitung dari
+  poligon resmi Dukcapil melalui `PD.luasKm2()`; kolom `luas_wilayah` mentah
+  tidak digunakan karena sebagian tidak konsisten satuannya. Kepadatan dapat
+  ditampilkan pada keempat tingkat bila luas poligon tersedia. Bila tidak
+  tersedia, tulis **Belum tersedia**, bukan perkiraan.
+- Warna provinsi/kabupaten pada peta Populasi tetap berdasarkan kepadatan;
+  kecamatan/desa berdasarkan jumlah penduduk. Pilihan warna tersebut tidak
+  membatasi angka yang dapat ditampilkan pada kartu.
+- Angka tetap berasal dari data Dukcapil lokal dan dimuat bertahap; klik
+  wilayah tidak memanggil API TokoMedia dan tidak mengubah snapshot media.
 
 ### 4.3 Laporan Data Pemetaan (`datapemetaan.html`, orderan 31)
 
@@ -397,6 +423,7 @@ var coba = 0;
 | **Tombol Satelit/Map bergantian** | hanya ada 2 pilihan, jadi satu tombol lebih enak daripada daftar melayang |
 | **Bilah atas ikon saja** | 8 tombol bertulisan penuh butuh 536 px, bingkai HP hanya 430 px. Arti tiap ikon dijelaskan di panduan (bagian "Arti ikon di bilah atas") |
 | **Jangkar + label media di peta** | satu provinsi = satu jangkar + satu label. Jangkar menunjukkan **tempat**, label menunjukkan **isi**. Dipisah supaya MapLibre bisa menyembunyikan label yang bertumpuk tanpa ikut menghilangkan jangkarnya |
+| **Klik satu wilayah → satu kartu angka** | pengguna membaca angka wilayah yang dipilih tanpa memenuhi peta dengan label. Populasi menampilkan penduduk/kepadatan; Agama menampilkan penduduk, mayoritas, dan tujuh kategori. Rincian tambahan bersifat lipat dan kartu dibatasi tinggi di HP |
 
 ### Bilah atas — 8 tombol, ikon saja (orderan 24)
 

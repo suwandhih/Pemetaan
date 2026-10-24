@@ -1,0 +1,2924 @@
+/* Pemetaan — tampilan
+   Syarat 14c: HP tegak (portrait).
+   Orderan 22 (menggantikan 14d): di PC peta memenuhi tinggi layar dan
+   selebar layar — tidak ada ruang kosong di atas/bawah. Daftar anggota &
+   form isian menjadi kolom di sisi kiri supaya peta tetap terlihat penuh
+   saat mengisi data. Di HP tidak ada perubahan. */
+
+:root {
+  --lebar-hp: 430px;
+  --lebar-panel: 380px;
+  --tinggi-bilah: 40px;
+  --gelap: #0b0f14;
+  --terang: #e8eef5;
+  --garis: rgba(255, 255, 255, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #05080b;
+  color: var(--terang);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+/* Di HP lebar bingkai dibatasi selebar HP (430 px) supaya peta tidak
+   mengecil; sisa lebar itulah yang di-scroll kiri-kanan. Di PC batas ini
+   dilepas oleh aturan @media di akhir berkas (orderan 22). */
+#bingkai {
+  position: relative;
+  width: min(100%, var(--lebar-hp));
+  max-width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  overflow: clip;
+  background: var(--gelap);
+}
+
+@media (min-width: 480px) {
+  #bingkai {
+    border-left: 1px solid #1e2833;
+    border-right: 1px solid #1e2833;
+  }
+}
+
+#peta {
+  position: absolute;
+  inset: 0;
+}
+
+#bilah-atas,
+#bilah-bawah {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--tinggi-bilah);
+  padding: 0 10px;
+  background: rgba(11, 15, 20, 0.78);
+  backdrop-filter: blur(6px);
+  font-size: 13px;
+}
+
+#bilah-atas {
+  top: 0;
+  border-bottom: 1px solid var(--garis);
+}
+
+/* Orderan 15 — tombol pembuka pilihan jenis peta. Lebarnya mengikuti tulisan
+   supaya nama jenis peta terbaca utuh di HP sempit sekalipun. */
+#tombol-jenis {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-jenis:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#tombol-jenis[aria-expanded="true"] {
+  border-color: #58a6ff;
+  background: rgba(88, 166, 255, 0.22);
+}
+
+#jenis-nama {
+  font-weight: 600;
+}
+
+#tombol-jenis .panah {
+  font-size: 9px;
+  opacity: 0.7;
+}
+
+/* Orderan 16 — tombol pembuka pilihan tingkat peta penduduk ([Populasi 👁]). */
+#tombol-warna {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-warna:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#tombol-warna[aria-expanded="true"],
+#tombol-warna[aria-pressed="true"] {
+  border-color: #63c2de;
+  background: rgba(99, 194, 222, 0.24);
+}
+
+#tombol-warna[aria-pressed="false"] #warna-ikon {
+  opacity: 0.55;
+}
+
+#warna-nama {
+  font-weight: 600;
+}
+
+/* Daftar tingkat penduduk */
+#pemilih-warna {
+  position: absolute;
+  top: calc(var(--tinggi-bilah) + 4px);
+  left: 8px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 200px;
+  max-width: calc(100% - 16px);
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  background: rgba(11, 15, 20, 0.96);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+#pemilih-warna[hidden] {
+  display: none;
+}
+
+.pilihan-warna {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.2;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.pilihan-warna:active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.pilihan-warna.nyala {
+  background: rgba(99, 194, 222, 0.26);
+  box-shadow: inset 0 0 0 1px rgba(99, 194, 222, 0.5);
+}
+
+/* ============================================================
+   Orderan 21 — peta penduduk menurut agama
+   ------------------------------------------------------------
+   Tombol [Agama 🙏] berdiri sendiri di sebelah tombol Populasi.
+   Daftar melayangnya memakai tempat yang sama dengan daftar Populasi,
+   jadi keduanya tidak pernah terbuka bersamaan (diatur di js/agama.js
+   dan js/warna.js).
+   ============================================================ */
+
+#tombol-agama {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-agama:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#tombol-agama[aria-expanded="true"],
+#tombol-agama[aria-pressed="true"] {
+  border-color: #63c2de;
+  background: rgba(99, 194, 222, 0.24);
+}
+
+#tombol-agama[aria-pressed="false"] #agama-ikon {
+  opacity: 0.55;
+}
+
+#agama-nama {
+  font-weight: 600;
+}
+
+#pemilih-agama {
+  position: absolute;
+  top: calc(var(--tinggi-bilah) + 4px);
+  left: 8px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 200px;
+  max-width: calc(100% - 16px);
+  max-height: calc(100% - var(--tinggi-bilah) - 16px);
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  background: rgba(11, 15, 20, 0.96);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+#pemilih-agama[hidden] {
+  display: none;
+}
+
+.agama-kepala {
+  padding: 5px 9px 3px;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.agama-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 2px 5px 4px;
+}
+
+.agama-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11.5px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.agama-chip i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.agama-chip.nyala {
+  border-color: #63c2de;
+  background: rgba(99, 194, 222, 0.26);
+  font-weight: 600;
+}
+
+.agama-pisah {
+  height: 1px;
+  margin: 4px 5px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Tombol mematikan peta agama — hanya tampil saat peta agama menyala. */
+.agama-mati {
+  margin: 5px 5px 2px;
+  padding: 7px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.agama-mati[hidden] {
+  display: none;
+}
+
+.agama-mati:active {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Daftar jumlah per agama — dipakai di kartu peta & di form anggota. */
+.agama-daftar {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.agama-baris {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: 'nama angka' 'bar bar';
+  gap: 2px 8px;
+  width: 100%;
+  padding: 5px 7px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11.5px;
+  line-height: 1.3;
+  text-align: left;
+}
+
+button.agama-baris {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button.agama-baris:active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+button.agama-baris:hover {
+  border-color: rgba(99, 194, 222, 0.5);
+}
+
+.agama-nama {
+  grid-area: nama;
+  font-weight: 600;
+}
+
+.agama-angka {
+  grid-area: angka;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.agama-bar {
+  grid-area: bar;
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.agama-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+/* Blok agama di form Tambah/Ubah Anggota. */
+.fa-agama-judul {
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.fa-agama-sumber {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.fa-agama-mayoritas {
+  margin-top: 2px;
+}
+
+.fa-agama-petunjuk {
+  margin-top: 4px;
+  opacity: 0.65;
+}
+
+#fa-agama[hidden] {
+  display: none;
+}
+
+/* ============================================================
+   Orderan 24 — menu "Media on/off"
+   ------------------------------------------------------------
+   Menggantikan tombol mata (👁) di sebelah tombol Anggota. Tombol
+   mata hanya bisa menyembunyikan SELURUH penanda; menu ini bisa
+   memilih kelompok mana yang tampil.
+
+   Daftarnya memakai tempat yang sama dengan daftar Populasi dan
+   Agama, jadi ketiganya tidak pernah terbuka bersamaan (diatur di
+   js/media.js, js/warna.js, dan js/agama.js).
+   ============================================================ */
+
+#tombol-media {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-media:active,
+#tombol-dashboard:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#tombol-media[aria-expanded="true"],
+#tombol-media[aria-pressed="true"],
+#tombol-dashboard[aria-expanded="true"] {
+  border-color: #63c2de;
+  background: rgba(99, 194, 222, 0.24);
+}
+
+#pemilih-media {
+  position: absolute;
+  top: calc(var(--tinggi-bilah) + 4px);
+  left: 8px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 230px;
+  max-width: calc(100% - 16px);
+  max-height: calc(100% - var(--tinggi-bilah) - 16px);
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  background: rgba(11, 15, 20, 0.96);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+#pemilih-media[hidden] {
+  display: none;
+}
+
+.media-kepala {
+  padding: 5px 9px 3px;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.media-baris {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.media-baris:active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.media-baris.nyala {
+  background: rgba(99, 194, 222, 0.26);
+  box-shadow: inset 0 0 0 1px rgba(99, 194, 222, 0.5);
+}
+
+/* Icon kelompok — bentuknya sama dengan icon penanda di peta, jadi
+   pemakai langsung tahu baris ini milik penanda yang mana. */
+.media-gambar {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 18px 18px;
+  opacity: 0.45;
+}
+
+.media-baris.nyala .media-gambar {
+  opacity: 1;
+}
+
+.media-nama {
+  flex: 1 1 auto;
+  white-space: nowrap;
+}
+
+.media-keadaan {
+  flex: none;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.media-baris.nyala .media-keadaan {
+  opacity: 0.9;
+  font-weight: 600;
+}
+
+.media-pisah {
+  height: 1px;
+  margin: 4px 5px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.media-serempak {
+  display: flex;
+  gap: 4px;
+  padding: 2px 5px 4px;
+}
+
+.media-serempak-tombol {
+  flex: 1 1 0;
+  padding: 7px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11.5px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.media-serempak-tombol:active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.media-serempak-tombol.nyala {
+  border-color: #58a6ff;
+  background: rgba(88, 166, 255, 0.18);
+  color: #9ecbff;
+  font-weight: 600;
+}
+
+/* ============================================================
+   Orderan 26 — keterangan media di peta
+   ------------------------------------------------------------
+   Jangkar (titik) dan label (tulisan) ditaruh di atas provinsi yang
+   punya data media. Keterangan ini menjelaskan warna tiap kelompok,
+   dan hanya muncul kalau memang ada datanya — jadi tidak pernah
+   menampilkan kelompok yang kosong.
+
+   Letaknya di kiri bawah, di atas bilah bawah. Sisi kanan bawah sudah
+   dipakai #atribusi, jadi keduanya tidak bertabrakan.
+   ============================================================ */
+
+#keterangan-media {
+  position: absolute;
+  left: 8px;
+  /* Diangkat melewati #atribusi (kanan bawah, tinggi ±11 px + 4 px jarak)
+     supaya keduanya tidak bertumpuk saat keterangan melipat jadi
+     beberapa baris di layar sempit. */
+  bottom: calc(var(--tinggi-bilah) + 18px);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: calc(100% - 16px);
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  background: rgba(11, 15, 20, 0.82);
+  backdrop-filter: blur(6px);
+  font-size: 10.5px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+#keterangan-media[hidden] {
+  display: none;
+}
+
+#km-judul {
+  flex: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+#km-daftar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* Pil warna — bentuknya sama dengan label di peta supaya pemakai
+   langsung menghubungkan warna dengan kelompoknya. */
+.km-pil {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  white-space: nowrap;
+}
+
+.km-pil i {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================================
+   Orderan 20 — titik lokasi suku bangsa
+   ------------------------------------------------------------
+   Tombol [Suku 🧬] berdiri sendiri di sebelah tombol Agama. Daftarnya
+   disusun seperti panel Anggota (revisi 2026-10-17): di PC menjadi kolom
+   kiri sehingga peta tetap terlihat penuh saat terbang — tidak tertutup
+   kotak hitam. Di HP panelnya menutupi layar seperti panel Anggota.
+   ============================================================ */
+
+#tombol-suku {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-suku:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#tombol-suku[aria-expanded="true"],
+#tombol-suku[aria-pressed="true"] {
+  border-color: #63c2de;
+  background: rgba(99, 194, 222, 0.24);
+}
+
+#tombol-suku[aria-pressed="false"] #suku-ikon {
+  opacity: 0.55;
+}
+
+#suku-nama-tombol {
+  font-weight: 600;
+}
+
+/* Panel daftar suku — susunannya meniru #panel-anggota. */
+#panel-suku {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overflow: clip;
+  background: rgba(9, 12, 16, 0.97);
+  backdrop-filter: blur(8px);
+}
+
+#panel-suku[hidden] {
+  display: none;
+}
+
+#panel-dashboard {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #0b1118;
+  color: var(--terang);
+}
+
+#panel-dashboard[hidden] { display: none; }
+
+/* Orderan 32: isi laporan manajemen diganti Data Pemetaan. */
+#dashboard-laporan { display: block; flex: 1; min-width: 0; min-height: 0; width: 100%; border: 0; background: #f4f3ed; }
+#panel-dashboard { background: #f4f3ed; }
+#dashboard-status { flex: none; padding: 7px 16px; margin: 0; color: #596960; background: #eae9dc; font-size: 11px; }
+@media (min-width: 900px) {
+  #panel-dashboard { width: min(1100px, 85vw); }
+  #bingkai:has(#panel-dashboard:not([hidden])) #peta,
+  #bingkai:has(#panel-dashboard:not([hidden])) #bilah-atas,
+  #bingkai:has(#panel-dashboard:not([hidden])) #bilah-bawah,
+  #bingkai:has(#panel-dashboard:not([hidden])) #cari,
+  #bingkai:has(#panel-dashboard:not([hidden])) #keterangan-media,
+  #bingkai:has(#panel-dashboard:not([hidden])) #atribusi { left: min(1100px, 85vw); right: 0; }
+}
+
+#dashboard-kepala {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--garis);
+  background: linear-gradient(120deg, rgba(34, 69, 84, .36), rgba(12, 17, 24, .96) 68%);
+}
+
+#dashboard-kepala h2 { margin: 0; font-size: 20px; letter-spacing: -.025em; }
+#dashboard-subjudul { margin: 4px 0 0; color: #a7b5c2; font-size: 11px; }
+.dashboard-eyebrow { margin: 0 0 5px; color: #69d3c3; font-size: 9px; font-weight: 750; letter-spacing: .14em; }
+#dashboard-tutup { width: 32px; height: 32px; border: 1px solid var(--garis); border-radius: 9px; background: #17212c; color: var(--terang); cursor: pointer; }
+#dashboard-filter { flex: none; display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--garis); }
+#dashboard-filter label { color: #a7b5c2; font-size: 11px; }
+#dashboard-pulau { flex: 1; min-width: 0; padding: 8px 10px; border: 1px solid #344352; border-radius: 8px; background: #111a23; color: var(--terang); font: inherit; font-size: 12px; }
+#dashboard-status { flex: none; padding: 7px 16px 0; color: #8fa3b3; font-size: 10px; }
+#dashboard-isi { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 12px 14px 28px; scrollbar-color: #405365 transparent; }
+.dashboard-seksi { margin: 0 0 18px; }
+.dashboard-seksi h3 { margin: 0; color: #eef5fa; font-size: 14px; letter-spacing: -.01em; }
+.dashboard-keterangan { margin: 4px 0 10px; color: #91a1af; font-size: 10px; line-height: 1.45; }
+.dashboard-kartu-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.dashboard-angka { position: relative; display: flex; min-height: 94px; flex-direction: column; justify-content: center; gap: 3px; padding: 11px; overflow: hidden; border: 1px solid #253440; border-radius: 12px; background: linear-gradient(145deg, #151f29, #10171f); }
+.dashboard-angka-simbol { position: absolute; top: 8px; right: 10px; color: #69d3c3; opacity: .8; font-size: 14px; }
+.dashboard-angka-label { max-width: 85%; color: #adbac5; font-size: 9px; line-height: 1.3; }
+.dashboard-angka-nilai { color: #f3f7fa; font-size: 24px; font-weight: 720; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.dashboard-angka small { color: #8293a1; font-size: 9px; line-height: 1.35; }
+.dashboard-kategori-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.dashboard-kategori-grid .dashboard-angka { min-height: 80px; }
+.dashboard-kategori-grid .dashboard-angka-nilai { font-size: 20px; }
+.dashboard-tabel-bungkus { overflow: auto; border: 1px solid #253440; border-radius: 10px; }
+.dashboard-tabel { width: 100%; border-collapse: collapse; font-size: 10px; }
+.dashboard-tabel th, .dashboard-tabel td { padding: 8px 9px; border-bottom: 1px solid rgba(255,255,255,.055); text-align: left; vertical-align: top; }
+.dashboard-tabel thead th { position: sticky; top: 0; z-index: 1; background: #18232e; color: #aebbc7; font-size: 9px; font-weight: 650; }
+.dashboard-tabel tbody th { min-width: 130px; color: #dce6ed; font-weight: 600; }
+.dashboard-tabel tbody tr:last-child th, .dashboard-tabel tbody tr:last-child td { border-bottom: 0; }
+.dashboard-badge { display: inline-block; padding: 3px 6px; border-radius: 999px; font-size: 9px; white-space: nowrap; }
+.dashboard-badge.ada { background: rgba(47, 177, 145, .14); color: #78e0c5; }
+.dashboard-badge.kosong { background: rgba(241, 184, 91, .12); color: #e7bd77; }
+.dashboard-media-rincian { display: block; max-width: 145px; margin-top: 4px; color: #8395a4; font-size: 8px; line-height: 1.5; }
+.dashboard-daftar-bahasa, .dashboard-provinsi-kosong, .dashboard-suku-grid { display: grid; grid-template-columns: 1fr; gap: 6px; }
+.dashboard-bahasa-item, .dashboard-provinsi-kosong-item, .dashboard-suku-item { padding: 9px 10px; border: 1px solid #253440; border-radius: 9px; background: #111a23; }
+.dashboard-bahasa-atas { display: flex; justify-content: space-between; gap: 8px; color: #e3edf3; font-size: 10px; }
+.dashboard-bahasa-atas span { color: #70d2c2; font-size: 9px; }
+.dashboard-bahasa-item p, .dashboard-provinsi-kosong-item p { margin: 5px 0 0; color: #96a6b3; font-size: 9px; line-height: 1.5; }
+.dashboard-provinsi-kosong-item h4 { margin: 0 0 5px; color: #d8e4eb; font-size: 11px; }
+.dashboard-suku-item { display: grid; grid-template-columns: 1fr auto; gap: 5px 8px; align-items: baseline; }
+.dashboard-suku-item strong { color: #dce8ef; font-size: 10px; }
+.dashboard-suku-item span { color: #70d2c2; font-size: 9px; white-space: nowrap; }
+.dashboard-suku-item small { grid-column: 1 / -1; color: #899aa8; font-size: 8px; line-height: 1.45; }
+.dashboard-kosong { margin: 8px 0 0; color: #98a9b6; font-size: 10px; }
+.dashboard-catatan-metode { padding: 10px; border-left: 2px solid #e1b45f; border-radius: 0 8px 8px 0; background: rgba(225,180,95,.08); color: #c8b991; font-size: 9px; line-height: 1.55; }
+
+#suku-kepala {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--garis);
+}
+
+#suku-judul {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#suku-jumlah {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+#suku-tutup {
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--terang);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#suku-sumber {
+  flex: none;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--garis);
+  font-size: 10.5px;
+  opacity: 0.6;
+}
+
+#suku-isi {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 10px;
+}
+
+#suku-kaki {
+  flex: none;
+  padding: 8px 10px;
+  border-top: 1px solid var(--garis);
+}
+
+#suku-rincian {
+  flex: none;
+  max-height: 52%;
+  overflow-y: auto;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--garis);
+  background: rgba(99, 194, 222, 0.06);
+}
+
+#suku-rincian[hidden] {
+  display: none;
+}
+
+.suku-rincian-judul {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#suku-petunjuk {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.45;
+  opacity: 0.65;
+}
+
+#suku-mati {
+  width: 100%;
+  margin-top: 7px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#suku-mati[hidden] {
+  display: none;
+}
+
+#suku-mati:active {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Satu baris suku: nama + tanda "gabungan", angka jiwa & persentase,
+   lalu bar proporsi terhadap suku terbanyak (Jawa). */
+.suku-baris {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: 'nama angka' 'bar bar';
+  gap: 2px 8px;
+  width: 100%;
+  margin-bottom: 3px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11.5px;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.suku-baris:active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.suku-baris:hover {
+  border-color: rgba(99, 194, 222, 0.5);
+}
+
+.suku-baris.nyala {
+  border-color: #63c2de;
+  background: rgba(99, 194, 222, 0.22);
+}
+
+.suku-nama {
+  grid-area: nama;
+  font-weight: 600;
+}
+
+.suku-tanda {
+  margin-left: 5px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 9.5px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.suku-angka {
+  grid-area: angka;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.suku-bar {
+  grid-area: bar;
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.suku-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #63c2de;
+}
+
+.suku-petunjuk {
+  padding: 2px 9px 4px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  opacity: 0.65;
+}
+
+/* Blok "kawasan utama" di kartu rincian. */
+.suku-kepala {
+  margin-top: 10px;
+}
+
+.suku-kawasan {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.suku-kawasan-baris {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 11.5px;
+}
+
+.suku-kawasan-nama {
+  font-weight: 600;
+}
+
+.suku-kawasan-catatan {
+  opacity: 0.65;
+  font-size: 10.5px;
+  text-align: right;
+}
+
+.suku-catatan {
+  margin-top: 8px;
+}
+
+/* Keterangan angka saat satu wilayah diklik */
+#kartu {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: calc(var(--tinggi-bilah) + 40px);
+  z-index: 3;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  background: rgba(11, 15, 20, 0.95);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  font-size: 12px;
+}
+
+#kartu[hidden] {
+  display: none;
+}
+
+#kartu-tutup {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--terang);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.kartu-judul {
+  margin: 0 22px 6px 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.kartu-tabel {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.kartu-tabel td {
+  padding: 2px 0;
+  vertical-align: top;
+}
+
+.kartu-tabel td:first-child {
+  width: 42%;
+  opacity: 0.66;
+}
+
+.kartu-tabel td:last-child {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Keterangan warna peta penduduk */
+#derajat {
+  position: absolute;
+  left: 8px;
+  bottom: calc(var(--tinggi-bilah) + 6px);
+  z-index: 2;
+  padding: 7px 22px 7px 9px;
+  border-radius: 8px;
+  background: rgba(11, 15, 20, 0.8);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+#derajat[hidden] {
+  display: none;
+}
+
+#derajat-tutup {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--terang);
+  font-size: 9px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.derajat-judul {
+  margin-bottom: 4px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.derajat-baris {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.derajat-kotak {
+  width: 14px;
+  height: 9px;
+  border-radius: 2px;
+  flex: none;
+}
+
+.derajat-catatan {
+  margin-top: 4px;
+  opacity: 0.6;
+}
+
+/* Revisi 2026-10-17: daftar jenis peta tidak dipakai lagi — tombolnya
+   bergantian (Satelit ⇄ Map). Aturan #pemilih-peta / .pilihan-peta dihapus. */
+
+/* ---------- Orderan 19: tombol & kotak cari ---------- */
+
+/* Orderan 24 — bilah atas menjadi IKON SAJA.
+   ------------------------------------------------------------
+   Sebelumnya tombol memakai tulisan penuh ([Anggota][Satelit]
+   [Populasi][Agama][Suku][⌕][?]). Diukur 17 Okt 2026: tujuh tombol
+   bertulisan penuh butuh 536 px, sedangkan bingkai HP selalu hanya
+   430 px (lihat --lebar-hp) — tombol paling kanan terpotong.
+
+   Orderan 24 menambah satu tombol lagi (Media on/off), jadi tulisan
+   penuh tidak mungkin lagi muat. Pemilik proyek memutuskan seluruh
+   tombol memakai ikon saja, dan arti tiap ikon dijelaskan di panduan
+   (lihat js/panduan.js, bagian "Arti ikon di bilah atas").
+
+   Diukur 22 Okt 2026 setelah diubah: 8 tombol × 30 px + 7 jarak × 5 px
+   = 275 px — muat di 320 px sekalipun, dengan sisa ruang. */
+
+#bilah-atas {
+  gap: 5px;
+  padding: 0 7px;
+}
+
+#tombol-jenis,
+#tombol-warna,
+#tombol-agama,
+#tombol-suku,
+#tombol-media,
+#tombol-dashboard,
+#tombol-anggota {
+  width: 30px;
+  min-width: 30px;
+  padding: 0;
+  justify-content: center;
+}
+
+/* Tulisan pada tombol disembunyikan; ikonnya tetap tampil. */
+#jenis-nama,
+#warna-nama,
+#agama-nama,
+#suku-nama-tombol {
+  display: none;
+}
+
+/* Tombol Anggota memakai ikon garis-tiga (☰) sebagai ganti tulisan.
+   Ditulis dengan #bilah-atas di depan supaya menang atas aturan
+   #tombol-anggota yang ada di bagian bawah berkas (font-size: 12px). */
+#bilah-atas #tombol-anggota {
+  font-size: 0;
+}
+
+#bilah-atas #tombol-anggota::before {
+  content: '\2630';
+  font-size: 14px;
+}
+
+/* Ikon tombol sedikit diperbesar supaya tetap jelas tanpa tulisan. */
+#tombol-jenis,
+#tombol-warna,
+#tombol-agama,
+#tombol-suku {
+  font-size: 14px;
+}
+
+/* Layar sangat sempit (< 300 px) — diukur 22 Okt 2026: delapan tombol
+   30 px + jarak 5 px butuh 282 px. HP tersempit yang lazim dipakai
+   selebar 320 px, jadi sebenarnya sudah muat; blok ini hanya jaring
+   pengaman supaya tidak ada tombol yang terpotong di layar luar biasa
+   sempit. Diukur ulang: 8 × 28 px + 7 × 3 px + 2 × 4 px = 253 px. */
+@media (max-width: 399px) {
+  #bilah-atas {
+    gap: 4px;
+    padding: 0 4px;
+  }
+
+  #tombol-jenis,
+  #tombol-warna,
+  #tombol-agama,
+  #tombol-suku,
+  #tombol-media,
+  #tombol-dashboard,
+  #tombol-anggota,
+  #tombol-cari,
+  #tombol-panduan {
+    width: 28px;
+    min-width: 28px;
+  }
+
+  #tombol-cari,
+  #tombol-panduan {
+    flex: 0 0 28px;
+  }
+}
+
+#tombol-cari,
+#tombol-panduan {
+  flex: 0 0 30px;
+  margin-left: 0;
+}
+
+@media (max-width: 299px) {
+  #bilah-atas {
+    gap: 2px;
+    padding: 0 2px;
+  }
+
+  #tombol-cari,
+  #tombol-panduan {
+    flex: 0 0 28px !important;
+  }
+
+  #tombol-jenis,
+  #tombol-warna,
+  #tombol-agama,
+  #tombol-suku,
+  #tombol-media,
+  #tombol-dashboard,
+  #tombol-anggota,
+  #tombol-cari,
+  #tombol-panduan {
+    width: 28px;
+    min-width: 28px;
+    flex: 0 0 28px !important;
+  }
+}
+
+#tombol-dashboard {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  min-width: 30px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-cari {
+  margin-left: auto;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  min-width: 30px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-cari[aria-expanded="true"] {
+  border-color: #58a6ff;
+  background: rgba(88, 166, 255, 0.22);
+}
+
+#cari {
+  position: absolute;
+  top: var(--tinggi-bilah);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - var(--tinggi-bilah) - var(--tinggi-bilah));
+  border-bottom: 1px solid var(--garis);
+  background: rgba(9, 12, 16, 0.97);
+  backdrop-filter: blur(8px);
+}
+
+#cari[hidden] {
+  display: none;
+}
+
+#cari-baris {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--garis);
+}
+
+#cari-ikon {
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+#cari-isian {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+#cari-isian:focus {
+  outline: none;
+  border-color: #58a6ff;
+}
+
+#cari-tutup {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--terang);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#cari-hasil {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 8px 10px;
+}
+
+.cari-grup {
+  margin: 8px 2px 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.cari-baris {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 9px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.cari-baris:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.cari-ikon {
+  flex: none;
+  width: 18px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.cari-titik {
+  width: 10px;
+  height: 10px;
+  margin: 4px 4px 0;
+  border-radius: 50%;
+}
+
+.cari-isi {
+  flex: 1;
+  min-width: 0;
+}
+
+.cari-nama {
+  display: block;
+  font-weight: 600;
+}
+
+.cari-ket {
+  display: block;
+  margin-top: 1px;
+  font-size: 10.5px;
+  opacity: 0.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cari-pesan {
+  margin: 10px 4px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  opacity: 0.7;
+}
+
+#bilah-bawah {
+  bottom: 0;
+  border-top: 1px solid var(--garis);
+}
+
+#judul {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+#wilayah {
+  margin-left: auto;
+  font-size: 12px;
+  opacity: 0.75;
+  /* Nama wilayah panjang (mis. "Kalimantan Barat") tidak boleh menekan
+     tombol peta di sebelah kiri — teksnya dipotong dengan "…". */
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+#bilah-bawah button {
+  width: 44px;
+  height: 30px;
+  flex: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--terang);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#bilah-bawah button:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#posisi {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+/* Grup tombol [Anggota][👁] di sebelah kanan bilah atas. */
+/* Grup tombol anggota — diletakkan paling kiri bilah atas (revisi
+   2026-10-17) supaya sejajar dengan kolom form anggota di bawahnya saat
+   kolom itu terbuka di PC. */
+#grup-anggota {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#tombol-anggota {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-anggota:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Panel daftar anggota — menutupi bilah atas & bawah, peta tetap di bawahnya. */
+#panel-anggota {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overflow: clip;
+  background: rgba(9, 12, 16, 0.97);
+  backdrop-filter: blur(8px);
+}
+
+#panel-anggota[hidden] {
+  display: none;
+}
+
+#anggota-kepala {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--garis);
+}
+
+#anggota-judul {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#anggota-jumlah {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+#anggota-kat-tombol,
+#anggota-update {
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#anggota-kat-tombol {
+  margin-left: auto;
+}
+
+#anggota-update:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+#anggota-kat-tombol.nyala {
+  border-color: #58a6ff;
+  background: rgba(88, 166, 255, 0.22);
+}
+
+#anggota-tambah {
+  padding: 6px 12px;
+  border: 1px solid rgba(88, 166, 255, 0.5);
+  border-radius: 8px;
+  background: rgba(88, 166, 255, 0.2);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Saat mode Kategori aktif, bersihkan layar kerja dari form + Anggota
+   dan daftar anggota di bawahnya supaya tidak membingungkan. */
+#panel-anggota.mode-kategori #anggota-tambah,
+#panel-anggota.mode-kategori #anggota-update,
+#panel-anggota.mode-kategori #anggota-jumlah,
+#panel-anggota.mode-kategori #anggota-tingkat,
+#panel-anggota.mode-kategori #anggota-daftar {
+  display: none;
+}
+
+/* Panel kelola kategori (tambah / edit / del) */
+#anggota-kategori-panel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+#anggota-kategori-panel[hidden] {
+  display: none;
+}
+
+.kat-kepala {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 11.5px;
+  opacity: 0.85;
+}
+
+#anggota-kat-tutup {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--terang);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.kat-daftar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.kat-baris {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.kat-baris:hover {
+  border-color: rgba(88, 166, 255, 0.5);
+}
+
+.kat-baris.dipilih {
+  border-color: #58a6ff;
+  background: rgba(88, 166, 255, 0.24);
+  font-weight: 600;
+}
+
+.kat-warna {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.kat-tambah-baris {
+  display: flex;
+  gap: 6px;
+}
+
+.kat-tambah-baris .fa-input {
+  flex: 1;
+  min-width: 0;
+}
+
+#kat-tambah,
+#kat-ubah,
+#kat-hapus {
+  flex: none;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#kat-tambah,
+#kat-ubah {
+  border: 1px solid #58a6ff;
+  background: rgba(88, 166, 255, 0.22);
+}
+
+#kat-hapus {
+  border: 1px solid rgba(232, 86, 63, 0.65);
+  background: rgba(232, 86, 63, 0.22);
+}
+
+#kat-tambah[hidden],
+#kat-ubah[hidden],
+#kat-hapus[hidden] {
+  display: none;
+}
+
+.fa-label-baris {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fa-tautan-kecil {
+  margin-top: 8px;
+  padding: 2px 6px;
+  border: 1px solid rgba(88, 166, 255, 0.45);
+  border-radius: 5px;
+  background: rgba(88, 166, 255, 0.14);
+  color: #58a6ff;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#anggota-tutup {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--terang);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* Orderan 24: tombol mata (👁) dihapus — digantikan menu Media on/off
+   (#tombol-media) yang bisa memilih kelompok mana yang tampil. */
+
+/* Tombol tingkat pengelompokan */
+#anggota-tingkat {
+  flex: none;
+  display: flex;
+  gap: 5px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--garis);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+#anggota-tingkat::-webkit-scrollbar { display: none; }
+
+.anggota-tingkat-tombol {
+  flex: none;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.anggota-tingkat-tombol.nyala {
+  border-color: #58a6ff;
+  background: rgba(88, 166, 255, 0.24);
+  font-weight: 600;
+}
+
+#anggota-daftar {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 10px calc(var(--tinggi-bilah) + 12px);
+}
+
+/* Penanda keadaan sambungan ke database (orderan 7).
+   Hijau = data tersimpan di Neon, sama di HP dan PC.
+   Kuning = sedang luring, data ditahan di peramban dulu. */
+#anggota-sambung {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--garis);
+  font-size: 10.5px;
+  line-height: 1.3;
+  opacity: 0.75;
+}
+
+#anggota-sambung::before {
+  content: '';
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #8b949e;
+}
+
+#anggota-sambung.penyambung::before { background: #d29922; }
+#anggota-sambung.tersambung::before { background: #3fb950; }
+#anggota-sambung.luring::before { background: #d29922; }
+#anggota-sambung.mati::before { background: #8b949e; }
+
+/* Isian kode database — muncul hanya bila kode belum pernah dimasukkan
+   di perangkat ini (orderan 7). */
+#anggota-kunci {
+  flex: none;
+  padding: 10px;
+  border-bottom: 1px solid var(--garis);
+  background: rgba(88, 166, 255, 0.06);
+}
+
+.anggota-kunci-catatan {
+  margin: 0 0 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+.anggota-kunci-baris {
+  display: flex;
+  gap: 6px;
+}
+
+.anggota-kunci-baris .fa-input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Kode database disamarkan sendiri, bukan lewat type="password" — lihat
+   keterangan di index.html. `-webkit-text-security` didukung Chrome, Edge,
+   dan Safari; peramban yang tidak mendukungnya tetap menampilkan tulisan
+   biasa (tidak rusak, hanya tidak tersamar). */
+.anggota-kunci-samar {
+  -webkit-text-security: disc;
+  text-security: disc;
+}
+
+.anggota-kunci-simpan {
+  flex: none;
+  padding: 0 14px;
+  border: 1px solid #58a6ff;
+  border-radius: 8px;
+  background: rgba(88, 166, 255, 0.24);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.anggota-kunci-simpan[disabled] { opacity: 0.5; }
+
+.anggota-kosong {
+  margin: 24px 8px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  text-align: center;
+  opacity: 0.6;
+}
+
+.anggota-grup {
+  margin-bottom: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.anggota-grup-judul {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 9px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.anggota-grup-pin {
+  color: #58a6ff;
+  font-size: 9px;
+}
+
+.anggota-grup-nama {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.anggota-grup-jumlah {
+  padding: 1px 6px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 10px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.anggota-aksi {
+  display: flex;
+  gap: 3px;
+  margin-left: auto;
+}
+
+.anggota-aksi-tombol {
+  width: 24px;
+  height: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--terang);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.anggota-aksi-tombol:active {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.anggota-baris {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.anggota-baris:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.anggota-warna {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.anggota-isi {
+  min-width: 0;
+}
+
+.anggota-nama {
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.anggota-ket {
+  font-size: 10px;
+  opacity: 0.55;
+}
+
+/* Form isian anggota.
+   HP (orderan 18): peta di ATAS 45%, form di BAWAH 55% — supaya peta tetap
+   terlihat dan bisa diperiksa sambil mengisi. Peta benar-benar menyusut
+   (bukan ditutup), jadi wilayah yang dipilih tidak tersembunyi di balik form.
+   PC (orderan 22): form menjadi kolom penuh di sisi kiri — lihat blok
+   @media (min-width: 900px) di akhir berkas. */
+#form-anggota {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  height: 55%;
+  max-height: 55%;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  background: #0e1319;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.65);
+}
+
+#form-anggota[hidden] {
+  display: none;
+}
+
+.fa-kepala {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--garis);
+}
+
+#fa-judul {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#fa-tutup {
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--terang);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fa-isi {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 12px;
+}
+
+.fa-label {
+  display: block;
+  margin: 10px 0 4px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.fa-input {
+  width: 100%;
+  padding: 8px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 12.5px;
+}
+
+.fa-input:focus {
+  outline: none;
+  border-color: #58a6ff;
+}
+
+.fa-nonaktif {
+  background: rgba(255, 255, 255, 0.02);
+  opacity: 0.8;
+}
+
+.fa-area {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.fa-wilayah-baris {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.fa-wilayah-baris .fa-label {
+  flex: none;
+  width: 96px;
+  margin: 0;
+  font-size: 10.5px;
+}
+
+.fa-pilih {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 7px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11.5px;
+  /* Daftar pilihan (dropdown) digambar peramban, bukan oleh halaman.
+     Tanpa ini, Chrome memakai latar putih sedangkan warna teks dari
+     .fa-pilih tetap terang — nama wilayah jadi tidak terbaca. */
+  color-scheme: dark;
+}
+
+/* Warna daftar pilihan dipatok sendiri: latar gelap, teks terang.
+   Sebagian peramban mengabaikan bagian ini dan memakai gayanya sendiri. */
+.fa-pilih option,
+.fa-pilih optgroup {
+  background-color: #182029;
+  color: #e8eef5;
+}
+
+.fa-pilih option:checked {
+  background-color: #1f6feb;
+  color: #ffffff;
+}
+
+.fa-pilih:disabled {
+  opacity: 0.55;
+}
+
+/* Kolom "fa-input" yang berupa <select> (Kategori, dan lain-lain) perlu
+   perlakuan sama seperti .fa-pilih: daftarnya digambar peramban dengan
+   latar putih, jadi warna teks wajib dipatok. */
+select.fa-input {
+  color-scheme: dark;
+}
+
+select.fa-input option,
+select.fa-input optgroup {
+  background-color: #182029;
+  color: #e8eef5;
+}
+
+select.fa-input option:checked {
+  background-color: #1f6feb;
+  color: #ffffff;
+}
+
+.fa-baris2 {
+  display: flex;
+  gap: 10px;
+}
+
+.fa-baris2 > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.fa-catatan {
+  margin: 6px 0 0;
+  font-size: 10.5px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.fa-peringatan {
+  color: #ffe08a;
+}
+
+/* Orderan 18: tombol "Titik tengah wilayah" di bawah keterangan pin. */
+.fa-tengah {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fa-tengah[hidden] {
+  display: none;
+}
+
+.fa-aksi {
+  flex: none;
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--garis);
+}
+
+.fa-tombol {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fa-simpan {
+  border-color: rgba(88, 166, 255, 0.55);
+  background: rgba(88, 166, 255, 0.26);
+  font-weight: 600;
+}
+
+.fa-hapus {
+  flex: 0 0 76px;
+  border-color: rgba(232, 86, 63, 0.5);
+  background: rgba(232, 86, 63, 0.2);
+}
+
+#atribusi {
+  position: absolute;
+  right: 6px;
+  bottom: calc(var(--tinggi-bilah) + 4px);
+  z-index: 2;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.55);
+  text-shadow: 0 1px 2px #000;
+  pointer-events: none;
+}
+
+#galat {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.6;
+  background: var(--gelap);
+}
+
+/* ============================================================
+   Panduan pemakaian — tombol [?] di bilah atas
+   ------------------------------------------------------------
+   Satu tombol [?] di ujung kanan bilah atas. Saat diketuk, panduan yang
+   tampil menyesuaikan tempat pemakai berada (form, daftar anggota, suku,
+   populasi, agama, cari, kartu rincian, atau peta biasa).
+
+   Di HP panduan menutupi layar karena layarnya sempit. Di PC panduan
+   menjadi kolom di sisi KANAN (lihat @media min-width: 900px di akhir
+   berkas), sehingga form atau daftar di kiri tetap terlihat dan bisa
+   langsung dicoba sambil membaca panduannya.
+   ============================================================ */
+
+#tombol-panduan {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  min-width: 30px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#tombol-panduan:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#tombol-panduan[aria-expanded="true"] {
+  border-color: #63c2de;
+  background: rgba(99, 194, 222, 0.24);
+}
+
+#panduan {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overflow: clip;
+  background: rgba(9, 12, 16, 0.97);
+  backdrop-filter: blur(8px);
+}
+
+#panduan[hidden] {
+  display: none;
+}
+
+#panduan-kepala {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--garis);
+}
+
+#panduan-judul {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#panduan-tutup {
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--terang);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#panduan-isi {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 12px 14px;
+}
+
+#panduan-kaki {
+  flex: none;
+  padding: 8px 10px 10px;
+  border-top: 1px solid var(--garis);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.panduan-kaki-judul {
+  margin: 0 0 6px;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+#panduan-daftar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.panduan-pilih {
+  padding: 5px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--terang);
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.2;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.panduan-pilih:active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.panduan-pilih.nyala {
+  border-color: #63c2de;
+  background: rgba(99, 194, 222, 0.24);
+  font-weight: 600;
+}
+
+.panduan-blok + .panduan-blok {
+  margin-top: 13px;
+}
+
+.panduan-sub {
+  margin: 0 0 5px;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.panduan-teks {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.panduan-langkah,
+.panduan-butir {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.panduan-langkah li,
+.panduan-butir li {
+  margin-bottom: 4px;
+}
+
+.panduan-langkah li::marker {
+  color: #63c2de;
+  font-weight: 600;
+}
+
+.panduan-hasil .panduan-butir li::marker {
+  color: #63c2de;
+}
+
+.panduan-catatan .panduan-butir li {
+  font-size: 12px;
+  opacity: 0.78;
+}
+
+/* ------------------------------------------------------------
+   Tautan di dalam kalimat panduan
+   ------------------------------------------------------------
+   Kata kunci di dalam tanda [[ ]] menjadi tautan yang bisa diketuk dan
+   langsung memperagakan yang dimaksud — peta benar-benar bergerak, tombol
+   benar-benar ditekan. Warnanya dibedakan dari teks biasa supaya jelas
+   bahwa bagian itu bisa diketuk.
+   ------------------------------------------------------------ */
+.panduan-tautan {
+  display: inline;
+  margin: 0;
+  padding: 0 1px;
+  border: 0;
+  border-bottom: 1px dashed #63c2de;
+  border-radius: 0;
+  background: none;
+  color: #7fd4ee;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  line-height: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.panduan-tautan:hover {
+  color: #a8e4f6;
+  border-bottom-style: solid;
+}
+
+.panduan-tautan:active {
+  background: rgba(99, 194, 222, 0.22);
+}
+
+/* Tautan yang tidak bisa dijalankan (mis. tombolnya sedang tidak tampil)
+   berkedip sebentar supaya pemakai tahu tautannya memang bekerja. */
+.panduan-tautan-mati {
+  animation: panduan-kedip 0.45s ease 2;
+}
+
+@keyframes panduan-kedip {
+  0%, 100% { background: none; }
+  50% { background: rgba(99, 194, 222, 0.35); }
+}
+
+/* ------------------------------------------------------------
+   Panduan menyingkir sebentar (HP)
+   ------------------------------------------------------------
+   Di HP panduan menutupi seluruh layar. Saat tautan gerak peta diketuk,
+   panduan turun ke bawah supaya peta terlihat bergerak, lalu naik lagi
+   sendiri. Di PC peta sudah terlihat, jadi tidak dipakai.
+   ------------------------------------------------------------ */
+#panduan {
+  transition: transform 260ms ease;
+}
+
+#panduan.panduan-singkir {
+  transform: translateY(100%);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   Sasaran yang sedang ditunjukkan
+   ------------------------------------------------------------
+   Tombol atau kolom yang disebut di panduan dikedipkan supaya pemakai
+   tahu persis yang mana. Dipakai untuk tombol yang mengubah data
+   (Simpan, Hapus) — ditunjukkan, tapi tidak ditekan.
+   ------------------------------------------------------------ */
+.panduan-sorot {
+  animation: panduan-sorot 0.55s ease 3;
+  outline: 2px solid #63c2de;
+  outline-offset: 2px;
+}
+
+@keyframes panduan-sorot {
+  0%, 100% { outline-color: #63c2de; }
+  50% { outline-color: rgba(99, 194, 222, 0.15); }
+}
+
+/* ============================================================
+   Orderan 18 — peta di atas, form isian di bawah (HP)
+   ------------------------------------------------------------
+   Saat form Tambah/Ubah Anggota terbuka di HP, peta menyusut ke 45% atas
+   dan form menempati 55% bawah. Peta benar-benar menyusut (lebarnya tidak
+   diubah, tingginya yang dipangkas), sehingga MapLibre menghitung ulang
+   ukurannya dan titik tengah peta = titik tengah area yang terlihat.
+   Di PC aturan ini tidak berlaku — form tetap kolom penuh di sisi kiri.
+   ============================================================ */
+@media (max-width: 899px) {
+  #bingkai:has(#form-anggota:not([hidden])) #peta {
+    bottom: 55%;
+  }
+
+  /* Bilah bawah (posisi + tombol geser) ikut naik ke atas form, supaya
+     tidak tertutup form. */
+  #bingkai:has(#form-anggota:not([hidden])) #bilah-bawah {
+    bottom: 55%;
+  }
+
+  /* Keterangan yang menempel di bawah peta ikut naik. */
+  #bingkai:has(#form-anggota:not([hidden])) #atribusi,
+  #bingkai:has(#form-anggota:not([hidden])) #derajat {
+    bottom: calc(55% + var(--tinggi-bilah) + 4px);
+  }
+
+  #bingkai:has(#form-anggota:not([hidden])) #kartu {
+    bottom: calc(55% + var(--tinggi-bilah) + 40px);
+    /* Kartu rincian suku (orderan 20) lebih tinggi daripada kartu Populasi
+       karena memuat daftar kawasan utama. Diukur 17 Okt 2026 pada layar
+       360x640: kartu 377 px sedangkan ruang di atasnya hanya 208 px,
+       sehingga kartu meluber ke atas dan menutupi bilah tombol. Karena itu
+       tingginya dibatasi setinggi area peta yang tersisa, sisanya digeser.
+       Sisa ruang = 100% − 55% (form) − 2 × bilah (atas & bawah) − 44 px. */
+    max-height: calc(45% - var(--tinggi-bilah) * 2 - 44px);
+    overflow-y: auto;
+  }
+
+  /* Daftar melayang (Populasi & Agama) dibatasi setinggi area peta yang
+     tersisa, supaya tidak menutupi keterangan warna di bawahnya. Keduanya
+     memakai tempat yang sama, jadi aturannya harus sama juga. */
+  #bingkai:has(#form-anggota:not([hidden])) #pemilih-warna,
+  #bingkai:has(#form-anggota:not([hidden])) #pemilih-agama {
+    max-height: calc(45% - var(--tinggi-bilah) - 12px);
+    overflow-y: auto;
+  }
+}
+
+/* ============================================================
+   Orderan 22 — tampilan PC (layar lebar)
+   ------------------------------------------------------------
+   Ambang 900 px: di bawah itu dianggap HP, dan tampilan HP TIDAK berubah
+   sama sekali (peta tetap selebar 430 px, sisa lebar di-scroll kiri-kanan).
+   Di atas 900 px dianggap PC:
+     · peta memenuhi tinggi & lebar layar — tidak ada ruang kosong;
+     · daftar anggota & form isian menjadi kolom di sisi kiri, peta
+       menyusut ke sisa lebar sehingga tetap terlihat penuh (tidak
+       tertutup kolom). MapLibre menyesuaikan ukurannya sendiri.
+   Diletakkan di akhir berkas supaya menang atas aturan dasar di atas.
+   ============================================================ */
+@media (max-width: 479px) {
+  #bilah-atas #tombol-cari,
+  #bilah-atas #tombol-panduan {
+    margin-left: 0;
+    flex: 0 0 28px;
+    width: 28px;
+    min-width: 28px;
+  }
+}
+
+@media (max-width: 299px) {
+  #bilah-atas #tombol-cari,
+  #bilah-atas #tombol-panduan {
+    flex-basis: 26px;
+    width: 26px;
+    min-width: 26px;
+  }
+}
+
+@media (min-width: 900px) {
+  #panel-dashboard {
+    left: 0;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: min(760px, 62vw);
+    height: auto;
+    border-right: 1px solid #1e2833;
+    box-shadow: 10px 0 32px rgba(0, 0, 0, .48);
+  }
+
+  #dashboard-isi { padding: 16px 20px 30px; }
+  .dashboard-kartu-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .dashboard-kategori-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .dashboard-kategori-grid .dashboard-angka { min-height: 90px; padding: 9px; }
+  .dashboard-kategori-grid .dashboard-angka-nilai { font-size: 18px; }
+  .dashboard-daftar-bahasa, .dashboard-provinsi-kosong { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dashboard-suku-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  #bingkai:has(#panel-dashboard:not([hidden])) #peta {
+    left: min(760px, 62vw);
+  }
+
+  #bingkai:has(#panel-dashboard:not([hidden])) #bilah-atas,
+  #bingkai:has(#panel-dashboard:not([hidden])) #bilah-bawah {
+    left: min(760px, 62vw);
+    right: 0;
+  }
+
+  #bingkai:has(#panel-dashboard:not([hidden])) #keterangan-media {
+    left: calc(min(760px, 62vw) + 8px);
+  }
+
+  #bingkai:has(#panel-dashboard:not([hidden])) #atribusi {
+    left: auto;
+    right: 4px;
+  }
+
+  #bingkai:has(#panel-dashboard:not([hidden])) #pemilih-warna,
+  #bingkai:has(#panel-dashboard:not([hidden])) #pemilih-agama,
+  #bingkai:has(#panel-dashboard:not([hidden])) #pemilih-media {
+    left: calc(min(760px, 62vw) + 8px);
+  }
+
+  #bingkai:has(#panel-dashboard:not([hidden])) #cari {
+    left: min(760px, 62vw);
+  }
+
+  #bingkai {
+    width: 100%;
+    max-width: none;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  #panel-anggota,
+  #panel-suku,
+  #panel-dashboard,
+  #form-anggota {
+    left: 0;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: var(--lebar-panel);
+    height: auto;
+    max-height: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-right: 1px solid #1e2833;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Selama kolom kiri terbuka, peta, bilah, dan keterangan digeser ke
+     kanannya. Saat kolom tertutup, semuanya kembali selebar layar. */
+  #bingkai:has(#panel-anggota:not([hidden])) #peta,
+  #bingkai:has(#panel-suku:not([hidden])) #peta,
+  #bingkai:has(#panel-dashboard:not([hidden])) #peta,
+  #bingkai:has(#form-anggota:not([hidden])) #peta {
+    left: var(--lebar-panel);
+  }
+
+  #bingkai:has(#panel-anggota:not([hidden])) #bilah-atas,
+  #bingkai:has(#panel-anggota:not([hidden])) #bilah-bawah,
+  #bingkai:has(#panel-suku:not([hidden])) #bilah-atas,
+  #bingkai:has(#panel-suku:not([hidden])) #bilah-bawah,
+  #bingkai:has(#panel-dashboard:not([hidden])) #bilah-atas,
+  #bingkai:has(#panel-dashboard:not([hidden])) #bilah-bawah,
+  #bingkai:has(#form-anggota:not([hidden])) #bilah-atas,
+  #bingkai:has(#form-anggota:not([hidden])) #bilah-bawah {
+    left: var(--lebar-panel);
+  }
+
+  #bingkai:has(#panel-anggota:not([hidden])) #pemilih-warna,
+  #bingkai:has(#panel-anggota:not([hidden])) #pemilih-agama,
+  #bingkai:has(#panel-anggota:not([hidden])) #kartu,
+  #bingkai:has(#panel-anggota:not([hidden])) #derajat,
+  #bingkai:has(#panel-suku:not([hidden])) #pemilih-warna,
+  #bingkai:has(#panel-suku:not([hidden])) #pemilih-agama,
+  #bingkai:has(#panel-dashboard:not([hidden])) #pemilih-warna,
+  #bingkai:has(#panel-dashboard:not([hidden])) #pemilih-agama,
+  #bingkai:has(#panel-dashboard:not([hidden])) #pemilih-media,
+  #bingkai:has(#panel-suku:not([hidden])) #kartu,
+  #bingkai:has(#panel-suku:not([hidden])) #derajat,
+  #bingkai:has(#form-anggota:not([hidden])) #pemilih-warna,
+  #bingkai:has(#form-anggota:not([hidden])) #pemilih-agama,
+  #bingkai:has(#form-anggota:not([hidden])) #kartu,
+  #bingkai:has(#form-anggota:not([hidden])) #derajat {
+    left: calc(var(--lebar-panel) + 8px);
+  }
+
+  /* Kotak cari hanya selebar peta, tidak menutupi kolom kiri. */
+  #bingkai:has(#panel-anggota:not([hidden])) #cari,
+  #bingkai:has(#panel-suku:not([hidden])) #cari,
+  #bingkai:has(#panel-dashboard:not([hidden])) #cari,
+  #bingkai:has(#form-anggota:not([hidden])) #cari {
+    left: var(--lebar-panel);
+  }
+
+  /* Keterangan media ikut bergeser supaya tidak tertutup kolom kiri. */
+  #bingkai:has(#panel-anggota:not([hidden])) #keterangan-media,
+  #bingkai:has(#panel-suku:not([hidden])) #keterangan-media,
+  #bingkai:has(#panel-dashboard:not([hidden])) #keterangan-media,
+  #bingkai:has(#form-anggota:not([hidden])) #keterangan-media {
+    left: calc(var(--lebar-panel) + 8px);
+  }
+
+  /* ------------------------------------------------------------
+     Kartu rincian di PC dibuat ringkas (revisi 2026-10-17)
+     ------------------------------------------------------------
+     Diukur pada layar 1440 px: kartu melebar penuh sehingga label di kiri
+     dan angkanya di kanan berjauhan, dan blok "kawasan utama" jadi tinggi
+     (kartu Jawa 345 px). Di PC lebarnya dibatasi dan daftar kawasannya
+     disusun dua kolom, jadi jauh lebih ringkas. Di HP tidak diubah —
+     di sana lebarnya memang sudah terbatas. */
+  #kartu {
+    right: auto;
+    width: min(560px, calc(100% - 16px));
+    padding: 12px 14px;
+  }
+
+  #bingkai:has(#panel-anggota:not([hidden])) #kartu,
+  #bingkai:has(#form-anggota:not([hidden])) #kartu {
+    width: min(560px, calc(100% - var(--lebar-panel) - 16px));
+  }
+
+  /* Tabel rincian disusun dua pasang per baris supaya tidak memanjang ke
+     bawah. `display: contents` membuat <tbody> dan <tr> tembus, sehingga
+     <td>-nya menjadi sel kisi. <tbody> wajib ikut — peramban menyisipkannya
+     sendiri, dan kalau tidak tembus seluruh tabel jadi satu sel kisi.
+     Hanya berlaku di #kartu; tabel di dalam panel suku (380 px) tetap satu
+     kolom supaya tidak berdesakan. */
+  #kartu .kartu-tabel {
+    display: grid;
+    grid-template-columns: max-content 1fr max-content 1fr;
+    column-gap: 12px;
+  }
+
+  #kartu .kartu-tabel tbody,
+  #kartu .kartu-tabel tr {
+    display: contents;
+  }
+
+  #kartu .kartu-tabel td:first-child {
+    width: auto;
+  }
+
+  /* Daftar kawasan utama dua kolom. */
+  .suku-kawasan {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3px 10px;
+  }
+
+  .suku-kawasan-baris {
+    padding: 3px 8px;
+  }
+
+  .suku-kawasan-catatan {
+    font-size: 10px;
+  }
+
+  /* Daftar 7 agama di kartu juga dua kolom — diukur 17 Okt 2026: kartu
+     agama 376 px tinggi kalau satu kolom, jadi 196 px kalau dua kolom. */
+  .agama-daftar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3px 10px;
+  }
+
+  /* Rincian suku di panel: di PC kolomnya sempit (380 px), jadi kawasan
+     utama tetap satu kolom supaya tidak berdesakan. */
+  #suku-isi .suku-kawasan {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Tabel rincian di panel suku juga satu kolom. */
+  #suku-rincian .kartu-tabel {
+    display: table;
+  }
+
+  #suku-rincian .kartu-tabel tbody {
+    display: table-row-group;
+  }
+
+  #suku-rincian .kartu-tabel tr {
+    display: table-row;
+  }
+
+  #suku-rincian .kartu-tabel td {
+    display: table-cell;
+  }
+
+  #suku-rincian .kartu-tabel td:first-child {
+    width: 46%;
+  }
+
+  /* ------------------------------------------------------------
+     Panduan pemakaian di PC — kolom KANAN
+     ------------------------------------------------------------
+     Di PC panduan tidak menutupi layar, melainkan menjadi kolom di sisi
+     kanan selebar 380 px. Dengan begitu form atau daftar di kiri tetap
+     terlihat dan bisa langsung dicoba sambil membaca panduannya.
+     Peta, bilah, dan keterangan menyusut dari kanan supaya tidak
+     tertutup kolom panduan.
+     ------------------------------------------------------------ */
+  #panduan {
+    left: auto;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--lebar-panel);
+    border-left: 1px solid #1e2833;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.55);
+  }
+
+  #bingkai:has(#panduan:not([hidden])) #peta {
+    right: var(--lebar-panel);
+  }
+
+  #bingkai:has(#panduan:not([hidden])) #bilah-atas,
+  #bingkai:has(#panduan:not([hidden])) #bilah-bawah {
+    right: var(--lebar-panel);
+  }
+
+  #bingkai:has(#panduan:not([hidden])) #cari {
+    right: var(--lebar-panel);
+  }
+
+  #bingkai:has(#panduan:not([hidden])) #atribusi {
+    right: calc(var(--lebar-panel) + 6px);
+  }
+
+  /* Daftar melayang Populasi & Agama juga dibatasi supaya tidak masuk ke
+     bawah kolom panduan. */
+  #bingkai:has(#panduan:not([hidden])) #pemilih-warna,
+  #bingkai:has(#panduan:not([hidden])) #pemilih-agama {
+    max-width: calc(100% - var(--lebar-panel) - 16px);
+  }
+
+  /* Kartu rincian dibatasi lebarnya supaya tidak masuk ke bawah kolom
+     panduan. Kartu menempel di kiri (left: 8px), jadi lebarnya dikurangi
+     lebar panduan. */
+  #bingkai:has(#panduan:not([hidden])) #kartu {
+    width: min(560px, calc(100% - var(--lebar-panel) - 16px));
+  }
+
+  /* Kalau kolom kiri DAN panduan terbuka bersamaan, peta menyusut dari
+     kedua sisi. Kartu rincian dibatasi lebarnya supaya tetap muat. */
+  #bingkai:has(#panduan:not([hidden])):has(#panel-anggota:not([hidden])) #kartu,
+  #bingkai:has(#panduan:not([hidden])):has(#panel-suku:not([hidden])) #kartu,
+  #bingkai:has(#panduan:not([hidden])):has(#form-anggota:not([hidden])) #kartu {
+    width: min(560px, calc(100% - var(--lebar-panel) * 2 - 16px));
+  }
+
+  #panel-dashboard {
+    width: min(760px, 62vw);
+    right: auto;
+    left: 0;
+  }
+
+  #bingkai:has(#panel-dashboard:not([hidden])) #peta,
+  #bingkai:has(#panel-dashboard:not([hidden])) #bilah-atas,
+  #bingkai:has(#panel-dashboard:not([hidden])) #bilah-bawah,
+  #bingkai:has(#panel-dashboard:not([hidden])) #cari {
+    left: min(760px, 62vw);
+    right: 0;
+  }
+
+  #bingkai:has(#panel-dashboard:not([hidden])) #pemilih-warna,
+  #bingkai:has(#panel-dashboard:not([hidden])) #pemilih-agama,
+  #bingkai:has(#panel-dashboard:not([hidden])) #pemilih-media,
+  #bingkai:has(#panel-dashboard:not([hidden])) #keterangan-media {
+    left: calc(min(760px, 62vw) + 8px);
+  }
+
+  #bingkai:has(#panel-dashboard:not([hidden])) #atribusi {
+    left: auto;
+    right: 4px;
+  }
+}

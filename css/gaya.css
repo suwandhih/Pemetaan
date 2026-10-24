@@ -2922,3 +2922,39 @@ select.fa-input option:checked {
     right: 4px;
   }
 }
+
+/* Orderan 33: satu wilayah diklik, satu kartu angka; bukan label pada semua poligon.
+   Diletakkan setelah aturan responsif lama agar ukuran kartu angka tidak ditimpa. */
+#bingkai #kartu:has(.kartu-angka) {
+  right: 8px;
+  width: auto;
+  max-height: calc(100% - var(--tinggi-bilah) * 2 - 60px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+#bingkai #kartu:has(.kartu-angka)[hidden] { display: none; }
+.kartu-angka { color: var(--terang); }
+.kartu-eyebrow { margin: 0 28px 3px 0; color: #8ed4c3; font-size: 9px; font-weight: 650; letter-spacing: .09em; text-transform: uppercase; }
+.kartu-angka .kartu-judul { margin-bottom: 10px; font-size: 16px; line-height: 1.25; }
+.kartu-angka-utama { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.kartu-angka-utama > div { min-width: 0; padding: 9px 10px; border: 1px solid rgba(142, 212, 195, .2); border-radius: 8px; background: rgba(142, 212, 195, .06); }
+.kartu-angka-utama span, .kartu-angka-utama small { display: block; color: #afbec8; font-size: 10px; line-height: 1.4; }
+.kartu-angka-utama strong { display: block; margin: 3px 0; color: #f2f8f5; font-size: 23px; font-weight: 650; line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.kartu-angka-utama .kartu-angka-teks { font-size: 17px; }
+.kartu-petunjuk { margin: 12px 0 4px; color: #afbec8; font-size: 10px; }
+.kartu-rincian { margin-top: 10px; border-top: 1px solid rgba(255, 255, 255, .12); padding-top: 7px; }
+.kartu-rincian summary { color: #a9bac5; font-size: 10px; cursor: pointer; }
+.kartu-rincian .kartu-tabel { margin-top: 7px; font-size: 10px; }
+@media (min-width: 900px) {
+  #bingkai #kartu:has(.kartu-angka) { left: 16px; right: auto; bottom: calc(var(--tinggi-bilah) + 44px); width: 340px; max-height: min(70%, 620px); }
+}
+@media (max-width: 420px) {
+  #bingkai #kartu:has(.kartu-angka) { padding: 9px 10px; }
+  .kartu-angka-utama strong { font-size: 20px; }
+  .kartu-angka-utama > div { padding: 8px; }
+}
+@media (max-width: 899px) {
+  #bingkai:has(#form-anggota:not([hidden])) #kartu:has(.kartu-angka) {
+    max-height: calc(45% - var(--tinggi-bilah) * 2 - 44px);
+  }
+}
