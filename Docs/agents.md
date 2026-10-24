@@ -139,6 +139,7 @@ Bagian ini yang membuat asisten **teringat** — bukan sekadar punya aturan.
 | 3 | **Backup dulu** (git commit) sebelum dan sesudah setiap revisi. |
 | 4 | **Orderan dikerjakan satu per satu** — selesai → uji → lapor → lanjut. |
 | 5 | **Jangan mengarang data.** Sumber tidak memberi angka → katakan tidak ada. |
+| 6 | **Tutup pekerjaan dengan jelas.** Hasil inti → uji terbatas → lapor → hentikan server; jangan biarkan proses tampak berjalan tanpa akhir. |
 
 ### 📚 Daftar berkas dokumen proyek
 
@@ -206,6 +207,8 @@ Kalau ada pekerjaan baru, perlakukan sebagai **orderan baru** — catat dulu di
 | API TokoMedia mengembalikan halaman login, bukan JSON | API belum terpasang di produksi | ambil lewat Worker (server), bukan peramban |
 | Icon kategori tidak muncul di dalam bulatan penanda | `icon-offset` **dikalikan `icon-size`** (bukan piksel/em) | offset = jarak_px / icon-size; `-34 / 0.24 = -141.67` |
 | Penggabungan penanda (cluster) dibuang | Pemilik proyek menilai angka tumpukan sulit dipahami | jangan pasang `cluster: true` lagi |
+| Server pratinjau tampak seperti pekerjaan 3 jam | Hasil selesai tetapi proses tidak segera ditutup | Server hanya untuk tinjauan; sebut sejak awal, beri waktu mulai/selesai, hentikan setelah verifikasi |
+| Report diperluas sebelum hasil inti diserahkan | Terlalu banyak penyempurnaan dan uji berurutan | Ambil snapshot sekali → tampilkan inti → uji terbatas → lapor; kegagalan API harus berhenti dengan pesan, bukan menunggu |
 
 Daftar jebakan teknis yang lebih lengkap ada di
 [`prompt.md`](./prompt.md) bagian 9.
@@ -223,3 +226,7 @@ Daftar jebakan teknis yang lebih lengkap ada di
 8. **Proyek sudah selesai 2026-10-17.** Untuk melanjutkan, baca dulu
    [`prompt.md`](./prompt.md) (konsep) dan [`CHANGELOG.md`](./CHANGELOG.md)
    (riwayat) supaya tidak mengulang pekerjaan yang sudah ada.
+9. **Jeda sementara 2026-10-24:** orderan 28–32 menunggu konfirmasi akhir;
+   jangan melanjutkan tanpa aba-aba. Laporan manajemen kini memakai
+   `datapemetaan.html`; dashboard lama ada di backup. Tidak ada server/proses
+   yang perlu dibiarkan berjalan setelah hasil diverifikasi.

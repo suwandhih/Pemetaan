@@ -77,8 +77,8 @@ Situs live: **https://suwandhih.github.io/Pemetaan/**
 ```
 C:\data\Pemetaan\
 ├── index.html                  kerangka halaman peta (~230 baris)
-├── datapemetaan.html           laporan data interaktif (orderan 31)
-├── dashboard.html              dashboard cakupan layanan (orderan 29)
+├── datapemetaan.html           laporan data interaktif (orderan 31–32)
+├── dashboard.html              dashboard cakupan layanan lama (orderan 29; arsip, bukan tombol utama)
 ├── css\
 │   ├── gaya.css                seluruh tampilan peta (~2.400 baris)
 │   └── datapemetaan.css        tampilan laporan data interaktif
@@ -99,9 +99,12 @@ C:\data\Pemetaan\
 │   ├── cari.js                 pencarian wilayah / anggota / nama jalan (orderan 19)
 │   ├── datapemetaan.js         navigasi laporan dan pembacaan media read-only
 │   ├── analisis-media.js       hitungan target/produk, grafik, prioritas, matriks
+│   ├── laporan-manajemen.js    tombol ▣ pada peta memuat Data Pemetaan
 │   └── panduan.js              panduan pemakaian interaktif (tombol ?)
+├── backup\
+│   └── laporan-manajemen-20261024\  index, dashboard, dan gaya lama sebelum diganti
 ├── data\
-│   ├── datapemetaan\          indeks dan rincian laporan, dimuat saat diklik
+│   ├── datapemetaan\          indeks, rincian, dan snapshot media; dimuat saat diperlukan
 │   ├── wilayah-warna\          554 berkas poligon + angka penduduk
 │   │   ├── prop-nasional.js        38 provinsi
 │   │   ├── kab-nasional.js         514 kabupaten/kota
@@ -304,7 +307,9 @@ perhitungan kedua. Dashboard lama disimpan pada
 Pemetaan → Worker → Rumahweb → API TokoMedia. Pembacaan selesai dalam 4,272
 detik. Report memuat snapshot bersama indeks/bahasa; tidak memanggil API secara
 otomatis setiap halaman dibuka. Tombol pembaruan manual tetap membaca katalog
-terbaru dan mengganti tampilan selama sesi tersebut. Enam catatan lokasi
+terbaru dan mengganti tampilan selama sesi tersebut. Snapshot pada GitHub
+diperbarui melalui proses pembuatan/commit snapshot; perubahan manual di browser
+tidak otomatis menimpa berkas tersebut. Enam catatan lokasi
 nasional/gugus sudah termasuk dalam 304 rekaman dan bukan kegagalan kategori.
 Hasil: 212/341 target ada isi (62,2%), 129 belum, 6 lengkap, 206 sebagian,
 731 pasangan produk inti kurang. Ini bukan inventaris seluruh judul video.
