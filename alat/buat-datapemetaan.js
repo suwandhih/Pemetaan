@@ -99,7 +99,7 @@ async function atributSumber(tingkat) {
     await new Promise(function (resolve) { setTimeout(resolve, 350); });
   }
   const bersih = bersihkanSumber(hasil, desaTingkat ? 10 : 6);
-  const keluaran = { mentah: bersih.mentah, kosong: bersih.kosong, duplikat: bersih.duplikat, data: bersih.data };
+  const keluaran = { diambil: new Date().toISOString(), mentah: bersih.mentah, kosong: bersih.kosong, duplikat: bersih.duplikat, data: bersih.data };
   tulis(namaBerkas, keluaran);
   return keluaran;
 }
@@ -340,6 +340,10 @@ async function utama() {
     sumber: {
       wilayah: prop.tanggal,
       agama: agamaProp.tanggal,
+      atributKecamatanDesa: [sumberKec.diambil, sumberDesa.diambil].filter(Boolean).sort()[0] || null,
+      atributKecamatan: sumberKec.diambil || null,
+      atributDesa: sumberDesa.diambil || null,
+      atributSumber: TANPA_SUMBER ? 'Tidak disertakan (--tanpa-sumber)' : 'Dukcapil ArcGIS, diambil saat indeks dibuat',
       bahasa: 'Katalog Pemetaan — 430 nama bahasa, provinsi ditinjau manual'
     },
     total: {

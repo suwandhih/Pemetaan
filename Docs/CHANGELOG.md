@@ -31,6 +31,62 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 ## 2026-10-24
 
+### Orderan 31 — `datapemetaan.html`, cermin data interaktif Indonesia
+
+**Baru.** Laporan data lengkap dengan empat tab: Wilayah, Bahasa & media,
+Suku & agama, dan Sumber. Rincian dibuka saat diklik: Indonesia → provinsi →
+kabupaten/kota → kecamatan → desa/kelurahan. Tidak memuat seluruh data desa
+saat halaman pertama dibuka.
+
+- **38 provinsi · 514 kabupaten/kota · 7.275 kecamatan unik · 83.379 desa unik**;
+  430 nama bahasa dalam katalog Pemetaan; 28 kelompok BPS SP2010; tujuh
+  agama/kepercayaan dalam angka dan persentase bila penyebut tersedia.
+  Total penduduk nasional dari atribut provinsi: **284.973.643 jiwa**.
+- **7.829 berkas JSON** dalam `data/datapemetaan/`: indeks nasional, indeks
+  bahasa/suku, 38 provinsi, 514 kabupaten, dan 7.275 kecamatan. Berkas desa
+  berada di dalam rincian kecamatan, dengan pencarian dan paginasi.
+- Atribut Dukcapil disegarkan tanpa mengubah poligon peta. Urutan wilayah
+  memakai kode numerik, sehingga `1101` tidak didahului `1116`.
+- Sumber mentah dibedakan dari wilayah unik: 7.285 rekaman kecamatan = 7.240
+  unik tingkat atas + 39 kosong + 6 duplikat; 83.489 rekaman desa = 83.379
+  unik + 78 kosong + 32 duplikat. Tambahan 35 kecamatan berasal dari 246 desa
+  yang kode induknya tidak tercatat pada layanan kecamatan. Semuanya tetap di
+  kabupaten resmi; **0 kabupaten rekaan**. 517 desa tidak memiliki total
+  penduduk yang dapat dipakai; tidak diisi perkiraan.
+- Bahasa dan media dapat dibandingkan per provinsi. Data tersimpan Neon dan
+  katalog API terbaru ditampilkan terpisah. Film Isa, Film Ikatan Ilahi, dan
+  Video Kitab Suci dicocokkan menurut bahasa + provinsi; Clip/Aplikasi tidak
+  diklaim sebagai media spesifik bahasa provinsi. Media tanpa provinsi tetap
+  ditampilkan terpisah. Laporan hanya memakai `ambilSemua` dan `tarikRumahweb`
+  dengan kode aplikasi, tidak menyimpan ke Neon/TokoMedia.
+- Format angka Indonesia konsisten; dialog rincian mendukung keyboard/Escape
+  dan mencegah respons lama menimpa wilayah yang baru dipilih. Tabel tetap
+  dapat digulir di dalam pembungkusnya tanpa overflow seluruh halaman.
+
+**Alat pemeliharaan.** `alat/buat-datapemetaan.js` membangkitkan seluruh indeks
+dari sumber, bukan dari total hardcode. `alat/audit-datapemetaan.js` memeriksa
+semua kode unik, hubungan induk-anak, agama, jumlah, cakupan sumber lokal/API,
+dan keberadaan 7.829 berkas. `alat/perbarui-datapemetaan.js` memakai salinan
+kerja, pagination `objectid ASC`, backup Git dengan trailer kolaborator, audit,
+lalu penggantian sumber/laporan setelah sukses. Dry-run tidak mengubah data
+aktif; desa provinsi dipecah per kabupaten; nilai `null` dipertahankan;
+perubahan jumlah penduduk yang sah tidak ditolak oleh perbandingan geometri lama.
+
+**Verifikasi.** Sintaks seluruh alat dan modul laporan lulus; `git diff --check`
+lulus. Audit lengkap lulus, termasuk pemulihan atribut LHOKNGA `110602` dari
+sumber resmi. Pembaruan terisolasi dengan API tiruan lulus: dry-run non-mutasi,
+filter provinsi, pembagian desa per kabupaten, kode unik, dan kegagalan jaringan
+aman. **31 pemeriksaan regresi + 18 lanjutan browser lulus**, termasuk hierarki,
+kelompok tambahan Karimun, agama desa, pencarian, media read-only, keyboard,
+dan 0 galat runtime. Tampilan diperiksa pada 320/390/768/1440 px; tabel tetap
+dapat digulir, tanpa overflow halaman. Media live tidak diklaim terverifikasi
+karena sesi uji tidak memiliki kode aplikasi; permintaan tanpa kode dari asal
+situs ditolak 401, sesuai kontrak Worker. Tidak ada aksi tulis produksi.
+
+**Status:** menunggu konfirmasi pemilik proyek; belum dinyatakan `SELESAI`.
+
+---
+
 ### Orderan 30 — satu tombol Media On/Off dengan pilihan yang diingat
 
 **Perbaikan.** Tombol **Semua hidup** dan **Semua mati** diganti satu tombol

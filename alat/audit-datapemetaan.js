@@ -101,6 +101,29 @@ try {
   const berkasAda = new Set(fs.readdirSync(FOLDER).filter(n => n.endsWith('.json')));
   for (const nama of berkasDiharapkan) wajib(berkasAda.has(nama), 'Berkas rincian tidak tersedia: ' + nama);
   for (const nama of berkasAda) wajib(berkasDiharapkan.has(nama), 'Berkas JSON tidak terhubung: ' + nama);
+  if (!pilihan) {
+    const vm = require('vm');
+    function sumber(nama, variabel) {
+      const konteks = { window: {} };
+      vm.runInNewContext(fs.readFileSync(path.join(AKAR, 'data', 'agama', nama), 'utf8'), konteks);
+      return konteks.window[variabel];
+    }
+    const kodeLokalKec = new Set(), kodeLokalDesa = new Set();
+    for (const nama of fs.readdirSync(path.join(AKAR, 'data', 'agama'))) {
+      const m = nama.match(/^(kec|desa)-\d+\.js$/);
+      if (!m) continue;
+      const data = sumber(nama, m[1] === 'kec' ? 'AGAMA_KEC' : 'AGAMA_DESA');
+      for (const r of data) {
+        if (!r[m[1] === 'kec' ? 3 : 4]) continue;
+        const kode = r.slice(0, m[1] === 'kec' ? 3 : 4).map((n, i) => String(n).padStart(i === 3 ? 4 : 2, '0')).join('');
+        (m[1] === 'kec' ? kodeLokalKec : kodeLokalDesa).add(kode);
+      }
+    }
+    for (const kode of kodeLokalKec) wajib(kodeKecamatan.has(kode), 'Kecamatan lokal tidak terwakili: ' + kode);
+    for (const kode of kodeLokalDesa) wajib(kodeDesa.has(kode), 'Desa lokal tidak terwakili: ' + kode);
+    wajib(kodeLokalKec.size === indeks.kecamatanSumber - indeks.kecamatanTanpaIdentitas - indeks.kecamatanDuplikatAtribut, 'Cakupan atribut kecamatan lokal/API berbeda');
+    wajib(kodeLokalDesa.size === kodeDesa.size, 'Cakupan atribut desa lokal/API berbeda');
+  }
   wajib(totalAgama[0] > 0, 'Total penduduk tidak tersedia');
   if (kesalahan.length) throw new Error(kesalahan.slice(0, 30).join('\n') + (kesalahan.length > 30 ? '\n… ' + (kesalahan.length - 30) + ' galat lain' : ''));
   console.log(JSON.stringify({ ok: true, total: indeks.total, jumlahPenduduk: totalAgama[0], agama: totalAgama.slice(1), sumber: { kecamatan: indeks.kecamatanSumber, desa: indeks.desaSumber, kecamatanKosong: indeks.kecamatanTanpaIdentitas, desaKosong: indeks.entriSumberTanpaIdentitas, kecamatanDuplikat: indeks.kecamatanDuplikatAtribut, desaDuplikat: indeks.desaDuplikatAtribut }, berkas: berkasAda.size, desaTanpaPenduduk, desaTanpaGeometri, desaTanpaInduk }, null, 2));

@@ -262,7 +262,7 @@ async function utama() {
     for (const berkas of ['datapemetaan.html', 'js/datapemetaan.js']) {
       const lokasi = path.join(KERJA, berkas);
       let isi = fs.readFileSync(lokasi, 'utf8');
-      isi = isi.replace(/\d{8}-(?:01|data)/g, versiData());
+      isi = isi.replace(/\d{8}-(?:\d+|data)/g, versiData());
       fs.writeFileSync(lokasi, isi, 'utf8');
     }
     if (!KERING) { tukarHasil(sementara, keluaran); }

@@ -76,9 +76,12 @@ Situs live: **https://suwandhih.github.io/Pemetaan/**
 
 ```
 C:\data\Pemetaan\
-├── index.html                  kerangka halaman (~230 baris)
+├── index.html                  kerangka halaman peta (~230 baris)
+├── datapemetaan.html           laporan data interaktif (orderan 31)
+├── dashboard.html              dashboard cakupan layanan (orderan 29)
 ├── css\
-│   └── gaya.css                seluruh tampilan (~2.400 baris)
+│   ├── gaya.css                seluruh tampilan peta (~2.400 baris)
+│   └── datapemetaan.css        tampilan laporan data interaktif
 ├── js\
 │   ├── lib\
 │   │   ├── maplibre-gl.js      MapLibre GL JS 5.9.0 (954 KB, lokal)
@@ -94,8 +97,10 @@ C:\data\Pemetaan\
 │   ├── label.js                jangkar & label media per provinsi (orderan 26)
 │   ├── tokomedia.js            tombol [Update] — tarik data media dari API TokoMedia (orderan 27)
 │   ├── cari.js                 pencarian wilayah / anggota / nama jalan (orderan 19)
+│   ├── datapemetaan.js         navigasi laporan dan pembacaan media read-only
 │   └── panduan.js              panduan pemakaian interaktif (tombol ?)
 ├── data\
+│   ├── datapemetaan\          indeks dan rincian laporan, dimuat saat diklik
 │   ├── wilayah-warna\          554 berkas poligon + angka penduduk
 │   │   ├── prop-nasional.js        38 provinsi
 │   │   ├── kab-nasional.js         514 kabupaten/kota
@@ -106,6 +111,9 @@ C:\data\Pemetaan\
 │   ├── ambil-agama.js          angka agama dari Dukcapil
 │   ├── buat-indeks-cari.js     indeks pencarian wilayah
 │   ├── buat-peta-bahasa.js     peta bahasa → koordinat untuk Worker
+│   ├── buat-datapemetaan.js    membangkitkan indeks laporan berjenjang
+│   ├── perbarui-datapemetaan.js pembaruan atribut Dukcapil yang tervalidasi
+│   ├── audit-datapemetaan.js   audit seluruh hierarki laporan
 │   ├── sumber-tokomedia\       peta-provinsi.json (430 bahasa → provinsi)
 │   └── neon-siapkan.js         menyiapkan tabel di Neon
 ├── cloudflare\
@@ -188,7 +196,63 @@ window.AGAMA_PROP = [
 **Tujuh agama yang disajikan:** Islam, Kristen, Katolik, Hindu, Budha,
 Konghucu, Kepercayaan.
 
-### 4.3 Sumber data
+### 4.3 Laporan Data Pemetaan (`datapemetaan.html`, orderan 31)
+
+Laporan interaktif adalah cermin data wilayah, penduduk, agama, bahasa, suku,
+dan media—bukan salinan satu halaman besar yang memuat semuanya sekaligus.
+Empat tab tersedia: **Wilayah**, **Bahasa & media**, **Suku & agama**, dan
+**Sumber**. Navigasi wilayah: Indonesia → 38 provinsi → kabupaten/kota →
+kecamatan → desa/kelurahan; rincian JSON dimuat saat diklik.
+
+| Komponen | Peran |
+|---|---|
+| `datapemetaan.html`, `css/datapemetaan.css`, `js/datapemetaan.js` | laporan responsif, pencarian, paginasi desa, dialog rincian dengan fokus keyboard |
+| `data/datapemetaan/indeks.json` | total nasional, ringkasan provinsi, sumber dan batas data |
+| `data/datapemetaan/bahasa-suku.json` | indeks ringkas 430 bahasa dan 28 kelompok BPS SP2010 |
+| `provinsi-<kode2>.json`, `kabupaten-<kode4>.json`, `kecamatan-<kode6>.json` | rincian bertahap; desa berada dalam berkas kecamatan |
+| `alat/buat-datapemetaan.js` | menggabungkan geometri/atribut lokal, atribut Dukcapil terbaru, katalog bahasa dan suku |
+| `alat/perbarui-datapemetaan.js` | pembaruan manual atribut Dukcapil melalui folder kerja sementara |
+| `alat/audit-datapemetaan.js` | audit semua tautan, kode unik, jumlah, nilai agama, dan berkas rincian |
+
+**Total yang disajikan:** 38 provinsi, 514 kabupaten/kota, 7.275 kecamatan unik,
+83.379 desa/kelurahan unik, 430 nama bahasa dalam katalog Pemetaan, dan 28
+kelompok suku BPS SP2010. Total penduduk/agama menggunakan atribut Dukcapil,
+bukan proyeksi BPS. Nilai `null` tidak diubah menjadi nol; persentase tidak
+dihitung bila total penduduk tidak tersedia/nol.
+
+**Batas sumber harus tetap dijelaskan:** 39 kecamatan dan 78 desa pada respons
+sumber tidak memiliki identitas; 6 kecamatan dan 32 desa duplikat identik
+disajikan sekali. Sebanyak 35 kode kecamatan hanya muncul dari 246 desa,
+ditandai induk tidak tercatat, tetap dalam kabupaten resmi, tanpa membuat
+kabupaten rekaan. Nama kelompok tidak ditebak bila sumber tidak menyediakannya.
+
+**Media:** hanya aksi `ambilSemua` dan `tarikRumahweb` yang dikirim laporan.
+Kode aplikasi tetap diperlukan sesuai kontrak Worker; tidak ditanam pada kode.
+Data tersimpan Neon dipisahkan dari katalog API terbaru. Film Isa, Film Ikatan
+Ilahi, dan Video Kitab Suci dibandingkan berdasarkan normalisasi bahasa dan
+provinsi. Clip/Aplikasi tidak dianggap sebagai cakupan spesifik bahasa provinsi.
+Entri tanpa provinsi ditampilkan terpisah. Tombol laporan tidak menyimpan API
+ke Neon; penyimpanan media hanya melalui Update pada aplikasi peta utama.
+
+**Pembaruan manual Dukcapil** (jalankan dari akar proyek):
+
+```powershell
+node alat/perbarui-datapemetaan.js --dry-run
+node alat/perbarui-datapemetaan.js
+node alat/perbarui-datapemetaan.js --tingkat=kecamatan,desa --hanya=33
+node alat/perbarui-datapemetaan.js --tingkat=desa --hanya=3301
+```
+
+Dry-run tidak mengubah sumber atau laporan aktif. Pembaruan normal membuat
+backup Git, mengambil atribut dengan `objectid ASC`, menjaga `null`, membagi
+desa provinsi per kabupaten, memvalidasi kode unik, membangun dan mengaudit
+laporan sementara, baru menukar sumber/laporan aktif setelah semuanya lulus.
+Poligon `data/wilayah-warna/` tidak diubah. `--tanpa-backup` hanya untuk uji
+terisolasi; `--luring` memerlukan cache sumber eksplisit melalui
+`PEMETAAN_CACHE_SUMBER` bila dipakai alat pembaruan. Cache tidak dipublikasikan.
+Audit terpisah dapat dijalankan dengan `node alat/audit-datapemetaan.js`.
+
+### 4.4 Sumber data
 
 | Data | Sumber | Cara ambil |
 |---|---|---|
@@ -347,6 +411,7 @@ tingginya ±11 px + 4 px jarak, jadi keterangan perlu diangkat ke **+18 px**.
 | 25 | Seluruh kategori bisa dihidupkan / dimatikan | `media.js` | daftar digabung dari kategori yang dipakai anggota + daftar kategori resmi |
 | 26 | Jangkar & label media per provinsi | `label.js` | satu jangkar + satu label per provinsi berdata media; label menyebut nama pendek kelompok yang sedang hidup; ketuk → garis merah provinsi |
 | 27 | Pemetaan memakai 2 server (Neon + Rumahweb) | `worker.js`, `simpanan.js`, `tokomedia.js` | Neon = data anggota (baca/tulis); Rumahweb = data media TokoMedia (**baca saja**) lewat `pemetaan-bridge.php`; 300 anggota · 35 provinsi berlabel |
+| 31 | Laporan Data Pemetaan | `datapemetaan.html`, `js/datapemetaan.js`, `alat/*datapemetaan.js` | rincian Indonesia → desa saat diklik; 430 bahasa, 28 kelompok suku, tujuh agama, perbandingan lima media read-only; pembaruan Dukcapil manual tervalidasi |
 | — | Panduan pemakaian interaktif | `panduan.js` | tombol `?` mengenali posisi pemakai; kata kunci jadi tautan yang benar-benar menjalankan aksinya |
 
 ### Detail yang mudah terlewat

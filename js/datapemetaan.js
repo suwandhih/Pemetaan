@@ -9,7 +9,7 @@
   var KUNCI = 'pemetaan_kunci';
   var dasar = new URL('.', location.href).href;
   var indeks = null, tersimpan = [], katalog = null, gagalMedia = [];
-  var cache = {}, bahasaSuku = {}, tab = 'wilayah', fokusSebelum = null, bahasaTerbuka = {};
+  var cache = {}, bahasaSuku = {}, tab = 'wilayah', fokusSebelum = null, bahasaTerbuka = {}, tokenDetail = 0;
   var elStatus = document.getElementById('status');
   var elDetail = document.getElementById('detail');
   var elIsiDetail = document.getElementById('isi-detail');
@@ -20,8 +20,11 @@
     if (teks !== undefined) { e.textContent = teks; }
     return e;
   }
-  function angka(n) { return n === null || n === undefined ? '—' : Number(n).toLocaleString('id-ID'); }
-  function persen(n, pembagi) { return pembagi > 0 ? (n / pembagi * 100).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + '%' : '—'; }
+  function angka(n) {
+    if (n === null || n === undefined || !Number.isFinite(Number(n))) { return '—'; }
+    return String(n).replace('-', '−').replace(/\d+/, function (s) { return s.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); });
+  }
+  function persen(n, pembagi) { return pembagi > 0 ? (n / pembagi * 100).toFixed(2).replace('.', ',').replace(/,?0+$/, '').replace(/\.$/, '') + '%' : '—'; }
   function normal(n) { return String(n || '').toLocaleLowerCase('id-ID').replace(/^bahasa\s+/i, '').trim(); }
   function kode(a) { return String(a.kodeProvinsi || '').padStart(2, '0'); }
   function rincian(a, label) { var r = (a.rincian || []).find(function (x) { return x.label === label; }); return r ? r.nilai : ''; }
@@ -41,7 +44,7 @@
   function ambil(nama) {
     if (cache[nama]) { return cache[nama]; }
     status('Memuat rincian ' + nama.replace(/\.json$/, '') + '…');
-    cache[nama] = fetch(dasar + 'data/datapemetaan/' + nama + '?v=20261024-data', { cache: 'no-cache' }).then(function (r) {
+    cache[nama] = fetch(dasar + 'data/datapemetaan/' + nama + '?v=20261024-04', { cache: 'no-cache' }).then(function (r) {
       if (!r.ok) { throw new Error('Berkas ' + nama + ' tidak ditemukan (' + r.status + ').'); }
       return r.json();
     }).then(function (d) { status(''); return d; }).catch(function (e) {
@@ -53,8 +56,8 @@
     var c = el('article', 'kartu');
     c.appendChild(el('h3', '', judul));
     if (aksi) {
-      var b = el('button'); b.type = 'button'; b.appendChild(el('strong', '', nilai)); b.setAttribute('aria-label', judul + ': ' + nilai + '. Buka rincian'); b.addEventListener('click', aksi); c.appendChild(b);
-    } else { c.appendChild(el('strong', '', nilai)); }
+      var b = el('button'); b.type = 'button'; b.appendChild(el('strong', '', angka(nilai))); b.setAttribute('aria-label', judul + ': ' + angka(nilai) + '. Buka rincian'); b.addEventListener('click', aksi); c.appendChild(b);
+    } else { c.appendChild(el('strong', '', angka(nilai))); }
     if (keterangan) { c.appendChild(el('small', '', keterangan)); }
     return c;
   }
@@ -96,10 +99,12 @@
     return d;
   }
   function tutupDetail() {
+    tokenDetail++;
     elDetail.hidden = true; elDetail.setAttribute('aria-hidden', 'true'); document.body.style.overflow = '';
     if (fokusSebelum) { fokusSebelum.focus(); }
   }
   function bukaDetail(judul, jalur, subjudul) {
+    tokenDetail++;
     fokusSebelum = document.activeElement;
     document.getElementById('judul-detail').textContent = judul;
     document.getElementById('jalur-detail').textContent = jalur;
@@ -108,11 +113,14 @@
     elDetail.hidden = false; elDetail.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden';
     document.getElementById('tutup-detail').focus();
   }
-  function detailSiap(konten) { elIsiDetail.replaceChildren(konten); elIsiDetail.scrollTop = 0; }
+  function detailSiap(konten, token) { if (token !== undefined && token !== tokenDetail) { return; } elIsiDetail.replaceChildren(konten); elIsiDetail.scrollTop = 0; }
+  function rincianGagal(e, token) { if (token === tokenDetail && !elDetail.hidden) { detailSiap(el('p', 'catatan', e.message), token); } }
   function bukaProvinsi(pk) {
     var p = indeks.provinsi[pk];
     bukaDetail(p.nama, 'INDONESIA / PROVINSI ' + pk, 'Wilayah, bahasa, suku, agama, dan media dalam satu rincian.');
+    var token = tokenDetail;
     ambil('provinsi-' + pk + '.json').then(function (d) {
+      if (token !== tokenDetail) { return; }
       var w = el('div'), ringkas = el('div', 'ringkas-detail');
       [['Kab/Kota', d.kabupaten.length], ['Kecamatan', d.provinsi.kec], ['Desa/Kelurahan', d.provinsi.desa], ['Bahasa', d.provinsi.bahasa.length]].forEach(function (x) {
         var a = el('div'); a.appendChild(el('strong', '', angka(x[1]))); a.appendChild(el('small', '', x[0])); ringkas.appendChild(a);
@@ -126,23 +134,27 @@
       var k = el('section', 'kelompok'); k.appendChild(el('h3', '', 'Kabupaten / kota'));
       var t = tabel(['Nama', 'Kecamatan', 'Desa/Kelurahan']);
       d.kabupaten.forEach(function (q) { baris(t.isi, q.nama, [{ nilai: q.kec, aksi: function () { bukaKabupaten(q.kode); } }, { nilai: q.desa, aksi: function () { bukaKabupaten(q.kode); } }], function () { bukaKabupaten(q.kode); }); });
-      k.appendChild(t.bungkus); w.appendChild(k); detailSiap(w);
-    }).catch(function (e) { detailSiap(el('p', 'catatan', e.message)); });
+      k.appendChild(t.bungkus); w.appendChild(k); detailSiap(w, token);
+    }).catch(function (e) { rincianGagal(e, token); });
   }
   function bukaKabupaten(kk) {
     bukaDetail('Kabupaten / kota ' + kk, 'PROVINSI ' + kk.slice(0, 2) + ' / KABUPATEN / KOTA', 'Rincian dimuat hanya untuk kabupaten/kota ini.');
+    var token = tokenDetail;
     ambil('kabupaten-' + kk + '.json').then(function (d) {
+      if (token !== tokenDetail) { return; }
       var w = el('div'); document.getElementById('judul-detail').textContent = d.kabupaten.nama;
       w.appendChild(agama(d.kabupaten.agama));
       if (d.kabupaten.tanpaInduk) { w.appendChild(el('p', 'catatan', 'Kelompok ini tidak memiliki induk kabupaten/kota pada data nasional. Ditampilkan sesuai kode desa, bukan dipindahkan.')); }
       var t = tabel(['Kecamatan', 'Desa/Kelurahan']);
       d.kecamatan.forEach(function (q) { baris(t.isi, q.nama, [{ nilai: q.desa, aksi: function () { bukaKecamatan(q.kode); } }], function () { bukaKecamatan(q.kode); }); });
-      w.appendChild(t.bungkus); detailSiap(w);
-    }).catch(function (e) { detailSiap(el('p', 'catatan', e.message)); });
+      w.appendChild(t.bungkus); detailSiap(w, token);
+    }).catch(function (e) { rincianGagal(e, token); });
   }
   function bukaKecamatan(kc) {
     bukaDetail('Kecamatan ' + kc, 'KABUPATEN ' + kc.slice(0, 4) + ' / KECAMATAN', 'Nama desa/kelurahan, penduduk, dan agama.');
+    var token = tokenDetail;
     ambil('kecamatan-' + kc + '.json').then(function (d) {
+      if (token !== tokenDetail) { return; }
       var w = el('div'); document.getElementById('judul-detail').textContent = d.kecamatan.nama;
       w.appendChild(agama(d.kecamatan.agama));
       if (d.kecamatan.tanpaInduk) { w.appendChild(el('p', 'catatan', 'Kode kecamatan ini tidak tercatat pada tingkat kecamatan. Nama diambil dari desa bila dapat dikenali; desa tetap ditampilkan sesuai kode sumber.')); }
@@ -166,8 +178,8 @@
           nav.append(sebelum, el('span', '', 'Halaman ' + (halaman + 1) + ' / ' + totalHalaman + ' · ' + semua.length + ' desa'), sesudah); daftar.appendChild(nav);
         }
       }
-      cari.addEventListener('input', function () { halaman = 0; gambar(); }); w.append(cari, daftar); gambar(); detailSiap(w);
-    }).catch(function (e) { detailSiap(el('p', 'catatan', e.message)); });
+      cari.addEventListener('input', function () { halaman = 0; gambar(); }); w.append(cari, daftar); gambar(); detailSiap(w, token);
+    }).catch(function (e) { rincianGagal(e, token); });
   }
   function detailDesa(q) {
     var d = el('div', 'kelompok'); d.id = 'desa-' + q.kode;
@@ -214,8 +226,10 @@
   function dapatKunci() { try { return localStorage.getItem(KUNCI) || ''; } catch (e) { return ''; } }
   function mintaKunci() {
     if (dapatKunci()) { return Promise.resolve(true); }
-    var k = window.prompt('Masukkan kode database Pemetaan untuk membaca data tersimpan dan katalog media.\nKode disimpan hanya di peramban ini.');
-    if (!k) { return Promise.resolve(false); }
+    var k;
+    try { k = window.prompt('Masukkan kode database Pemetaan untuk membaca data tersimpan dan katalog media.\nKode disimpan hanya di peramban ini.'); }
+    catch (e) { pesanMedia('Browser ini tidak mendukung isian kode. Buka laporan di Chrome dan coba lagi.', true); return Promise.resolve(false); }
+    if (!k || !k.trim()) { return Promise.resolve(false); }
     try { localStorage.setItem(KUNCI, k.trim()); } catch (e) { /* peramban dapat membatasi penyimpanan */ }
     return panggilWorker('cek', 15000).then(function () { return true; }).catch(function () {
       try { localStorage.removeItem(KUNCI); } catch (e) { /* abaikan */ }
@@ -309,9 +323,6 @@
         kanan.appendChild(chip);
         if (dalamSimpan.length) { kanan.appendChild(el('span', 'chip media', 'tersimpan ' + dalamSimpan.length)); }
       });
-      var khusus = katalog ? katalog.filter(function (a) {
-        return ['Clip Kitab Suci', 'Aplikasi Kitab Suci'].indexOf(a.kategori) >= 0 && (rincian(a, 'Bahasa') || rincian(a, 'Gugus') || rincian(a, 'Wilayah'));
-      }) : [];
       r.append(kiri, kanan); isi.appendChild(r);
     });
     b.addEventListener('click', function () { bahasaTerbuka[pk] = isi.hidden; isi.hidden = !isi.hidden; b.setAttribute('aria-expanded', isi.hidden ? 'false' : 'true'); panah.textContent = isi.hidden ? '+' : '−'; });
@@ -356,7 +367,7 @@
   function gambarSumber() {
     var d = document.getElementById('info-sumber');
     var a = el('article', 'kotak'); a.appendChild(el('h3', '', 'Dukcapil Kemendagri'));
-    a.appendChild(el('p', '', 'Penduduk, agama, dan wilayah administratif. Data lokal diambil ' + indeks.sumber.wilayah + ' (wilayah) dan ' + indeks.sumber.agama + ' (agama).'));
+    a.appendChild(el('p', '', 'Penduduk, agama, dan wilayah administratif. Geometri lokal diambil ' + indeks.sumber.wilayah + '; atribut provinsi/kabupaten ' + indeks.sumber.agama + '; atribut kecamatan/desa ' + (indeks.sumber.atributKecamatanDesa || 'mengikuti berkas lokal') + '.'));
     a.appendChild(el('p', '', '38 provinsi · 514 kabupaten/kota · ' + angka(indeks.total.kecamatan) + ' kecamatan bernama · ' + angka(indeks.total.desa) + ' desa/kelurahan bernama.'));
     a.appendChild(el('p', 'catatan', 'Layanan sumber melaporkan ' + angka(indeks.kecamatanSumber) + ' record kecamatan dan ' + angka(indeks.desaSumber) + ' record desa. Setelah duplikat identik disajikan satu kali, terdapat ' + angka(indeks.total.kecamatan) + ' kecamatan unik dan ' + angka(indeks.total.desa) + ' desa unik yang dapat dirinci. Sebanyak ' + indeks.kecamatanTanpaIdentitas + ' kecamatan dan ' + indeks.entriSumberTanpaIdentitas + ' desa tidak memiliki nama/kode/geometri, sehingga ditampilkan sebagai jumlah entri kosong, bukan diberi identitas rekaan.'));
     var b = el('article', 'kotak'); b.appendChild(el('h3', '', 'Bahasa, media & suku'));
@@ -367,10 +378,11 @@
     c.appendChild(el('p', '', 'Media: klik Baca katalog media terbaru pada tab Bahasa & media. Hanya membaca API; tidak menulis ke TokoMedia. Gunakan Update di panel Anggota bila katalog baru juga ingin disimpan ke Pemetaan.'));
     var pre = el('pre'); pre.style.whiteSpace = 'pre-wrap'; pre.style.fontSize = '11px'; pre.textContent = 'node alat/perbarui-datapemetaan.js';
     c.appendChild(el('p', '', 'Dukcapil: jalankan alat pembaruan manual berikut dari folder proyek. Alat mencadangkan sumber lama, mengambil atribut baru, memvalidasi hierarki, dan membangkitkan ulang indeks laporan:')); c.appendChild(pre);
+    c.appendChild(el('p', 'kecil', 'Tambahkan --dry-run untuk simulasi tanpa mengubah sumber/laporan aktif. Tambahkan --tingkat=kecamatan,desa --hanya=33 untuk satu provinsi, atau --tingkat=desa --hanya=3301 untuk satu kabupaten.'));
     c.appendChild(el('p', '', 'Tidak ada pengunduhan seluruh Dukcapil setiap halaman dibuka. Rincian dimuat per provinsi/kabupaten/kecamatan saat diklik.'));
     var e = el('article', 'kotak'); e.appendChild(el('h3', '', 'Batas sumber'));
     e.appendChild(el('p', '', indeks.desaTanpaIndukKecamatan + ' desa memiliki kode kecamatan yang tidak tercatat pada tingkat kecamatan; kelompoknya ditandai sebagai induk tidak tercatat. Tidak ada pemindahan wilayah berdasarkan tebakan.'));
-    e.appendChild(el('p', '', indeks.desaTanpaPenduduk + ' desa memiliki null pada penduduk peta dan total 0 pada agama. Persentase tidak dihitung bila pembaginya nol.'));
+    e.appendChild(el('p', '', indeks.desaTanpaPenduduk + ' desa tidak memiliki total penduduk yang dapat digunakan (null/nol pada sumber). Persentase tidak dihitung bila pembaginya nol.'));
     e.appendChild(el('p', '', 'Terdapat ' + (indeks.kecamatanDuplikatIdentik || 0) + ' kecamatan dan ' + (indeks.desaDuplikatIdentik || 0) + ' desa dengan baris sumber yang identik. Baris yang benar-benar sama disajikan satu kali; rekaman mentah tetap dijelaskan di atas.'));
     e.appendChild(el('p', '', 'Angka Dukcapil berbasis administrasi kependudukan; tidak disamakan dengan proyeksi BPS. Data tidak tersedia ditandai —, bukan diisi angka perkiraan.')); d.append(a, b, c, e);
   }
