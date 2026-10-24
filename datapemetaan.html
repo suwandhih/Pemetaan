@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#102b29">
+<meta name="description" content="Cermin data Pemetaan: wilayah, penduduk, agama, bahasa, suku, dan media Indonesia.">
+<title>Data Pemetaan — Indonesia</title>
+<link rel="stylesheet" href="css/datapemetaan.css?v=20261024-01">
+</head>
+<body>
+<a class="loncat" href="#isi">Langsung ke isi</a>
+<header class="kepala">
+  <div class="kepala-isi">
+    <a class="kembali" href="index.html" aria-label="Kembali ke peta Pemetaan">← Peta</a>
+    <p class="eyebrow">PEMETAAN · CERMIN DATA</p>
+    <h1>Indonesia,<br><em>dalam angka.</em></h1>
+    <p class="pengantar">Wilayah, penduduk, agama, bahasa, suku, dan media.<br>Buka setiap angka untuk melihat rinciannya.</p>
+    <div class="stempel"><span class="titik"></span><span id="status-sumber">Memuat sumber data…</span></div>
+  </div>
+</header>
+<nav class="tab-bilah" aria-label="Bagian laporan">
+  <div class="tab-dalam" role="tablist">
+    <button id="tab-wilayah" class="tab aktif" role="tab" aria-selected="true" aria-controls="panel-wilayah" data-tab="wilayah">Wilayah</button>
+    <button id="tab-bahasa" class="tab" role="tab" aria-selected="false" aria-controls="panel-bahasa" data-tab="bahasa" tabindex="-1">Bahasa &amp; media</button>
+    <button id="tab-agama" class="tab" role="tab" aria-selected="false" aria-controls="panel-agama" data-tab="agama" tabindex="-1">Suku &amp; agama</button>
+    <button id="tab-sumber" class="tab" role="tab" aria-selected="false" aria-controls="panel-sumber" data-tab="sumber" tabindex="-1">Sumber</button>
+  </div>
+</nav>
+<main id="isi">
+  <div id="status" class="status" role="status" aria-live="polite">Memuat indeks wilayah…</div>
+  <section id="panel-wilayah" class="panel" role="tabpanel" aria-labelledby="tab-wilayah" hidden>
+    <div class="pengantar-bagian"><p class="eyebrow">01 / WILAYAH</p><h2>Dari Indonesia ke setiap daerah.</h2><p>Klik angka atau nama provinsi. Daftar kabupaten/kota, kecamatan, dan desa/kelurahan dimuat hanya saat dibuka.</p></div>
+    <div id="ringkasan-indonesia" class="kartu-grid"></div>
+    <div class="baris-judul"><div><p class="eyebrow">ADMINISTRASI</p><h2>38 provinsi</h2></div><label class="cari"><span>Cari provinsi</span><input id="cari-provinsi" type="search" placeholder="Nama provinsi…" autocomplete="off"></label></div>
+    <div class="tabel-bungkus"><table class="tabel tabel-provinsi"><thead><tr><th>Provinsi</th><th>Kab/Kota</th><th>Kecamatan</th><th>Desa/Kel.</th><th>Penduduk</th><th><span class="sr-only">Buka</span></th></tr></thead><tbody id="daftar-provinsi"></tbody></table></div>
+  </section>
+  <section id="panel-bahasa" class="panel" role="tabpanel" aria-labelledby="tab-bahasa" hidden>
+    <div class="pengantar-bagian"><p class="eyebrow">02 / BAHASA &amp; MEDIA</p><h2>Bahasa dan media yang tersedia.</h2><p>Bandingkan katalog bahasa tiap provinsi dengan katalog API TokoMedia. Angka katalog dan data tersimpan ditampilkan terpisah.</p></div>
+    <div class="tindakan"><button id="muat-media" class="tombol utama" type="button">Baca katalog media terbaru</button><button id="ganti-kunci" class="tombol" type="button">Ganti kode database</button><span id="status-media" class="kecil"></span></div>
+    <div id="ringkasan-media" class="kartu-grid"></div>
+    <div id="media-kategori"></div>
+    <div class="baris-judul"><div><p class="eyebrow">PERBANDINGAN</p><h2>Bahasa per provinsi</h2></div><label class="cari"><span>Cari bahasa/provinsi</span><input id="cari-bahasa" type="search" placeholder="Contoh: Jawa atau Aceh…" autocomplete="off"></label></div>
+    <div id="daftar-bahasa" class="daftar-bahasa"></div>
+    <div id="media-tanpa-provinsi"></div>
+  </section>
+  <section id="panel-agama" class="panel" role="tabpanel" aria-labelledby="tab-agama" hidden>
+    <div class="pengantar-bagian"><p class="eyebrow">03 / SUKU &amp; AGAMA</p><h2>Manusia di balik angka.</h2><p>Agama bersumber dari Dukcapil. Suku adalah 28 kelompok BPS SP2010 dan kawasan utamanya, bukan batas tempat tinggal seluruh anggota suku.</p></div>
+    <div id="ringkasan-agama"></div>
+    <div class="baris-judul"><div><p class="eyebrow">KAWASAN UTAMA BPS SP2010</p><h2>28 kelompok suku</h2></div></div>
+    <div id="daftar-suku" class="daftar-suku"></div>
+    <div class="baris-judul"><div><p class="eyebrow">PER PROVINSI</p><h2>Agama &amp; suku</h2></div></div>
+    <div id="agama-provinsi"></div>
+  </section>
+  <section id="panel-sumber" class="panel" role="tabpanel" aria-labelledby="tab-sumber" hidden>
+    <div class="pengantar-bagian"><p class="eyebrow">04 / SUMBER</p><h2>Data, batas, dan pembaruan.</h2><p>Laporan tidak mengisi kekosongan sumber dengan perkiraan. Setiap perbedaan dicatat agar tidak dianggap sebagai data yang pasti.</p></div>
+    <div id="info-sumber"></div>
+  </section>
+</main>
+<div id="detail" class="detail" hidden aria-hidden="true">
+  <button class="latar-detail" type="button" aria-label="Tutup rincian"></button>
+  <section class="lembar-detail" role="dialog" aria-modal="true" aria-labelledby="judul-detail">
+    <header class="kepala-detail"><div><p id="jalur-detail" class="eyebrow"></p><h2 id="judul-detail"></h2><p id="subjudul-detail"></p></div><button id="tutup-detail" class="tutup" type="button" aria-label="Tutup rincian">×</button></header>
+    <div id="isi-detail" class="isi-detail"></div>
+  </section>
+</div>
+<footer class="kaki"><span>Data Pemetaan · Tahap 1</span><a href="index.html">Kembali ke peta ↗</a></footer>
+<script src="js/simpanan.js?v=20261024-01"></script>
+<script src="js/datapemetaan.js?v=20261024-01"></script>
+</body>
+</html>
