@@ -82,8 +82,12 @@ pada `database-20261024.zip` di folder yang sama.
   dan layout tanpa overflow lulus.
 
 Status **MENUNGGU KONFIRMASI**, bukan `SELESAI` sampai pemilik menyatakannya.
-Pemeriksaan GitHub Pages dilakukan setelah push; server pratinjau dihentikan
-sesudah verifikasi, bukan dibiarkan berjalan.
+Commit `b3fde1a3` di-push dan deployment GitHub Pages `40099467497` berhasil
+pada commit yang sama. Snapshot publik terverifikasi **568 / 269 / 44**;
+laporan online menampilkan 232 terpetakan, 37 belum, dan 217 target bahasa,
+serta lima rincian Muna yang cocok. Peta online terverifikasi 571 anggota =
+568 media + 3 pribadi, 232 aplikasi terpetakan, dan 28 label Ap Kitab. Server
+pratinjau dihentikan setelah verifikasi, bukan dibiarkan berjalan.
 
 ---
 

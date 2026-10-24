@@ -16,7 +16,10 @@ Aturan pengelolaan:
 > Setelah itu pemilik proyek menambah orderan 23–34. Orderan 23–27 sudah
 > selesai; orderan 28–34 masih menunggu konfirmasi akhir pemilik.
 >
-> ## ✅ AUDIT AKURASI MEDIA — ORDERAN 34
+> ## ✅ AUDIT AKURASI MEDIA ONLINE — ORDERAN 34 MENUNGGU KONFIRMASI
+>
+> Koreksi dipublikasikan pada commit `b3fde1a3`; GitHub Pages berhasil dan
+> peta/laporan online telah diverifikasi. Server pratinjau telah dihentikan.
 >
 > Audit pemilik terbukti: 269 aplikasi sebelumnya diringkas menjadi lima
 > gugus, bukan bahasa. Worker dan database kini memuat 269 aplikasi: 232
@@ -34,7 +37,7 @@ Aturan pengelolaan:
 > | Snapshot media | **568 rekaman** · 269 aplikasi · 44 tanpa provinsi ditampilkan terpisah |
 > | Hasil target–produk | 212/341 ada isi · 129 belum · 6 lengkap · 731 produk inti kurang |
 > | Backup dashboard lama | `backup/laporan-manajemen-20261024/` |
-> | Commit aplikasi terakhir | `6b4f319a`, sudah di-push dan diverifikasi online |
+> | Commit aplikasi terakhir | `b3fde1a3`, sudah di-push dan diverifikasi online |
 > | Rentang proyek | 2026-10-12 → 2026-10-24 |
 >
 > **Situs live:** https://suwandhih.github.io/Pemetaan/
@@ -911,7 +914,7 @@ tidak hilang saat sesi panjang. Pengerjaan menunggu orderan resmi.
 | 2026-10-12 | Data awal **tidak lengkap** — pemilik proyek akan menyuplai data seadanya. Syarat: **cukup menggambarkan** kondisi, tidak harus utuh. |
 | 2026-10-12 | Data akan **dilengkapi oleh pengguna aplikasi** (kontribusi pengguna). Artinya aplikasi perlu jalur tulis (input data oleh pengguna), bukan hanya baca. |
 
-| 34 | **Audit dan koreksi akurasi data media pada peta dan laporan** — Aplikasi Kitab Suci tidak boleh diringkas menjadi lima bahasa/gugus; Film, Video, dan Clip diperiksa ulang dari sumber. Bedakan rekaman produk, bahasa unik, dan provinsi yang benar-benar dapat dipetakan; jangan menebak data yang tidak tersedia. Perbarui sumber peta dan snapshot laporan setelah backup, pertahankan anggota pribadi. Diperintahkan pemilik 2026-10-24 20:05 WIB. | **MENUNGGU KONFIRMASI** — audit live selesai: 568 rekaman; 269 aplikasi (232 terpetakan / 217 bahasa / 28 provinsi; 37 belum terpetakan); 44 tanpa provinsi termasuk Clip. Database 568 media + 3 anggota pribadi; lima ringkasan lama dihapus. Worker, snapshot, label, Update, dan laporan diuji; backup tersedia. Publikasi GitHub diverifikasi sebelum penutupan | 30–60 mnt (estimasi awal) | — |
+| 34 | **Audit dan koreksi akurasi data media pada peta dan laporan** — Aplikasi Kitab Suci tidak boleh diringkas menjadi lima bahasa/gugus; Film, Video, dan Clip diperiksa ulang dari sumber. Bedakan rekaman produk, bahasa unik, dan provinsi yang benar-benar dapat dipetakan; jangan menebak data yang tidak tersedia. Perbarui sumber peta dan snapshot laporan setelah backup, pertahankan anggota pribadi. Diperintahkan pemilik 2026-10-24 20:05 WIB. | **MENUNGGU KONFIRMASI** — audit live selesai: 568 rekaman; 269 aplikasi (232 terpetakan / 217 bahasa / 28 provinsi; 37 belum terpetakan); 44 tanpa provinsi termasuk Clip. Database 568 media + 3 anggota pribadi; lima ringkasan lama dihapus. Worker, snapshot, label, Update, dan laporan diuji; backup tersedia. Publikasi GitHub `b3fde1a3` dan deployment `40099467497` berhasil; peta/laporan online terverifikasi; pratinjau dihentikan | 30–60 mnt (estimasi awal) | — |
 
 ## Usulan (belum diperintahkan)
 
