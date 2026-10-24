@@ -72,7 +72,92 @@ Dicatat 2026-10-12. Dikerjakan **satu per satu** (aturan 6), tidak sekaligus.
 | 30 | **Revisi Media on/off** — ganti tombol [Semua hidup] dan [Semua mati] dengan satu tombol utama On/Off. Off menyembunyikan semua media sementara tanpa menghapus pilihan kategori pengguna; On memulihkan hanya kategori yang dipilih. Pilihan kategori tetap dapat diubah saat Off dan berlaku setelah On. Perintah dan persetujuan pengerjaan 2026-10-24. | **MENUNGGU KONFIRMASI** — implementasi dan verifikasi lokal selesai 2026-10-24; 24 pemeriksaan utama browser lulus, termasuk Off → ubah pilihan → reload → On; klik nyata dan ganti Satelit/Map juga lulus; 0 galat runtime aplikasi | 60–90 mnt | — |
 | 31 | **`datapemetaan.html` — cermin seluruh data Pemetaan, dibangun bertahap** — laporan interaktif, data terbuka saat diklik, bukan satu halaman raksasa yang menampilkan semuanya sekaligus. **Tahap 1 (disepakati 2026-10-24):** ringkasan Indonesia dan 38 provinsi; jumlah serta daftar kabupaten/kota, kecamatan, desa/kelurahan; penduduk; tujuh agama/kepercayaan dalam jumlah dan persentase; bahasa per provinsi dari katalog 430 bahasa; 28 kelompok suku/kelompok gabungan BPS SP2010 beserta kawasan utama dan penjelasan batas datanya; total masing-masing dari 5 jenis media beserta judul/nama bahasa; perbandingan bahasa provinsi dengan media yang sudah/belum tersedia. Entri media tanpa provinsi ditampilkan terpisah, tidak ditebak. Tahap selanjutnya membuka rincian kabupaten/kota → kecamatan → desa/kelurahan. Pembaruan media mengikuti API; pembaruan Dukcapil dilakukan melalui tindakan manual yang juga memperbarui seluruh turunan laporan, dengan tanggal/sumber data ditampilkan—bukan mengunduh seluruh Dukcapil setiap halaman dibuka. Total agama berarti jumlah penduduk per kategori, bukan menjumlahkan semua agama; suku bukan daftar seluruh suku atau tempat tinggal individu. | **MENUNGGU KONFIRMASI** — implementasi dan verifikasi lokal 2026-10-24: rincian lengkap Indonesia → 38 provinsi → 514 kab/kota → 7.275 kecamatan unik → 83.379 desa unik; 430 bahasa, 28 kelompok suku, 7 agama; 7.829 JSON dimuat bertahap; media Neon/API read-only dengan kode aplikasi. Audit seluruh tautan/kode/nilai dan pembaruan Dukcapil transaksional lulus; 31 uji regresi + 18 uji lanjutan browser lulus; 320/390/768/1440 px tanpa overflow halaman; 0 galat runtime. Uji media memakai Worker tiruan—tidak ada tulis produksi; kode produksi tidak tersedia pada sesi uji sehingga katalog live tidak diklaim telah diverifikasi | 4–6 jam (tahap 1) | — |
 
-| 32 | **Tahap 2 — Dasbor Target vs Produk & Kesenjangan Media pada `datapemetaan.html`** — bahasa daerah sebagai target utama, dengan kabupaten/desa tetap sebagai kerangka wilayah; dua ukuran cakupan isi film/video dan kelengkapan tiap produk; Clip/Aplikasi dibandingkan bila bahasa tersedia, sisanya terpisah per gugus/nasional. Sajikan cakupan nasional/provinsi, persentase dan kekurangan, grafik pie/donat sudah vs belum, grafik batang 38 provinsi, matriks bahasa × produk lengkap/sebagian/belum, serta prioritas bahasa berdasarkan kekurangan. Beberapa rekaman pada bahasa yang sama tidak dihitung sebagai beberapa bahasa terpenuhi. Variasi “Bahasa …” disatukan dalam provinsi yang sama: **430 entri katalog → 341 target bahasa unik** (keputusan pemilik proyek 2026-10-24); matriks dapat menampilkan target unik atau seluruh entri. Disepakati melalui pilihan pemilik proyek 2026-10-24. | **MENUNGGU KONFIRMASI** — implementasi dan verifikasi lokal 2026-10-24: grafik donat cakupan isi + 3 film/video, batang 38 provinsi, prioritas, matriks lengkap/sebagian/belum, rincian kekurangan dan media; 341/341 pemetaan katalog cocok; 25 model fixture + 16 katalog asli + 28 browser tahap 2 + 18 pengaman tambahan + 49 regresi lulus; kondisi API gagal aman; 320/390/768/1440 px tanpa overflow halaman; 0 galat runtime. Uji media memakai API tiruan—tidak ada tulis produksi; angka produk live belum diverifikasi karena sesi uji tidak memiliki kode aplikasi | 3–5 jam | — |
+| 32 | **Tahap 2 — Dasbor Target vs Produk & Kesenjangan Media pada `datapemetaan.html`** — bahasa daerah sebagai target utama, dengan kabupaten/desa tetap sebagai kerangka wilayah; dua ukuran cakupan isi film/video dan kelengkapan tiap produk; Clip/Aplikasi dibandingkan bila bahasa tersedia, sisanya terpisah per gugus/nasional. Sajikan cakupan nasional/provinsi, persentase dan kekurangan, grafik pie/donat sudah vs belum, grafik batang 38 provinsi, matriks bahasa × produk lengkap/sebagian/belum, serta prioritas bahasa berdasarkan kekurangan. Beberapa rekaman pada bahasa yang sama tidak dihitung sebagai beberapa bahasa terpenuhi. Variasi “Bahasa …” disatukan dalam provinsi yang sama: **430 entri katalog → 341 target bahasa unik** (keputusan pemilik proyek 2026-10-24); matriks dapat menampilkan target unik atau seluruh entri. Disepakati melalui pilihan pemilik proyek 2026-10-24. Konsep utuh dipindahkan ke **Catatan konsep report orderan 32** di bawah. | **DITUNDA — dihentikan pemilik proyek 2026-10-24 sekitar 17:04 WIB setelah proses sesi mendekati 3 jam; pemilik menilai cara ini tidak dapat dilanjutkan.** Implementasi lokal sempat dibuat dan diuji dengan API tiruan, tetapi **belum mendapat persetujuan pemilik dan belum diverifikasi dengan katalog media live**. Hasil kode tetap tersimpan sebagai checkpoint `b7516499`; bukan hasil akhir dan bukan `SELESAI`. Jangan melanjutkan dengan alur kerja yang sama tanpa keputusan baru. Server pratinjau lokal dihentikan. Alternatif dicatat pada U3–U5, belum dikerjakan | 3–5 jam (estimasi awal; tidak tercapai sesuai harapan pemilik) | — |
+
+### Catatan konsep report orderan 32 — tujuan pemilik proyek
+
+Dicatat ulang pada **2026-10-24** atas perintah pemilik proyek agar tujuan report
+tidak hilang ketika cara pengerjaan dihentikan. Bagian ini adalah **konsep dan
+batas hasil yang diinginkan**, bukan perintah melanjutkan implementasi.
+
+#### A. Tujuan utama
+
+Report harus menjadi **cermin seluruh data Pemetaan** dan alat untuk menjawab:
+**target Indonesia sebesar apa, produk media apa yang sudah dihasilkan, apa yang
+belum terpenuhi, dan berapa banyak yang masih harus diproduksi.** Report tidak
+hanya berisi jumlah wilayah atau jumlah judul media.
+
+#### B. Kerangka wilayah dan manusia
+
+- Mulai dari **Indonesia: 38 provinsi**, lalu dapat dibuka bertahap ke
+  kabupaten/kota → kecamatan → desa/kelurahan. Daftar panjang terbuka saat
+  diklik, bukan ditampilkan sebagai satu halaman raksasa.
+- Tampilkan jumlah dan nama rincian wilayah; penduduk serta tujuh kategori
+  agama/kepercayaan bila sumber menyediakan; suku dan kawasan utamanya sesuai
+  batas sumber; bahasa daerah pada setiap provinsi.
+- Kabupaten/desa adalah **kerangka wilayah**, bukan berarti setiap desa harus
+  memiliki satu produk media sendiri.
+- Data yang kosong atau tidak tersedia tetap dinyatakan demikian; tidak diisi
+  perkiraan. Angka suku tidak boleh diartikan sebagai jumlah anggota suku yang
+  telah menerima media.
+
+#### C. Target bahasa dan produk
+
+- **Bahasa daerah adalah dasar target produk.** Bandingkan bahasa provinsi
+  dengan Film Isa Al-Masih, Film Ikatan Ilahi, Video Kitab Suci, Clip Kitab
+  Suci, dan Aplikasi Kitab Suci.
+- Keputusan pemilik sebelumnya: tampilkan **430 entri katalog** dan **341 target
+  bahasa unik**. Variasi `Aceh`/`Bahasa Aceh` disatukan hanya dalam provinsi
+  yang sama; nama sama pada provinsi berbeda tidak otomatis digabung.
+- **Cakupan isi** = minimal satu dari tiga film/video inti sudah tersedia.
+  **Lengkap** = ketiganya tersedia. Film dan video dapat memiliki isi yang sama
+  tetapi bahasa berbeda; beberapa judul dalam bahasa yang sama tidak menambah
+  jumlah bahasa yang terpenuhi.
+- **Kekurangan produk** = pasangan target bahasa × jenis film/video inti yang
+  belum tersedia. Jika belum ada satu pun produk inti, dasar perhitungan awal
+  adalah `341 × 3 = 1.023` pasangan. Ini rumus/denominator, **bukan hasil live**
+  dan bukan jumlah desa.
+- Clip/Aplikasi dibandingkan bila informasi bahasa memang tersedia. Rekaman
+  nasional/gugus, tanpa bahasa, atau bahasa/provinsi ambigu ditampilkan terpisah;
+  jangan ditebak dan jangan dihitung sebagai target bahasa yang pasti.
+
+#### D. Isi report yang diharapkan
+
+- Ringkasan nasional: target, sudah ada isi, lengkap, sebagian, belum, dan
+  kekurangan produk. Dapat difilter/dibuka sampai provinsi dan bahasa.
+- Grafik pie/donat **target vs produk** dan grafik batang 38 provinsi. Setiap
+  grafik harus disertai angka serta keterangan rumus agar mudah dipahami.
+- Matriks bahasa × produk, daftar judul media yang sudah ada, produk yang masih
+  kurang, dan prioritas bahasa tanpa isi lebih dahulu lalu yang belum lengkap.
+- Sediakan pembeda jelas antara katalog API, data tersimpan, data di luar target,
+  dan sumber Dukcapil/BPS. Report harus dapat menjelaskan *mengapa* suatu media
+  dihitung atau dipisahkan.
+
+#### E. Pembaruan dan batas kebenaran
+
+- Media dapat berubah mengikuti API. Perubahan Dukcapil juga harus dapat
+  memperbarui angka report melalui pembaruan data yang disengaja, bukan mengunduh
+  seluruh data setiap halaman dibuka.
+- Jika API belum dibaca, hasil adalah **belum dibandingkan**. Jika pembacaan
+  sebagian gagal, hasil adalah **sementara** dan “belum” hanya berarti belum
+  ditemukan pada data yang berhasil dibaca—bukan bukti produk tidak tersedia.
+- **Belum ada verifikasi katalog live pada pekerjaan ini.** Jangan menyajikan
+  angka produksi aktual dari pengujian API tiruan seolah-olah sudah pasti.
+
+#### F. Kondisi penghentian dan hasil sementara
+
+- Pemilik proyek menghentikan proses pada **2026-10-24** setelah sesi mendekati
+  tiga jam. Penyebab keputusan: proses dirasa terlalu panjang dan cara ini tidak
+  dapat dilanjutkan sesuai harapan pemilik. Tidak ada dasar untuk mengklaim API
+  macet; server pratinjau yang terus aktif seharusnya dijelaskan/ditangani lebih
+  awal agar tidak menimbulkan kesan pekerjaan belum selesai.
+- Hasil sementara kode tetap berada di commit `b7516499`; commit sebelum
+  penundaan `83e2bf3`. Kode tidak dihapus, tetapi tidak boleh dianggap disetujui
+  atau dijadikan alasan untuk langsung melanjutkan.
+- Untuk pendekatan berikutnya: **sepakati contoh output dan batas waktu terlebih
+  dahulu; kerjakan dalam bagian kecil yang terlihat hasilnya; bedakan proses
+  terbatas dari server pratinjau; hentikan server saat tinjauan selesai; berikan
+  kemajuan dan waktu secara jujur.** Tidak boleh ada proses baru tanpa aba-aba.
 
 ### Orderan di luar daftar bernomor (perintah langsung pemilik proyek)
 
@@ -818,6 +903,9 @@ orderan 23–27 (2026-10-18 dan 2026-10-22) — semuanya sudah selesai.
 |----|--------|-----------------|---------|
 | U1 | ~~**Tarik ulang data media dari tokomedia.org**~~ **SELESAI lewat orderan 27** | — | Orderan 27 sudah mengisi 300 anggota media dari API TokoMedia di Rumahweb. Fitur jangkar & label media (orderan 26) kini menampilkan 35 provinsi. |
 | U2 | ~~**Rotasi kunci aplikasi (`KUNCI`)**~~ **DIBATALKAN 2026-10-22** | — | Pemilik proyek menyatakan ini **hanya demo dan tidak dipublikasikan**, jadi kunci tidak perlu diganti. |
+| U3 | **Alternatif report ringkas satu layar** — bukan melanjutkan dashboard kompleks. Hanya ringkasan nasional target/produk/kekurangan, satu grafik target vs produk, dan daftar prioritas bahasa. Detail wilayah lengkap tetap memakai report orderan 31. Tahap awal memakai snapshot media yang jelas tanggal/sumbernya; tidak menghitung ulang seluruh hierarki setiap halaman dibuka. | Rancangan/contoh output 30–45 mnt; jika disetujui, implementasi awal 60–90 mnt | **Paling sederhana untuk menilai manfaat report lebih dahulu.** Angka live memerlukan akses katalog dengan kode aplikasi. Hanya usulan; belum dipilih/dikerjakan. |
+| U4 | **Alternatif report Excel/CSV dari satu snapshot** — satu berkas lembar kerja berisi ringkasan, bahasa × produk, media yang sudah ada, dan produk yang kurang. Bisa disaring dan dibuka tanpa dashboard interaktif; cocok untuk pembahasan kebutuhan produksi. | Contoh output 20–30 mnt; jika disetujui, pembuatan awal 45–75 mnt | Paling cepat untuk mendapatkan data kerja yang bisa diperiksa, tetapi bukan tampilan web langsung dan perlu dibuat ulang ketika sumber berubah. Hanya usulan; belum dipilih/dikerjakan. |
+| U5 | **Alternatif report otomatis saat data berubah** — katalog media dibaca dan hasil perbandingan disimpan sebagai snapshot; halaman hanya membaca hasil yang sudah dihitung. Perubahan Dukcapil/media memicu pembangunan ulang snapshot, bukan perhitungan besar saat setiap pengguna membuka report. | Rancangan alur 45–60 mnt; jika disetujui, prototipe 90–150 mnt | Lebih sesuai untuk jangka panjang, tetapi perlu persiapan alur pembaruan dan akses API yang pasti. Jangan dimulai sebelum contoh report disepakati. Hanya usulan; belum dipilih/dikerjakan. |
 
 ---
 
