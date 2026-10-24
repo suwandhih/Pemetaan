@@ -41,7 +41,7 @@
   function ambil(nama) {
     if (cache[nama]) { return cache[nama]; }
     status('Memuat rincian ' + nama.replace(/\.json$/, '') + '…');
-    cache[nama] = fetch(dasar + 'data/datapemetaan/' + nama + '?v=20261024-01', { cache: 'no-cache' }).then(function (r) {
+    cache[nama] = fetch(dasar + 'data/datapemetaan/' + nama + '?v=20261024-data', { cache: 'no-cache' }).then(function (r) {
       if (!r.ok) { throw new Error('Berkas ' + nama + ' tidak ditemukan (' + r.status + ').'); }
       return r.json();
     }).then(function (d) { status(''); return d; }).catch(function (e) {
