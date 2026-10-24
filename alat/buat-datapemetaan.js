@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
-const AKAR = path.resolve(__dirname, '..');
+const AKAR = process.env.PEMETAAN_AKAR ? path.resolve(process.env.PEMETAAN_AKAR) : path.resolve(__dirname, '..');
 const argumen = process.argv.slice(2);
 const arg = argumen.find(function (a) { return a.startsWith('--keluaran='); });
 const KELUARAN = arg ? path.resolve(AKAR, arg.slice('--keluaran='.length)) : path.join(AKAR, 'data', 'datapemetaan');
@@ -26,72 +26,90 @@ function baca(nama, variabel) {
 }
 
 function kode(n, panjang) {
+  if (n === null || n === undefined || n === '' || !Number.isFinite(Number(n))) { throw new Error('Kode wilayah kosong/tidak sah.'); }
   return String(n).padStart(panjang, '0');
+}
+
+function bersihkanSumber(daftar, panjangKode) {
+  let kosong = 0, duplikat = 0;
+  const unik = new Map();
+  daftar.forEach(function (d) {
+    if (d.tanpaIdentitas) { kosong++; return; }
+    const kodeWilayah = String(d.kode || '');
+    const nama = typeof d.nama === 'string' ? d.nama.trim() : '';
+    if (!nama || !new RegExp('^\\d{' + panjangKode + '}$').test(kodeWilayah)) { throw new Error('Identitas sumber tidak lengkap: ' + (kodeWilayah || nama || 'tanpa nama')); }
+    d.nama = nama;
+    const lama = unik.get(kodeWilayah);
+    if (!lama) { unik.set(kodeWilayah, d); return; }
+    const kunciLama = panjangKode === 6 ? [lama.kabupaten, lama.nama] : [lama.kecamatan, lama.nama];
+    const kunciBaru = panjangKode === 6 ? [d.kabupaten, d.nama] : [d.kecamatan, d.nama];
+    if (JSON.stringify(kunciLama) !== JSON.stringify(kunciBaru)) { throw new Error('Kode sumber sama tetapi identitas/induk berbeda: ' + kodeWilayah); }
+    duplikat++;
+  });
+  return { data: [...unik.values()], kosong, duplikat, mentah: daftar.length };
+}
+
+async function ambilJson(url) {
+  for (let coba = 1; ; coba++) {
+    try {
+      const jawab = await fetch(url);
+      if (!jawab.ok) { throw new Error('HTTP ' + jawab.status); }
+      const isi = await jawab.json();
+      if (isi.error) { throw new Error(JSON.stringify(isi.error)); }
+      return isi;
+    } catch (e) {
+      if (coba === 4) { throw new Error('Sumber Dukcapil tidak dapat dibaca: ' + e.message); }
+      await new Promise(function (resolve) { setTimeout(resolve, coba * 1500); });
+    }
+  }
 }
 
 function tulis(nama, isi) {
   fs.writeFileSync(path.join(KELUARAN, nama), JSON.stringify(isi), 'utf8');
 }
 
-async function kecamatanTanpaGeometri() {
-  const berkas = path.join(KELUARAN, 'kecamatan-tanpa-geometri.json');
-  if (LURING && fs.existsSync(berkas)) { return JSON.parse(fs.readFileSync(berkas, 'utf8')); }
+async function atributSumber(tingkat) {
+  const desaTingkat = tingkat === 'desa';
+  const namaBerkas = (desaTingkat ? 'desa' : 'kecamatan') + '-sumber.json';
+  const berkas = path.join(KELUARAN, namaBerkas);
+  if (LURING && fs.existsSync(berkas)) { const d = JSON.parse(fs.readFileSync(berkas, 'utf8')); if (Array.isArray(d.data) && Number.isInteger(d.kosong)) { return d; } }
+  const kodeKolom = desaTingkat ? 'no_prop,no_kab,no_kec,no_kel' : 'no_prop,no_kab,no_kec';
+  const namaKolom = desaTingkat ? 'nama_kel' : 'nama_kec';
   const params = new URLSearchParams({
-    where: '1=1', outFields: 'no_prop,no_kab,no_kec,nama_kec,jumlah_penduduk,islam,kristen,katholik,hindu,budha,konghucu,kepercayaan',
-    returnGeometry: 'false', resultRecordCount: '10000', f: 'json'
-  });
-  const jawab = await fetch('https://gis.dukcapil.kemendagri.go.id/arcgis/rest/services/AGR_VISUAL_KEC_FIX/FeatureServer/2/query?' + params);
-  if (!jawab.ok) { throw new Error('Dukcapil kecamatan HTTP ' + jawab.status); }
-  const isi = await jawab.json();
-  if (isi.error) { throw new Error(JSON.stringify(isi.error)); }
-  const hasil = (isi.features || []).map(function (f) {
-    const a = f.attributes;
-    return {
-      kode: kode(a.no_prop, 2) + kode(a.no_kab, 2) + kode(a.no_kec, 2), nama: a.nama_kec,
-      kabupaten: kode(a.no_prop, 2) + kode(a.no_kab, 2), desa: [],
-      agama: [a.jumlah_penduduk, a.islam, a.kristen, a.katholik, a.hindu, a.budha, a.konghucu, a.kepercayaan], tanpaGeometri: true
-    };
-  });
-  if (hasil.length !== 7285) { throw new Error('Atribut kecamatan tidak lengkap: ' + hasil.length); }
-  tulis('kecamatan-tanpa-geometri.json', hasil);
-  return hasil;
-}
-
-async function desaTanpaGeometri() {
-  const berkas = path.join(KELUARAN, 'desa-tanpa-geometri.json');
-  if (LURING && fs.existsSync(berkas)) { return JSON.parse(fs.readFileSync(berkas, 'utf8')); }
-  const params = new URLSearchParams({
-    where: '1=1',
-    outFields: 'no_prop,no_kab,no_kec,no_kel,nama_kel,jumlah_penduduk,islam,kristen,katholik,hindu,budha,konghucu,kepercayaan',
-    returnGeometry: 'false', resultRecordCount: '10000', f: 'json'
+    where: '1=1', outFields: kodeKolom + ',' + namaKolom + ',jumlah_penduduk,islam,kristen,katholik,hindu,budha,konghucu,kepercayaan',
+    returnGeometry: 'false', resultRecordCount: '10000', orderByFields: 'objectid ASC', f: 'json'
   });
   const hasil = [];
   for (;;) {
     params.set('resultOffset', String(hasil.length));
-    const url = 'https://gis.dukcapil.kemendagri.go.id/arcgis/rest/services/AGR_VISUAL_KEL_FIX/FeatureServer/0/query?' + params;
-    const jawab = await fetch(url);
-    if (!jawab.ok) { throw new Error('Dukcapil desa HTTP ' + jawab.status); }
-    const isi = await jawab.json();
-    if (isi.error) { throw new Error(JSON.stringify(isi.error)); }
-    (isi.features || []).forEach(function (f) {
+    const layanan = desaTingkat ? 'AGR_VISUAL_KEL_FIX/FeatureServer/0' : 'AGR_VISUAL_KEC_FIX/FeatureServer/2';
+    const isi = await ambilJson('https://gis.dukcapil.kemendagri.go.id/arcgis/rest/services/' + layanan + '/query?' + params);
+    if (!Array.isArray(isi.features)) { throw new Error('Respons atribut ' + tingkat + ' tidak lengkap.'); }
+    isi.features.forEach(function (f) {
       const a = f.attributes;
-      hasil.push({
-        kode: kode(a.no_prop, 2) + kode(a.no_kab, 2) + kode(a.no_kec, 2) + kode(a.no_kel, 4),
-        nama: a.nama_kel,
-        kecamatan: kode(a.no_prop, 2) + kode(a.no_kab, 2) + kode(a.no_kec, 2),
-        agama: [a.jumlah_penduduk, a.islam, a.kristen, a.katholik, a.hindu, a.budha, a.konghucu, a.kepercayaan],
-        tanpaGeometri: true
-      });
+      const nilaiKode = [a.no_prop, a.no_kab, a.no_kec].concat(desaTingkat ? [a.no_kel] : []);
+      if (!a[namaKolom] && nilaiKode.every(function (n) { return !n; })) { hasil.push({ tanpaIdentitas: true }); return; }
+      const kodeWilayah = kode(a.no_prop, 2) + kode(a.no_kab, 2) + kode(a.no_kec, 2) + (desaTingkat ? kode(a.no_kel, 4) : '');
+      hasil.push({ kode: kodeWilayah, nama: a[namaKolom],
+        kabupaten: kodeWilayah.slice(0, 4), kecamatan: kodeWilayah.slice(0, 6), desa: [],
+        agama: [a.jumlah_penduduk, a.islam, a.kristen, a.katholik, a.hindu, a.budha, a.konghucu, a.kepercayaan], tanpaGeometri: true });
     });
-    if ((isi.features || []).length < 10000) { break; }
+    if (isi.features.length < 10000) { break; }
+    if (isi.exceededTransferLimit === false) { throw new Error('Pagination sumber ' + tingkat + ' tidak dapat diverifikasi.'); }
+    await new Promise(function (resolve) { setTimeout(resolve, 350); });
   }
-  if (hasil.length !== 83489) { throw new Error('Atribut desa tidak lengkap: ' + hasil.length); }
-  tulis('desa-tanpa-geometri.json', hasil);
-  return hasil;
+  const bersih = bersihkanSumber(hasil, desaTingkat ? 10 : 6);
+  const keluaran = { mentah: bersih.mentah, kosong: bersih.kosong, duplikat: bersih.duplikat, data: bersih.data };
+  tulis(namaBerkas, keluaran);
+  return keluaran;
 }
 
 async function utama() {
   fs.mkdirSync(KELUARAN, { recursive: true });
+  const sumberKec = TANPA_SUMBER ? { data: [], kosong: 0, duplikat: 0, mentah: 0 } : await atributSumber('kecamatan');
+  const sumberDesa = TANPA_SUMBER ? { data: [], kosong: 0, duplikat: 0, mentah: 0 } : await atributSumber('desa');
+  const atributKec = new Map(sumberKec.data.map(function (d) { return [d.kode, d]; }));
+  const atributDesa = new Map(sumberDesa.data.map(function (d) { return [d.kode, d]; }));
   const prop = baca(path.join(AKAR, 'data', 'wilayah-warna', 'prop-nasional.js'), 'WARNA_PROP');
   const kab = baca(path.join(AKAR, 'data', 'wilayah-warna', 'kab-nasional.js'), 'WARNA_KAB');
   const agamaProp = baca(path.join(AKAR, 'data', 'agama', 'prop-nasional.js'), 'AGAMA_PROP');
@@ -123,7 +141,7 @@ async function utama() {
     p.dataPenduduk = prop.data.find(function (d) {
       return kode(d.a[0], 2) === k;
     }).a[2];
-    if (a[2] !== p.dataPenduduk) { throw new Error('Penduduk dan agama berbeda sumber: ' + k); }
+    if (a[2] !== p.dataPenduduk) { console.warn('Catatan: penduduk provinsi terbaru berbeda dari geometri lama: ' + k); }
     delete p.dataPenduduk;
   });
 
@@ -134,7 +152,8 @@ async function utama() {
     const k = kode(d.a[0], 2) + kode(d.a[1], 2);
     const pk = k.slice(0, 2);
     const a = agamaKabMap[k];
-    if (!provinsi[pk] || !a || a[3] !== d.a[3]) { throw new Error('Kabupaten/agama tidak cocok: ' + k); }
+    if (!provinsi[pk] || !a) { throw new Error('Kabupaten/agama tidak cocok: ' + k); }
+    if (a[3] !== d.a[3]) { console.warn('Catatan: penduduk kabupaten terbaru berbeda dari geometri lama: ' + k); }
     kabupaten[k] = { kode: k, nama: d.a[2], provinsi: pk, kecamatan: [], desa: 0, agama: a.slice(3) };
     provinsi[pk].kab.push(k);
   });
@@ -144,11 +163,20 @@ async function utama() {
   const tambahanKab = {};
   const tambahanKec = {};
   const duplikatKecamatan = [];
-  let jumlahKec = 0, jumlahDesa = 0;
-  const berkasKec = {};
-  const berkasAgamaKec = {};
-  const berkasDesa = {};
-  const berkasAgamaDesa = {};
+  let kecTingkatAtas = 0;
+  const desaPetaLama = new Set();
+  const berkasKec = {}, berkasAgamaKec = {}, berkasDesa = {}, berkasAgamaDesa = {};
+  function petaSumber(data, panjang) {
+    const peta = new Map();
+    data.forEach(function (r) {
+      const k = kode(r[0], 2) + kode(r[1], 2) + kode(r[2], 2) + (panjang === 10 ? kode(r[3], 4) : '');
+      if (!r[panjang === 10 ? 4 : 3]) { return; }
+      const lama = peta.get(k);
+      if (lama && JSON.stringify(lama) !== JSON.stringify(r)) { throw new Error('Atribut agama berbeda untuk kode yang sama: ' + k); }
+      peta.set(k, r);
+    });
+    return peta;
+  }
   fs.readdirSync(path.join(AKAR, 'data', 'wilayah-warna')).forEach(function (nama) {
     let m = nama.match(/^kec-(\d{2})\.js$/);
     if (m) { berkasKec[m[1]] = nama; }
@@ -166,13 +194,14 @@ async function utama() {
     if (!berkasKec[pk] || !berkasAgamaKec[pk]) { throw new Error('Kecamatan/agama kurang: ' + pk); }
     const w = baca(path.join(AKAR, 'data', 'wilayah-warna', berkasKec[pk]), 'WARNA_KEC');
     const a = baca(path.join(AKAR, 'data', 'agama', berkasAgamaKec[pk]), 'AGAMA_KEC');
-    const petaAgama = {};
-    a.data.forEach(function (r) { petaAgama[kode(r[0], 2) + kode(r[1], 2) + kode(r[2], 2)] = r; });
+    const petaAgama = petaSumber(a.data, 6);
     w.data.forEach(function (d) {
       const k = kode(d.a[0], 2) + kode(d.a[1], 2) + kode(d.a[2], 2);
       const kk = k.slice(0, 4);
       const ag = petaAgama[k];
-      if (!kabupaten[kk] || !ag || ag[4] !== d.a[4]) { throw new Error('Kecamatan/agama tidak cocok: ' + k); }
+      if (!kabupaten[kk] || (!ag && !atributKec.has(k))) { throw new Error('Kecamatan/agama tidak cocok: ' + k); }
+      const sumber = atributKec.get(k);
+      const agamaWilayah = ag ? ag.slice(4) : sumber.agama;
       if (kecamatan[k]) {
         if (kecamatan[k].nama === d.a[3]) {
           duplikatKecamatan.push(k);
@@ -180,15 +209,15 @@ async function utama() {
         }
         throw new Error('Kode kecamatan sama tetapi isi berbeda: ' + k);
       }
-      kecamatan[k] = { kode: k, nama: d.a[3], kabupaten: kk, desa: [], agama: ag.slice(4) };
+      kecamatan[k] = { kode: k, nama: d.a[3], kabupaten: kk, desa: [], agama: agamaWilayah };
       kabupaten[kk].kecamatan.push(k);
       provinsi[pk].kec++;
-      jumlahKec++;
+      kecTingkatAtas++;
     });
   });
 
   const duplikatDesa = [];
-  function catatDesa(d, kc, ag) {
+  function catatDesa(d, kc) {
     if (desa[d.kode]) {
       const lama = desa[d.kode];
       if (lama.kecamatan === kc && lama.nama === d.nama) {
@@ -200,11 +229,8 @@ async function utama() {
     const kk = kc.slice(0, 4);
     const pk = kk.slice(0, 2);
     if (!provinsi[pk]) { throw new Error('Desa dengan provinsi tidak dikenal: ' + d.kode); }
-    if (!kabupaten[kk] && !tambahanKab[kk]) {
-      tambahanKab[kk] = { kode: kk, nama: 'Kelompok desa ' + kk + ' — induk kabupaten tidak tercatat', provinsi: pk, kecamatan: [], desa: 0, agama: null, tanpaInduk: true };
-      provinsi[pk].kab.push(kk);
-    }
-    const kab = kabupaten[kk] || tambahanKab[kk];
+    if (!kabupaten[kk]) { throw new Error('Desa tidak memiliki kabupaten resmi yang dikenal: ' + d.kode); }
+    const kab = kabupaten[kk];
     if (!kecamatan[kc] && !tambahanKec[kc]) {
       tambahanKec[kc] = { kode: kc, nama: 'Kode kecamatan ' + kc.slice(4) + ' (induk tidak tercatat)', kabupaten: kk, desa: [], agama: null, tanpaInduk: true };
       kab.kecamatan.push(kc);
@@ -213,36 +239,45 @@ async function utama() {
     (kecamatan[kc] || tambahanKec[kc]).desa.push(d.kode);
     kab.desa++;
     provinsi[pk].desa++;
-    jumlahDesa++;
   }
 
   Object.keys(berkasDesa).forEach(function (kk) {
     if (!berkasAgamaDesa[kk]) { throw new Error('Agama desa kurang: ' + kk); }
     const w = baca(path.join(AKAR, 'data', 'wilayah-warna', berkasDesa[kk]), 'WARNA_DESA');
     const a = baca(path.join(AKAR, 'data', 'agama', berkasAgamaDesa[kk]), 'AGAMA_DESA');
-    const petaAgama = {};
-    a.data.forEach(function (r) { petaAgama[kode(r[0], 2) + kode(r[1], 2) + kode(r[2], 2) + kode(r[3], 4)] = r; });
+    const petaAgama = petaSumber(a.data, 10);
     w.data.forEach(function (d) {
       const k = kode(d.a[0], 2) + kode(d.a[1], 2) + kode(d.a[2], 2) + kode(d.a[3], 4);
       const kc = k.slice(0, 6);
       const ag = petaAgama[k];
-      if (!ag) { throw new Error('Desa/agama tidak ditemukan: ' + k); }
-      catatDesa({ kode: k, nama: d.a[4], kecamatan: kc, agama: ag.slice(5),
-        penduduk: d.a[5], agamaTanpaTotal: d.a[5] === null && ag[5] === 0 }, kc);
+      if (!ag && !atributDesa.has(k)) { throw new Error('Desa/agama tidak ditemukan: ' + k); }
+      desaPetaLama.add(k);
+      const sumber = atributDesa.get(k);
+      const agamaWilayah = sumber ? sumber.agama : ag.slice(5);
+      catatDesa({ kode: k, nama: d.a[4], kecamatan: kc, agama: agamaWilayah,
+        agamaTanpaTotal: d.a[5] === null && agamaWilayah[0] === 0 }, kc);
     });
   });
 
-  const atributKec = TANPA_SUMBER ? [] : await kecamatanTanpaGeometri();
-  atributKec.forEach(function (d) {
+  sumberKec.data.forEach(function (d) {
+    if (!kabupaten[d.kabupaten]) { throw new Error('Kecamatan sumber tidak memiliki kabupaten yang dikenal: ' + d.kode); }
     if (kecamatan[d.kode]) { return; }
-    if (!d.nama || d.kode.includes('null') || !kabupaten[d.kabupaten]) { return; }
-    duplikatKecamatan.push(d.kode);
+    d.tanpaInduk = true;
+    tambahanKec[d.kode] = d;
   });
 
-  const atributDesa = TANPA_SUMBER ? [] : await desaTanpaGeometri();
-  atributDesa.forEach(function (d) {
-    if (desa[d.kode] || !d.nama || d.kode.includes('null')) { return; }
-    catatDesa(d, d.kecamatan);
+  if (!TANPA_SUMBER) {
+    const petaDesaSumber = atributDesa;
+    Object.keys(desa).forEach(function (k) {
+      const d = petaDesaSumber.get(k);
+      if (d) {
+        desa[k].agama = d.agama;
+        desa[k].agamaTanpaTotal = !(d.agama[0] > 0);
+      }
+    });
+  }
+  sumberDesa.data.forEach(function (d) {
+    if (!desa[d.kode]) { catatDesa(d, d.kecamatan); }
   });
 
   Object.values(tambahanKec).forEach(function (p) {
@@ -252,7 +287,7 @@ async function utama() {
       if (bagian.length > 3 && !/^(I|II|III|IV|V|\d+)$/i.test(bagian)) { nama[bagian] = true; }
     });
     const umum = Object.keys(nama);
-    if (umum.length === 1) { p.nama = umum[0] + ' (induk tidak tercatat)'; }
+    if (!p.nama && umum.length === 1) { p.nama = umum[0] + ' (induk tidak tercatat)'; }
   });
 
   Object.entries(bahasa).forEach(function ([nama, pk]) {
@@ -294,8 +329,8 @@ async function utama() {
     p.kab.forEach(function (kk) { if (!semuaKabupaten[kk]) { throw new Error('Kabupaten pada provinsi tidak ada: ' + kk); } });
     p.bahasa.forEach(function (nama) { if (bahasa[nama] !== p.kode) { throw new Error('Bahasa tidak cocok dengan provinsi: ' + nama); } });
   });
-  if (!TANPA_SUMBER && atributDesa.length !== 83489) {
-    throw new Error('Jumlah atribut desa sumber tidak lengkap: ' + atributDesa.length);
+  if (!TANPA_SUMBER && (!sumberKec.data.length || !sumberDesa.data.length || sumberKec.mentah !== sumberKec.data.length + sumberKec.kosong + sumberKec.duplikat || sumberDesa.mentah !== sumberDesa.data.length + sumberDesa.kosong + sumberDesa.duplikat)) {
+    throw new Error('Audit jumlah sumber tidak konsisten.');
   }
 
   const meta = {
@@ -317,11 +352,13 @@ async function utama() {
       agama: 7
     },
     desaTanpaPenduduk: Object.values(desa).filter(function (d) { return d.agamaTanpaTotal; }).length,
-    kecamatanSumber: atributKec.length,
-    desaSumber: atributDesa.length,
-    kecamatanTanpaIdentitas: atributKec.filter(function (d) { return !d.nama || d.kode.includes('null'); }).length,
-    entriSumberTanpaIdentitas: atributDesa.filter(function (d) { return !d.nama || d.kode.includes('null'); }).length,
-    desaTanpaGeometri: atributDesa.filter(function (d) { return !!d.nama && !d.kode.includes('null'); }).length,
+    kecamatanSumber: sumberKec.mentah,
+    desaSumber: sumberDesa.mentah,
+    kecamatanTanpaIdentitas: sumberKec.kosong,
+    entriSumberTanpaIdentitas: sumberDesa.kosong,
+    kecamatanDuplikatAtribut: sumberKec.duplikat,
+    desaDuplikatAtribut: sumberDesa.duplikat,
+    desaTanpaGeometri: sumberDesa.data.filter(function (d) { return !desaPetaLama.has(d.kode); }).length,
     desaTanpaIndukKecamatan: Object.values(tambahanKec).reduce(function (n, p) { return n + p.desa.length; }, 0),
     kelompokTanpaIndukKecamatan: Object.keys(tambahanKec).length,
     kabupatenTanpaInduk: Object.keys(tambahanKab).length,
@@ -367,7 +404,7 @@ async function utama() {
     if (!/\.json$/.test(nama)) { return; }
     const m = nama.match(/^(provinsi|kabupaten|kecamatan)-(\d+)\.json$/);
     const sah = !m || (m[1] === 'provinsi' ? provinsi[m[2]] : m[1] === 'kabupaten' ? kabupaten[m[2]] : kecamatan[m[2]]);
-    if (!sah || ['desa-tanpa-geometri.json', 'kecamatan-tanpa-geometri.json'].includes(nama)) {
+    if (!sah || ['desa-tanpa-geometri.json', 'kecamatan-tanpa-geometri.json', 'desa-sumber.json', 'kecamatan-sumber.json'].includes(nama)) {
       fs.unlinkSync(path.join(KELUARAN, nama));
     }
   });
@@ -384,7 +421,8 @@ async function utama() {
   if (TANPA_SUMBER && (meta.kecamatanSumber !== 0 || meta.desaSumber !== 0)) { throw new Error('Sumber audit kosong tidak konsisten.'); }
   const totalKecamatan = Object.keys(kecamatan).length;
   const totalDesa = Object.keys(desa).length;
-  if (semua.provinsi !== 38 || semua.kabupaten !== 514 || semua.kecamatan !== totalKecamatan || semua.desa !== totalDesa || semua.kecamatan !== 7275 || semua.desa !== 83379 ||
+  if (Object.keys(tambahanKab).length || Object.keys(tambahanKec).length !== Object.values(kecamatan).filter(function (p) { return p.tanpaInduk; }).length || (!TANPA_SUMBER && (totalKecamatan !== kecTingkatAtas + Object.keys(tambahanKec).length)) ||
+      semua.provinsi !== Object.keys(provinsi).length || semua.kabupaten !== Object.keys(kabupaten).length || semua.kecamatan !== totalKecamatan || semua.desa !== totalDesa ||
       penjumlahan.kab !== semua.kabupaten || penjumlahan.kec !== semua.kecamatan || penjumlahan.desa !== semua.desa) {
     throw new Error('Total data berbeda dari hierarki yang diharapkan: ' + JSON.stringify({ semua, penjumlahan }));
   }

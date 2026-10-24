@@ -155,7 +155,7 @@
         var t = tabel(['Desa/Kelurahan', 'Penduduk']);
         semua.slice(halaman * perHalaman, (halaman + 1) * perHalaman).forEach(function (q) {
           var tr = el('tr'), th = el('th'); th.scope = 'row'; th.textContent = q.nama;
-          var td = el('td', '', angka(q.penduduk !== undefined ? q.penduduk : q.agama[0]));
+          var td = el('td', '', angka(q.agama[0]));
           var b = el('button', 'tombol-angka', 'Agama'); b.type = 'button'; b.addEventListener('click', function () { detailDesa(q); }); tr.append(th, td, el('td')); tr.lastChild.appendChild(b); t.isi.appendChild(tr);
         });
         daftar.replaceChildren(t.bungkus);
