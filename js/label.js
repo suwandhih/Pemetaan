@@ -346,6 +346,11 @@
        jadi jangkar & label harus dipasang ulang. */
     peta.on('styledata', segarkan);
     peta.on('load', segarkan);
+    /* Data anggota dimuat asinkron. Jangan menggambar label dari array kosong
+       sebelum pembacaan database selesai. */
+    if (window.PD_ANGGOTA && PD_ANGGOTA.muat) {
+      PD_ANGGOTA.muat().then(segarkan, segarkan);
+    }
 
     siap = true;
     segarkan();

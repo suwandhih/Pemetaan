@@ -13,24 +13,25 @@ Aturan pengelolaan:
 > Pemilik proyek menyatakan **proyek Pemetaan selesai** pada 2026-10-17.
 > Seluruh **22 orderan** berstatus `SELESAI`.
 >
-> Setelah itu pemilik proyek menambah orderan 23–33. Orderan 23–27 sudah
-> selesai; orderan 28–33 masih menunggu konfirmasi akhir pemilik.
+> Setelah itu pemilik proyek menambah orderan 23–34. Orderan 23–27 sudah
+> selesai; orderan 28–34 masih menunggu konfirmasi akhir pemilik.
 >
-> ## ✅ ORDERAN 33 ONLINE — MENUNGGU KONFIRMASI
+> ## ✅ AUDIT AKURASI MEDIA — ORDERAN 34
 >
-> Opsi A sudah dipublikasikan dan diverifikasi online melalui commit
-> `6b4f319a`: satu kartu angka untuk provinsi, kabupaten/kota, kecamatan, dan
-> desa/kelurahan pada Populasi maupun Agama. Server pratinjau sudah dihentikan;
-> tidak ada proses kerja yang berjalan. Riwayat jeda sementara 18:57 WIB tetap
-> berlaku untuk pekerjaan sebelum instruksi Opsi A pada 19:09 WIB.
-> Bukan berarti seluruh order otomatis berstatus `SELESAI`.
+> Audit pemilik terbukti: 269 aplikasi sebelumnya diringkas menjadi lima
+> gugus, bukan bahasa. Worker dan database kini memuat 269 aplikasi: 232
+> rekaman terpetakan pada 217 target bahasa di 28 provinsi, 37 belum memiliki
+> pemetaan provinsi. Film/Video diperiksa sebagai kategori bahasa, bukan
+> jumlah judul. Clip Indonesia berisi 39 video dan tidak lagi dipetakan ke
+> Jakarta. Total katalog 568 rekaman; tiga anggota pribadi tetap tersimpan.
+> Riwayat order 33 dan jeda sementara sebelumnya tetap di arsip bawah.
 >
 > | Ringkasan terkini | Keterangan |
 > |---|---|
 > | Orderan selesai | **27** (1–27) |
-> | Menunggu konfirmasi | **28–33** |
+> | Menunggu konfirmasi | **28–34** |
 > | Report live | `datapemetaan.html` dan tombol **▣ Laporan manajemen** pada peta |
-> | Snapshot media | 304 rekaman, diambil 2026-10-24 18:19 WIB |
+> | Snapshot media | **568 rekaman** · 269 aplikasi · 44 tanpa provinsi ditampilkan terpisah |
 > | Hasil target–produk | 212/341 ada isi · 129 belum · 6 lengkap · 731 produk inti kurang |
 > | Backup dashboard lama | `backup/laporan-manajemen-20261024/` |
 > | Commit aplikasi terakhir | `6b4f319a`, sudah di-push dan diverifikasi online |
@@ -909,6 +910,8 @@ tidak hilang saat sesi panjang. Pengerjaan menunggu orderan resmi.
 | 2026-10-12 | Cakupan wilayah administratif yang diinginkan: provinsi, kabupaten/kota, kecamatan, desa. |
 | 2026-10-12 | Data awal **tidak lengkap** — pemilik proyek akan menyuplai data seadanya. Syarat: **cukup menggambarkan** kondisi, tidak harus utuh. |
 | 2026-10-12 | Data akan **dilengkapi oleh pengguna aplikasi** (kontribusi pengguna). Artinya aplikasi perlu jalur tulis (input data oleh pengguna), bukan hanya baca. |
+
+| 34 | **Audit dan koreksi akurasi data media pada peta dan laporan** — Aplikasi Kitab Suci tidak boleh diringkas menjadi lima bahasa/gugus; Film, Video, dan Clip diperiksa ulang dari sumber. Bedakan rekaman produk, bahasa unik, dan provinsi yang benar-benar dapat dipetakan; jangan menebak data yang tidak tersedia. Perbarui sumber peta dan snapshot laporan setelah backup, pertahankan anggota pribadi. Diperintahkan pemilik 2026-10-24 20:05 WIB. | **MENUNGGU KONFIRMASI** — audit live selesai: 568 rekaman; 269 aplikasi (232 terpetakan / 217 bahasa / 28 provinsi; 37 belum terpetakan); 44 tanpa provinsi termasuk Clip. Database 568 media + 3 anggota pribadi; lima ringkasan lama dihapus. Worker, snapshot, label, Update, dan laporan diuji; backup tersedia. Publikasi GitHub diverifikasi sebelum penutupan | 30–60 mnt (estimasi awal) | — |
 
 ## Usulan (belum diperintahkan)
 

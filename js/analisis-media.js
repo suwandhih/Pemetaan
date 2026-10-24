@@ -145,7 +145,7 @@
     TAMBAHAN.forEach(function (m) {
       var k = model.kategori[m], c = buat('article', 'kotak-produk');
       c.append(buat('h3', '', SINGKAT[m]), buat('strong', '', punyaKatalog ? angka(k.terpenuhi) + ' bahasa teridentifikasi' : '—'),
-        buat('p', '', k.recordApi + ' record katalog · ' + k.recordSimpan + ' tersimpan'),
+        buat('p', '', k.recordApi + ' rekaman produk · ' + k.terbanding + ' rekaman teridentifikasi pada target · ' + k.recordSimpan + ' tersimpan'),
         buat('small', '', 'Dibandingkan bila bahasa tersedia. Rekaman nasional/gugus tidak dianggap target bahasa yang belum terpenuhi.'));
       tambahan.appendChild(c);
     });

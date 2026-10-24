@@ -26,7 +26,7 @@
   }
   function persen(n, pembagi) { return pembagi > 0 ? (n / pembagi * 100).toFixed(2).replace('.', ',').replace(/,?0+$/, '').replace(/\.$/, '') + '%' : '—'; }
   function normal(n) { return String(n || '').toLocaleLowerCase('id-ID').replace(/^bahasa\s+/i, '').trim(); }
-  function kode(a) { return String(a.kodeProvinsi || '').padStart(2, '0'); }
+  function kode(a) { var k = String(a.kodeProvinsi || '').trim(); return k ? k.padStart(2, '0') : ''; }
   function rincian(a, label) { var r = (a.rincian || []).find(function (x) { return x.label === label; }); return r ? r.nilai : ''; }
   function bahasa(a) { return rincian(a, 'Bahasa') || a.nama.replace(/\s+-\s+(Film|Video|Clip|Aplikasi)[\s\S]*$/, ''); }
   function sumber(a) { return rincian(a, 'Sumber'); }
@@ -246,11 +246,25 @@
       if (!h.ok) { throw new Error(h.pesan || 'Worker menolak permintaan.'); } return h;
     }).finally(function () { clearTimeout(timer); });
   }
+  function kegagalanMedia() {
+    return gagalMedia.filter(function (g) {
+      return g.indexOf('bahasa belum terpetakan ke provinsi') < 0;
+    });
+  }
+  function ringkasKegagalan(daftar) {
+    var perKategori = {};
+    daftar.forEach(function (g) { var k = g.split(' / ')[0]; perKategori[k] = (perKategori[k] || 0) + 1; });
+    return Object.entries(perKategori).map(function (x) { return x[0] + ': ' + x[1]; }).join(' · ');
+  }
   function perbaruiAnalisis() {
     if (!window.AnalisisMedia || !indeks) { return; }
-    window.AnalisisMedia.perbarui({ indeks: indeks, bahasaSuku: bahasaSuku, katalog: katalog, tersimpan: tersimpan, gagalMedia: gagalMedia });
+    var gagalBaca = kegagalanMedia();
+    window.AnalisisMedia.perbarui({ indeks: indeks, bahasaSuku: bahasaSuku, katalog: katalog, tersimpan: tersimpan, gagalMedia: gagalBaca });
     var statusAnalisis = document.getElementById('status-analisis');
-    if (statusAnalisis) { statusAnalisis.textContent = katalog ? gagalMedia.length ? 'Sebagian katalog gagal dibaca: ' + gagalMedia.join(' · ') + '. Hasil bersifat sementara; tidak ada data yang ditulis.' : (waktuSnapshot ? 'Snapshot live ' + new Date(waktuSnapshot).toLocaleString('id-ID') + ' · ' : 'Katalog API terbaru · ') + katalog.length + ' rekaman katalog; tanpa penulisan data.' : 'Target 341 bahasa unik dari 430 entri katalog. Baca katalog untuk menghitung kekurangan produk.'; }
+    if (statusAnalisis) {
+      var tanpa = katalog ? katalog.filter(function (a) { return !kode(a); }).length : 0;
+      statusAnalisis.textContent = katalog ? gagalBaca.length ? 'Pembacaan kategori gagal: ' + gagalBaca.join(' · ') + '. Hasil bersifat sementara; tidak ada data yang ditulis.' : (waktuSnapshot ? 'Snapshot live ' + new Date(waktuSnapshot).toLocaleString('id-ID') + ' · ' : 'Katalog API terbaru · ') + katalog.length + ' rekaman katalog' + (tanpa ? ' · ' + tanpa + ' tanpa provinsi ditampilkan terpisah' : '') + '; tanpa penulisan data.' : 'Target 341 bahasa unik dari 430 entri katalog. Baca katalog untuk menghitung kekurangan produk.';
+    }
   }
   function muatMedia(manual) {
     waktuSnapshot = '';
@@ -260,14 +274,25 @@
       var janjiTersimpan = panggilWorker('ambilSemua').then(function (h) { tersimpan = bersihkanDaftar(h.anggota); }).catch(function (e) { tersimpan = []; pesanMedia(e.message, true); });
       var janjiKatalog = panggilWorker('tarikRumahweb').then(function (h) { katalog = bersihkanDaftar(h.anggota); gagalMedia = h.gagal || []; }).catch(function (e) { katalog = null; gagalMedia = []; pesanMedia('Katalog API tidak dapat dibaca: ' + e.message, true); });
       return Promise.all([janjiTersimpan, janjiKatalog]).then(function () {
-        gambarMedia(); gambarBahasa(); perbaruiAnalisis(); pesanMedia((katalog ? 'Katalog API diperbarui. ' : 'Katalog API belum tersedia; data tersimpan dimuat. ') + tersimpan.length + ' record media; tidak ada data yang ditulis ke TokoMedia.' + (katalog && gagalMedia.length ? ' Peringatan: sebagian katalog gagal dibaca; hasil analisis bersifat sementara.' : ''));
+        gambarMedia(); gambarBahasa(); perbaruiAnalisis(); pesanMedia((katalog ? 'Katalog API diperbarui. ' : 'Katalog API belum tersedia; data tersimpan dimuat. ') + tersimpan.length + ' record media; tidak ada data yang ditulis ke TokoMedia.' + (katalog && kegagalanMedia().length ? ' Peringatan: sebagian kategori gagal dibaca; hasil analisis bersifat sementara.' : ''));
       }).finally(function () { document.getElementById('muat-media').disabled = false; });
     });
   }
   function mediaPerKategori(daftar, kategori, bahasaNama, pk) {
     return daftar.filter(function (a) {
-      return a.kategori === kategori && (!bahasaNama || normal(bahasa(a)) === normal(bahasaNama)) &&
-        (!bahasaNama || ['Film Isa Al-Masih', 'Film Ikatan Ilahi', 'Video Kitab Suci'].indexOf(kategori) < 0 || kode(a) === pk);
+      if (a.kategori !== kategori || (bahasaNama && normal(bahasa(a)) !== normal(bahasaNama))) { return false; }
+      if (!bahasaNama) { return true; }
+      /* Aplikasi dengan nama bahasa yang sama di beberapa provinsi hanya
+         boleh mengisi target bila provinsinya memang tersedia dari sumber. */
+      if (kode(a)) { return kode(a) === pk; }
+      if (kategori === 'Aplikasi Kitab Suci') {
+        return Object.keys(bahasaSuku).filter(function (k) {
+          return (bahasaSuku[k].bahasa || []).some(function (n) { return normal(n) === normal(bahasaNama); });
+        }).length === 1 && pk === Object.keys(bahasaSuku).find(function (k) {
+          return (bahasaSuku[k].bahasa || []).some(function (n) { return normal(n) === normal(bahasaNama); });
+        });
+      }
+      return false;
     });
   }
   function daftarMedia(daftar, judul) {
@@ -288,7 +313,7 @@
     var daftar = katalog.filter(function (a) { return a.kategori === m; });
     var jumlahIsi = daftar.reduce(function (n, a) {
       var r = (a.rincian || []).find(function (x) { return x.label === 'Jumlah video' || x.label === 'Jumlah aplikasi'; });
-      return n + (r ? Number(r.nilai) || 0 : 0);
+      return n + (r ? Number(r.nilai) || 0 : 1);
     }, 0);
     if (m === 'Clip Kitab Suci' || m === 'Aplikasi Kitab Suci') {
       w.appendChild(el('p', 'catatan', 'Jumlah isi yang dilaporkan API: ' + angka(jumlahIsi) + (m === 'Clip Kitab Suci' ? ' video' : ' aplikasi') + '. Jumlah ini berbeda dari jumlah record pada katalog.'));
@@ -303,12 +328,24 @@
     var d = el('div', 'kategori-grid'); MEDIA.forEach(function (m) {
       var c = el('article', 'kategori'), n = tersimpan.filter(function (a) { return a.kategori === m; }).length;
       c.appendChild(el('h3', '', m)); var b = el('button', 'tombol-nama'); b.type = 'button'; b.appendChild(el('strong', '', katalog ? katalog.filter(function (a) { return a.kategori === m; }).length : n)); b.addEventListener('click', function () { bukaJenisMedia(m); }); c.appendChild(b);
-      c.appendChild(el('small', '', (katalog ? 'record katalog API' : 'record tersimpan') + ' · klik untuk judul/nama')); if (katalog) { c.appendChild(el('small', '', n + ' record tersimpan')); } d.appendChild(c);
+      c.appendChild(el('small', '', (katalog ? 'record katalog API' : 'record tersimpan') + ' · klik untuk judul/nama'));
+      if (katalog && m === 'Aplikasi Kitab Suci') {
+        var apps = katalog.filter(function (a) { return a.kategori === m; });
+        c.appendChild(el('small', '', 'Rekaman aplikasi, bukan jumlah bahasa · ' + apps.filter(function (a) { return kode(a); }).length + ' terpetakan · ' + apps.filter(function (a) { return !kode(a); }).length + ' belum'));
+      }
+      if (katalog && m === 'Clip Kitab Suci') {
+        var clips = katalog.filter(function (a) { return a.kategori === m; });
+        var jumlahClip = clips.reduce(function (n, a) { var r = rincian(a, 'Jumlah video'); return n + (Number(r) || 1); }, 0);
+        c.appendChild(el('small', '', '1 kategori bahasa Indonesia · ' + jumlahClip + ' video'));
+      }
+      if (katalog) { c.appendChild(el('small', '', n + ' record tersimpan')); } d.appendChild(c);
     }); k.appendChild(d);
     var tanpa = document.getElementById('media-tanpa-provinsi'); tanpa.replaceChildren();
     if (katalog) {
       var dTanpa = katalog.filter(function (a) { return !kode(a); }); tanpa.appendChild(kotakJudul('Media tanpa provinsi', 'Tetap ditampilkan sebagai sumber/gugus, bukan dipetakan secara perkiraan.')); tanpa.appendChild(daftarMedia(dTanpa, 'Tidak terpetakan per provinsi'));
-      if (gagalMedia.length) { tanpa.appendChild(el('p', 'catatan', 'Peringatan pembacaan API: ' + gagalMedia.join(' · '))); }
+      var gagalBaca = kegagalanMedia(), gagalPeta = gagalMedia.filter(function (g) { return g.indexOf('bahasa belum terpetakan ke provinsi') >= 0; });
+      if (gagalBaca.length) { tanpa.appendChild(el('p', 'catatan', 'Peringatan pembacaan API: ' + gagalBaca.join(' · '))); }
+      if (gagalPeta.length) { tanpa.appendChild(el('p', 'catatan', gagalPeta.length + ' catatan lokasi tidak tersedia (' + ringkasKegagalan(gagalPeta) + '). Semua kategori berhasil dibaca; nama sumber tetap ditampilkan, titik provinsi tidak ditebak.')); }
     }
   }
   function gambarBahasaProvinsi(pk) {
@@ -326,8 +363,8 @@
     if (!katalog) { isi.appendChild(el('p', 'catatan', 'Baca katalog API untuk membandingkan bahasa yang sudah/belum tercatat. Daftar bahasa tetap dapat dilihat.')); }
     namaBahasa.forEach(function (nama) {
       var r = el('div', 'bahasa-baris'), kiri = el('div'); kiri.appendChild(el('strong', '', nama));
-      var kanan = el('div'), film = ['Film Isa Al-Masih', 'Film Ikatan Ilahi', 'Video Kitab Suci'];
-      isi.appendChild(el('p', 'kecil', 'Clip/Aplikasi bersifat nasional/gugus; tidak dihitung sebagai media spesifik bahasa di bawah.'));
+      var kanan = el('div'), film = ['Film Isa Al-Masih', 'Film Ikatan Ilahi', 'Video Kitab Suci', 'Aplikasi Kitab Suci'];
+      isi.appendChild(el('p', 'kecil', 'Film/video dan Aplikasi dicocokkan dengan bahasa serta provinsi yang tersedia. Clip dan rekaman nasional/gugus tetap ditampilkan terpisah; tidak dijadikan target bahasa.'));
       film.forEach(function (m) {
         var dalamKatalog = katalog && mediaPerKategori(katalog, m, nama, pk);
         var dalamSimpan = mediaPerKategori(tersimpan, m, nama, pk);

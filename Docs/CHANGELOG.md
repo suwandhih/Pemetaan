@@ -19,11 +19,11 @@ Repo: https://github.com/suwandhih/Pemetaan
 | Hal | Keadaan terkini |
 |---|---|
 | Orderan selesai | 27 (orderan 1–27) |
-| Menunggu konfirmasi | 28–33 |
-| Status kerja | **Orderan 33 online dan terverifikasi; menunggu konfirmasi pemilik** |
+| Menunggu konfirmasi | 28–34 |
+| Status kerja | **Orderan 34: audit akurasi media dan sinkronisasi selesai; publikasi akhir diverifikasi** |
 | Publikasi Opsi A | `6b4f319a` · GitHub Pages berhasil · server pratinjau dihentikan |
 | Laporan aktif | Data Pemetaan pada `datapemetaan.html` dan tombol ▣ pada peta |
-| Snapshot media | 304 rekaman · 2026-10-24 18:19 WIB |
+| Snapshot media | **568 rekaman** · 269 aplikasi · 44 tanpa provinsi |
 | Target–produk | 212/341 ada isi · 129 belum · 6 lengkap · 731 produk inti kurang |
 | Rentang waktu | 2026-10-12 → 2026-10-24 |
 
@@ -32,6 +32,60 @@ ukuran kemajuan. Status `SELESAI` hanya mengikuti konfirmasi pemilik proyek.
 ---
 
 ## 2026-10-24
+
+### Orderan 34 — Audit dan koreksi akurasi data media
+
+Pemilik melaporkan bahwa Aplikasi Kitab Suci sudah banyak tersedia, tetapi peta
+hanya menunjukkan lima bahasa. Audit membuktikan keluhan tersebut: pipeline
+`tarikRumahweb` mengganti **269 aplikasi** menjadi **lima ringkasan gugus** dan
+menempatkannya pada provinsi wakil. Ini bukan jumlah bahasa dan bukan lokasi
+produk yang dapat dibuktikan. Titik pulih `7d0d156` dibuat sebelum audit;
+versi lama disimpan pada `backup/media-akurasi-20261024/` dan backup database
+pada `database-20261024.zip` di folder yang sama.
+
+- Worker kini membaca **`aplikasi/list`** lengkap melalui tiga halaman
+  (100 + 100 + 69) dari bridge baca yang sudah ada. Setiap produk memakai ID
+  sumber stabil (`tm-aplikasi-<id>`), nama asli, bahasa, gugus, dan tautan
+  sumber. Controller/bridge TokoMedia tidak diubah dan endpoint tulis tetap
+  tidak dibuka.
+- Hasil Aplikasi: **269 rekaman produk; 232 terpetakan pada 217 target bahasa
+  di 28 provinsi; 37 belum memiliki pemetaan provinsi**. Beberapa produk pada
+  bahasa yang sama tetap dihitung sebagai beberapa aplikasi tetapi satu bahasa.
+  Bahasa yang belum terpetakan tidak dibuang dan tidak diberi lokasi perkiraan.
+- Film Isa, Film Ikatan Ilahi, dan Video Kitab Suci diperiksa kembali melalui
+  `category/languages`: **178, 11, dan 109 kategori bahasa**, masing-masing
+  177, 8, dan 107 terpetakan. Angka ini bukan inventaris seluruh judul video;
+  satu bahasa dapat memiliki banyak judul (contoh Aceh: 62 judul Film Isa).
+- Clip: **satu kategori bahasa Indonesia dengan 39 video**, bukan 39 bahasa.
+  Titik lama di Jakarta dihapus karena sumber tidak memberikan provinsi.
+- Database diperbarui dari **304 media menjadi 568 media**; lima ringkasan
+  Aplikasi lama dihapus. **Tiga anggota pribadi dipertahankan** sehingga total
+  anggota menjadi **571** (568 media + 3 pribadi).
+- Update kini memvalidasi jumlah dan ID sebelum menyimpan, hanya menghapus
+  rekaman TokoMedia yang kedaluwarsa setelah penyimpanan berhasil, dan
+  mempertahankan kategori yang gagal dibaca melalui metadata `gagalBaca`.
+  Catatan lokasi tanpa provinsi tidak dianggap kegagalan pembacaan kategori.
+- Label media menunggu pemuatan anggota. Pada peta live terverifikasi **269
+  aplikasi dan 28 label “Ap Kitab”**, termasuk rincian Bahasa Aceh/Muna;
+  pilihan Media pengguna tetap dihormati. Clip tidak lagi menghasilkan label
+  provinsi yang tidak didukung sumber.
+- Snapshot laporan diperbarui menjadi **568 rekaman** dengan **44 tanpa
+  provinsi** (37 Aplikasi, 6 nasional/gugus, dan Clip). Kartu Aplikasi menjelaskan
+  perbedaan jumlah produk/bahasa. Matriks Muna menunjukkan Aplikasi untuk Muna,
+  Muna (1), Muna (2), dan Muna Selatan sesuai sumber. Peringatan palsu
+  “katalog belum lengkap” dihapus; data tanpa provinsi diringkas terpisah.
+- Versi Worker: `a09a3ecf-7f4c-46c4-b1dc-987c154d6836`. Sinkronisasi akhir
+  melalui tombol Update tervalidasi: 568 tersimpan, 0 kategori gagal dibaca,
+  43 catatan lokasi saat pembacaan, Clip tanpa provinsi. Snapshot terakhir
+  memasukkan Clip tanpa provinsi sehingga 44 total tanpa lokasi. Pemeriksaan
+  sintaks, editor, model perhitungan, laporan 269/232/37/44, matriks bahasa,
+  dan layout tanpa overflow lulus.
+
+Status **MENUNGGU KONFIRMASI**, bukan `SELESAI` sampai pemilik menyatakannya.
+Pemeriksaan GitHub Pages dilakukan setelah push; server pratinjau dihentikan
+sesudah verifikasi, bukan dibiarkan berjalan.
+
+---
 
 ### Orderan 33 — Opsi A: satu wilayah diklik, satu kartu angka
 

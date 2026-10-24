@@ -97,17 +97,39 @@
         if (!hasil || !hasil.ok) {
           throw new Error((hasil && hasil.pesan) || 'Worker tidak menjawab.');
         }
+        var terlihat = {}, duplikat = [];
+        hasil.anggota.forEach(function (a) {
+          if (!a.id || !a.nama || terlihat[a.id]) { duplikat.push(a.id || '(tanpa ID)'); }
+          terlihat[a.id] = true;
+        });
+        if (duplikat.length || !hasil.anggota.length || hasil.jumlah !== hasil.anggota.length) {
+          throw new Error('Data baru belum valid; database tidak diubah. Periksa ID/jumlah katalog.');
+        }
+        var lama = (window.PD_ANGGOTA && PD_ANGGOTA.ambilAnggota) ? PD_ANGGOTA.ambilAnggota() : [];
+        var gagalBaca = hasil.gagalBaca || [];
+        var ketinggalan = lama.filter(function (a) {
+          return /^tm-/.test(a.id || '') && !terlihat[a.id] && gagalBaca.indexOf(a.kategori) < 0;
+        });
+        var pesanKonfirmasi = 'Simpan ' + hasil.jumlah + ' rekaman media tervalidasi?\n\n' +
+          (ketinggalan.length ? ketinggalan.length + ' rekaman TokoMedia lama yang sudah tidak ada pada sumber akan dihapus. ' : 'Tidak ada rekaman TokoMedia lama yang perlu dihapus. ') +
+          'Anggota yang Anda isi sendiri tetap dipertahankan.';
+        if (!window.confirm(pesanKonfirmasi)) { throw new Error('Pembaruan dibatalkan; database tidak diubah.'); }
         pesan('Menyimpan ' + hasil.jumlah + ' anggota ke database\u2026');
         return Simpanan.simpanAnggotaBanyak(hasil.anggota).then(function (n) {
-          return { jumlah: hasil.jumlah, tersimpan: n, gagal: hasil.gagal || [] };
+          if (n !== hasil.anggota.length) { throw new Error('Penyimpanan belum lengkap; data lama tidak dihapus.'); }
+          return Promise.all(ketinggalan.map(function (a) { return Simpanan.hapusAnggota(a.id); })).then(function () {
+            return { jumlah: hasil.jumlah, tersimpan: n, dihapus: ketinggalan.length, gagal: hasil.gagal || [], gagalBaca: gagalBaca };
+          });
         });
       })
       .then(function (h) {
         var teks = h.tersimpan + ' anggota tersimpan dari API TokoMedia.';
+        if (h.dihapus) { teks += ' ' + h.dihapus + ' rekaman lama yang tidak ada pada sumber dihapus.'; }
         if (h.gagal.length) {
-          teks += ' ' + h.gagal.length + ' kelompok gagal: ' + h.gagal.join('; ');
+          teks += ' ' + h.gagal.length + ' catatan lokasi belum terpetakan; rekaman tetap ada tanpa titik provinsi.';
         }
-        pesan(teks, h.gagal.length ? 'salah' : '');
+        if (h.gagalBaca.length) { teks += ' Kategori gagal dibaca: ' + h.gagalBaca.join(', ') + '; data lama kategori tersebut dipertahankan.'; }
+        pesan(teks, h.gagalBaca.length ? 'salah' : '');
         if (window.PD_ANGGOTA && PD_ANGGOTA.muat) {
           return PD_ANGGOTA.muat().then(function () {
             if (PD_ANGGOTA.gambarPenanda) { PD_ANGGOTA.gambarPenanda(); }

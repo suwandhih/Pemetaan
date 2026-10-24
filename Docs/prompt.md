@@ -260,8 +260,9 @@ kabupaten rekaan. Nama kelompok tidak ditebak bila sumber tidak menyediakannya.
 Kode aplikasi tetap diperlukan sesuai kontrak Worker; tidak ditanam pada kode.
 Data tersimpan Neon dipisahkan dari katalog API terbaru. Film Isa, Film Ikatan
 Ilahi, dan Video Kitab Suci dibandingkan berdasarkan normalisasi bahasa dan
-provinsi. Clip/Aplikasi tidak dianggap sebagai cakupan spesifik bahasa provinsi.
-Entri tanpa provinsi ditampilkan terpisah. Tombol laporan tidak menyimpan API
+provinsi. Aplikasi juga dibandingkan bila bahasa serta provinsinya tersedia;
+jumlah rekaman aplikasi tidak disamakan dengan jumlah bahasa. Clip Indonesia
+dan entri tanpa provinsi ditampilkan terpisah, bukan ditempatkan di Jakarta. Tombol laporan tidak menyimpan API
 ke Neon; penyimpanan media hanya melalui Update pada aplikasi peta utama.
 
 **Pembaruan manual Dukcapil** (jalankan dari akar proyek):
@@ -328,15 +329,24 @@ perhitungan kedua. Dashboard lama disimpan pada
 `backup/laporan-manajemen-20261024/` dan dapat dipulihkan dari situ. Halaman
 `datapemetaan.html` mandiri tetap tersedia.
 
-**Snapshot live (2026-10-24):** `data/datapemetaan/snapshot-media.json` berisi
-304 rekaman katalog bahasa/produk yang dibaca read-only melalui koneksi
-Pemetaan → Worker → Rumahweb → API TokoMedia. Pembacaan selesai dalam 4,272
-detik. Report memuat snapshot bersama indeks/bahasa; tidak memanggil API secara
+**Snapshot live (2026-10-24, audit akurasi media):**
+`data/datapemetaan/snapshot-media.json` berisi **568 rekaman** katalog
+bahasa/produk yang dibaca read-only melalui koneksi Pemetaan → Worker →
+Rumahweb → API TokoMedia: 178 bahasa Film Isa, 11 Film Ikatan Ilahi, 109 Video
+Kitab Suci, satu kategori Clip Indonesia (39 video), dan **269 aplikasi**.
+Aplikasi dibaca lengkap melalui `aplikasi/list`, tiga halaman × maksimum 100,
+bukan lima ringkasan `aplikasi/area`. Sebanyak 232 rekaman aplikasi memiliki
+provinsi terverifikasi, mencakup 217 target bahasa di 28 provinsi; 37 belum
+memiliki pemetaan provinsi. Total 44 rekaman tanpa provinsi termasuk Clip dan
+entri nasional/gugus tetap ditampilkan terpisah tanpa titik yang dikarang. Report memuat snapshot bersama indeks/bahasa; tidak memanggil API secara
 otomatis setiap halaman dibuka. Tombol pembaruan manual tetap membaca katalog
 terbaru dan mengganti tampilan selama sesi tersebut. Snapshot pada GitHub
 diperbarui melalui proses pembuatan/commit snapshot; perubahan manual di browser
 tidak otomatis menimpa berkas tersebut. Enam catatan lokasi
-nasional/gugus sudah termasuk dalam 304 rekaman dan bukan kegagalan kategori.
+nasional/gugus dan bahasa tanpa provinsi sudah termasuk dalam 568 rekaman;
+itu bukan kegagalan membaca kategori. Kegagalan API dikembalikan terpisah
+melalui `gagalBaca`, dan sinkronisasi tidak menghapus data kategori yang gagal
+dibaca. Setiap aplikasi memakai ID sumber stabil; anggota pribadi dipertahankan.
 Hasil: 212/341 target ada isi (62,2%), 129 belum, 6 lengkap, 206 sebagian,
 731 pasangan produk inti kurang. Ini bukan inventaris seluruh judul video.
 
@@ -614,10 +624,10 @@ muncul dalam daftar gagal, bukan diberi lokasi perkiraan gugus. Catatan kategori
 wilayah seperti `Indonesia`, `Kalimantan` atau `Maluku - Papua` yang bukan bahasa
 provinsi disimpan tanpa koordinat sehingga tidak menghasilkan penanda laut.
 
-**Kelompok yang tidak menyediakan provinsi per bahasa** ditangani secara
-terbatas: Clip Kitab Suci berbahasa Indonesia memakai titik daratan di Jakarta;
-Aplikasi Kitab Suci memakai satu titik daratan wakil untuk setiap gugus API.
-Keduanya tidak diklaim sebagai lokasi bahasa tertentu.
+**Kelompok yang tidak menyediakan provinsi per bahasa** tidak dipaksakan
+mendapat titik. Clip berbahasa Indonesia tidak diberi provinsi/titik yang
+dikarang. Aplikasi dibaca per produk; hanya nama bahasa yang ada di katalog
+Pemetaan yang mendapat provinsi/titik. Ringkasan gugus tidak dijadikan bahasa.
 
 **Tidak ada penarikan otomatis** — hanya saat tombol ditekan.
 
@@ -682,7 +692,7 @@ waktu di proyek ini.
 | `#keterangan-media` **bertumpuk** dengan `#atribusi` di layar sempit | keduanya di kiri/kanan bawah | angkat keterangan ke `bottom: calc(var(--tinggi-bilah) + 18px)` — atribusi tingginya ±11 px + 4 px jarak |
 | `idBaru()` bisa **mengembalikan id yang sama** bila dipanggil beruntun dalam satu milidetik | berbasis waktu | untuk data uji, pakai id berurutan sendiri; jangan mengandalkan `idBaru()` dalam gelung rapat |
 | Token API **tidak boleh** ditanam di JavaScript | repo publik, "View Source" | simpan di sisi server (PHP) atau secret Worker; peramban hanya memanggil perantara |
-| `category/languages` **tidak ada** untuk sebagian kategori TokoMedia | kategori 127 (Clip) dan 129 (Aplikasi) isinya daftar video/aplikasi, bukan bahasa | tangani terpisah: Clip → `ckitab/index`, Aplikasi → `aplikasi/area` per gugus |
+| `category/languages` **tidak ada** untuk sebagian kategori TokoMedia | kategori 127 (Clip) dan 129 (Aplikasi) isinya daftar video/aplikasi, bukan bahasa | Clip → `ckitab/index`; Aplikasi → `aplikasi/list` dengan pagination lengkap, jangan `aplikasi/area` sebagai bahasa |
 | `region` dari API memakai **tanda hubung** (`Jawa - Bali - Nusa Tenggara`) sedangkan `GUGUS` memakai koma | dua sumber berbeda | `GUGUS_ALIAS` memetakan kedua bentuk ke satu nama |
 | Label media **berdesakan** saat peta dilihat dari jauh | 35 provinsi berlabel pada z4 | `text-size` dibuat `interpolate` (z4 → 10 px, z7 → 12,5 px) dan `text-padding` dinaikkan ke 8 |
 
