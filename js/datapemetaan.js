@@ -301,8 +301,7 @@
     namaBahasa.forEach(function (nama) {
       var r = el('div', 'bahasa-baris'), kiri = el('div'); kiri.appendChild(el('strong', '', nama));
       var kanan = el('div'), film = ['Film Isa Al-Masih', 'Film Ikatan Ilahi', 'Video Kitab Suci'];
-      var khusus = katalog ? katalog.filter(function (a) { return ['Clip Kitab Suci', 'Aplikasi Kitab Suci'].indexOf(a.kategori) >= 0; }) : [];
-      if (khusus.length) { isi.appendChild(el('p', 'kecil', 'Clip/Aplikasi bersifat nasional/gugus; tidak dihitung sebagai media spesifik bahasa di bawah.')); }
+      isi.appendChild(el('p', 'kecil', 'Clip/Aplikasi bersifat nasional/gugus; tidak dihitung sebagai media spesifik bahasa di bawah.'));
       film.forEach(function (m) {
         var dalamKatalog = katalog && mediaPerKategori(katalog, m, nama, pk);
         var dalamSimpan = mediaPerKategori(tersimpan, m, nama, pk);
@@ -359,7 +358,7 @@
     var a = el('article', 'kotak'); a.appendChild(el('h3', '', 'Dukcapil Kemendagri'));
     a.appendChild(el('p', '', 'Penduduk, agama, dan wilayah administratif. Data lokal diambil ' + indeks.sumber.wilayah + ' (wilayah) dan ' + indeks.sumber.agama + ' (agama).'));
     a.appendChild(el('p', '', '38 provinsi · 514 kabupaten/kota · ' + angka(indeks.total.kecamatan) + ' kecamatan bernama · ' + angka(indeks.total.desa) + ' desa/kelurahan bernama.'));
-    a.appendChild(el('p', 'catatan', 'Layanan sumber melaporkan ' + angka(indeks.kecamatanSumber) + ' record kecamatan dan ' + angka(indeks.desaSumber) + ' record desa. Sebanyak ' + indeks.kecamatanTanpaIdentitas + ' kecamatan dan ' + indeks.entriSumberTanpaIdentitas + ' desa tidak memiliki nama/kode/geometri, sehingga ditampilkan sebagai jumlah entri kosong, bukan diberi identitas rekaan.'));
+    a.appendChild(el('p', 'catatan', 'Layanan sumber melaporkan ' + angka(indeks.kecamatanSumber) + ' record kecamatan dan ' + angka(indeks.desaSumber) + ' record desa. Setelah duplikat identik disajikan satu kali, terdapat ' + angka(indeks.total.kecamatan) + ' kecamatan unik dan ' + angka(indeks.total.desa) + ' desa unik yang dapat dirinci. Sebanyak ' + indeks.kecamatanTanpaIdentitas + ' kecamatan dan ' + indeks.entriSumberTanpaIdentitas + ' desa tidak memiliki nama/kode/geometri, sehingga ditampilkan sebagai jumlah entri kosong, bukan diberi identitas rekaan.'));
     var b = el('article', 'kotak'); b.appendChild(el('h3', '', 'Bahasa, media & suku'));
     b.appendChild(el('p', '', '430 nama bahasa dari katalog Pemetaan. Tiga provinsi tidak memiliki entri pada katalog ini: Riau, Kepulauan Riau, dan DI Yogyakarta. Ini bukan klaim bahwa bahasa daerah tidak ada.'));
     b.appendChild(el('p', '', 'Media dibaca dari API TokoMedia melalui Rumahweb/Worker, baca saja. Data tersimpan berasal dari Neon. Nama media ditampilkan apa adanya; entri tanpa provinsi tidak ditebak.'));
@@ -372,6 +371,7 @@
     var e = el('article', 'kotak'); e.appendChild(el('h3', '', 'Batas sumber'));
     e.appendChild(el('p', '', indeks.desaTanpaIndukKecamatan + ' desa memiliki kode kecamatan yang tidak tercatat pada tingkat kecamatan; kelompoknya ditandai sebagai induk tidak tercatat. Tidak ada pemindahan wilayah berdasarkan tebakan.'));
     e.appendChild(el('p', '', indeks.desaTanpaPenduduk + ' desa memiliki null pada penduduk peta dan total 0 pada agama. Persentase tidak dihitung bila pembaginya nol.'));
+    e.appendChild(el('p', '', 'Terdapat ' + (indeks.kecamatanDuplikatIdentik || 0) + ' kecamatan dan ' + (indeks.desaDuplikatIdentik || 0) + ' desa dengan baris sumber yang identik. Baris yang benar-benar sama disajikan satu kali; rekaman mentah tetap dijelaskan di atas.'));
     e.appendChild(el('p', '', 'Angka Dukcapil berbasis administrasi kependudukan; tidak disamakan dengan proyeksi BPS. Data tidak tersedia ditandai —, bukan diisi angka perkiraan.')); d.append(a, b, c, e);
   }
   function pasang() {

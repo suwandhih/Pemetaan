@@ -143,6 +143,7 @@ async function utama() {
   const desa = {};
   const tambahanKab = {};
   const tambahanKec = {};
+  const duplikatKecamatan = [];
   let jumlahKec = 0, jumlahDesa = 0;
   const berkasKec = {};
   const berkasAgamaKec = {};
@@ -172,6 +173,13 @@ async function utama() {
       const kk = k.slice(0, 4);
       const ag = petaAgama[k];
       if (!kabupaten[kk] || !ag || ag[4] !== d.a[4]) { throw new Error('Kecamatan/agama tidak cocok: ' + k); }
+      if (kecamatan[k]) {
+        if (kecamatan[k].nama === d.a[3]) {
+          duplikatKecamatan.push(k);
+          return;
+        }
+        throw new Error('Kode kecamatan sama tetapi isi berbeda: ' + k);
+      }
       kecamatan[k] = { kode: k, nama: d.a[3], kabupaten: kk, desa: [], agama: ag.slice(4) };
       kabupaten[kk].kecamatan.push(k);
       provinsi[pk].kec++;
@@ -179,7 +187,16 @@ async function utama() {
     });
   });
 
+  const duplikatDesa = [];
   function catatDesa(d, kc, ag) {
+    if (desa[d.kode]) {
+      const lama = desa[d.kode];
+      if (lama.kecamatan === kc && lama.nama === d.nama) {
+        duplikatDesa.push(d.kode);
+        return;
+      }
+      throw new Error('Kode desa sama tetapi isi/induk berbeda: ' + d.kode);
+    }
     const kk = kc.slice(0, 4);
     const pk = kk.slice(0, 2);
     if (!provinsi[pk]) { throw new Error('Desa dengan provinsi tidak dikenal: ' + d.kode); }
@@ -219,10 +236,7 @@ async function utama() {
   atributKec.forEach(function (d) {
     if (kecamatan[d.kode]) { return; }
     if (!d.nama || d.kode.includes('null') || !kabupaten[d.kabupaten]) { return; }
-    kecamatan[d.kode] = d;
-    kabupaten[d.kabupaten].kecamatan.push(d.kode);
-    provinsi[d.kabupaten.slice(0, 2)].kec++;
-    jumlahKec++;
+    duplikatKecamatan.push(d.kode);
   });
 
   const atributDesa = TANPA_SUMBER ? [] : await desaTanpaGeometri();
@@ -258,22 +272,25 @@ async function utama() {
     });
   });
 
-  Object.values(provinsi).forEach(function (p) { p.kab.sort(); });
-  Object.values(kabupaten).forEach(function (p) { p.kecamatan.sort(); });
-  Object.values(tambahanKab).forEach(function (p) { p.kecamatan.sort(); });
-  Object.values(kecamatan).forEach(function (p) { p.desa.sort(); });
-  Object.values(tambahanKec).forEach(function (p) { p.desa.sort(); });
-
-  const salinanKecamatan = Object.assign({}, kecamatan);
   Object.assign(kecamatan, tambahanKec);
+  function urutKode(a, b) { return Number(a) - Number(b) || String(a).localeCompare(String(b)); }
+  Object.values(provinsi).forEach(function (p) { p.kab = [...new Set(p.kab)].sort(urutKode); });
+  Object.values(kabupaten).forEach(function (p) { p.kecamatan = [...new Set(p.kecamatan)].sort(urutKode); });
+  Object.values(tambahanKab).forEach(function (p) { p.kecamatan = [...new Set(p.kecamatan)].sort(urutKode); });
+  Object.values(kecamatan).forEach(function (p) { p.desa = [...new Set(p.desa)].sort(urutKode); });
+
   const semuaKabupaten = Object.assign({}, kabupaten, tambahanKab);
-  const semuaDesa = Object.values(desa).map(function (d) { return d.kode; }).sort();
-  if (new Set(semuaDesa).size !== semuaDesa.length) { throw new Error('Ada desa yang terdaftar lebih dari sekali.'); }
+  const semuaDesa = [];
+  Object.values(kecamatan).forEach(function (p) { p.desa.forEach(function (kd) { semuaDesa.push(kd); }); });
+  semuaDesa.sort();
+  if (new Set(semuaDesa).size !== semuaDesa.length || semuaDesa.length !== Object.keys(desa).length) { throw new Error('Ada desa yang terdaftar lebih dari sekali atau tidak memiliki induk.'); }
   Object.values(kecamatan).forEach(function (p) {
     if (!semuaKabupaten[p.kabupaten]) { throw new Error('Induk kabupaten tidak ada: ' + p.kode); }
     p.desa.forEach(function (kd) { if (!desa[kd]) { throw new Error('Desa tidak ada pada indeks: ' + kd); } });
   });
   Object.values(provinsi).forEach(function (p) {
+    p.kelompokTambahan = [];
+    p.kec = p.kab.reduce(function (n, kk) { return n + semuaKabupaten[kk].kecamatan.length; }, 0);
     p.kab.forEach(function (kk) { if (!semuaKabupaten[kk]) { throw new Error('Kabupaten pada provinsi tidak ada: ' + kk); } });
     p.bahasa.forEach(function (nama) { if (bahasa[nama] !== p.kode) { throw new Error('Bahasa tidak cocok dengan provinsi: ' + nama); } });
   });
@@ -293,8 +310,8 @@ async function utama() {
     total: {
       provinsi: Object.keys(provinsi).length,
       kabupaten: Object.keys(kabupaten).length,
-      kecamatan: jumlahKec,
-      desa: jumlahDesa,
+      kecamatan: Object.keys(kecamatan).length,
+      desa: Object.keys(desa).length,
       bahasa: Object.keys(bahasa).length,
       suku: suku.SUKU.length,
       agama: 7
@@ -308,9 +325,11 @@ async function utama() {
     desaTanpaIndukKecamatan: Object.values(tambahanKec).reduce(function (n, p) { return n + p.desa.length; }, 0),
     kelompokTanpaIndukKecamatan: Object.keys(tambahanKec).length,
     kabupatenTanpaInduk: Object.keys(tambahanKab).length,
+    desaDuplikatIdentik: duplikatDesa.length,
+    kecamatanDuplikatIdentik: duplikatKecamatan.length,
     provinsi: Object.fromEntries(Object.entries(provinsi).map(function ([k, p]) {
       return [k, { nama: p.nama, kab: p.kab.length, kec: p.kec, desa: p.desa,
-        bahasa: p.bahasa.length, suku: p.suku.length, agama: p.agama }];
+        kelompokTambahan: p.kelompokTambahan.length, kecamatanTingkatAtas: p.kab.reduce(function (n, kk) { return n + kabupaten[kk].kecamatan.filter(function (kc) { return !kecamatan[kc].tanpaInduk; }).length; }, 0), bahasa: p.bahasa.length, suku: p.suku.length, agama: p.agama }];
     }))
   };
   tulis('indeks.json', meta);
@@ -323,11 +342,14 @@ async function utama() {
       kabupaten: p.kab.map(function (kk) {
         const q = kabupaten[kk] || tambahanKab[kk];
         return { kode: kk, nama: q.nama, kec: q.kecamatan.length, desa: q.desa, agama: q.agama };
+      }),
+      kelompokTambahan: p.kelompokTambahan.map(function (kk) {
+        const q = tambahanKab[kk];
+        return { kode: kk, nama: q.nama, kec: q.kecamatan.length, desa: q.desa, agama: q.agama, tanpaInduk: true };
       })
     });
   });
   Object.assign(kabupaten, tambahanKab);
-  Object.assign(kecamatan, tambahanKec);
   Object.entries(kabupaten).forEach(function ([k, p]) {
     tulis('kabupaten-' + k + '.json', {
       kabupaten: p,
@@ -341,9 +363,13 @@ async function utama() {
     tulis('kecamatan-' + k + '.json', { kecamatan: p, desa: p.desa.map(function (kd) { return desa[kd]; }) });
   });
 
-  ['desa-tanpa-geometri.json', 'kecamatan-tanpa-geometri.json'].forEach(function (nama) {
-    const lokasi = path.join(KELUARAN, nama);
-    if (fs.existsSync(lokasi)) { fs.unlinkSync(lokasi); }
+  fs.readdirSync(KELUARAN).forEach(function (nama) {
+    if (!/\.json$/.test(nama)) { return; }
+    const m = nama.match(/^(provinsi|kabupaten|kecamatan)-(\d+)\.json$/);
+    const sah = !m || (m[1] === 'provinsi' ? provinsi[m[2]] : m[1] === 'kabupaten' ? kabupaten[m[2]] : kecamatan[m[2]]);
+    if (!sah || ['desa-tanpa-geometri.json', 'kecamatan-tanpa-geometri.json'].includes(nama)) {
+      fs.unlinkSync(path.join(KELUARAN, nama));
+    }
   });
 
   const semua = Object.assign({}, meta.total);
@@ -356,7 +382,9 @@ async function utama() {
     penjumlahan.suku += p.suku.length;
   });
   if (TANPA_SUMBER && (meta.kecamatanSumber !== 0 || meta.desaSumber !== 0)) { throw new Error('Sumber audit kosong tidak konsisten.'); }
-  if (semua.provinsi !== 38 || semua.kabupaten !== 514 || semua.kecamatan !== 7246 || semua.desa !== 83411 ||
+  const totalKecamatan = Object.keys(kecamatan).length;
+  const totalDesa = Object.keys(desa).length;
+  if (semua.provinsi !== 38 || semua.kabupaten !== 514 || semua.kecamatan !== totalKecamatan || semua.desa !== totalDesa || semua.kecamatan !== 7275 || semua.desa !== 83379 ||
       penjumlahan.kab !== semua.kabupaten || penjumlahan.kec !== semua.kecamatan || penjumlahan.desa !== semua.desa) {
     throw new Error('Total data berbeda dari hierarki yang diharapkan: ' + JSON.stringify({ semua, penjumlahan }));
   }

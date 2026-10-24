@@ -1,6 +1,6 @@
 /* DATA AGAMA DESA — bagian 1172 (Dukcapil Kemendagri)
    Sumber: gis.dukcapil.kemendagri.go.id · ArcGIS FeatureServer, tanpa kunci
-   Ambil: 2026-10-17 · tanpa batas wilayah
+   Ambil: 2026-10-24 · tanpa batas wilayah
    Kolom a: [no_prop, no_kab, no_kec, no_kel, nama_kel, jumlah_penduduk, islam, kristen, katholik, hindu, budha, konghucu, kepercayaan]
-   Dibuat oleh alat/ambil-agama.js — jangan diubah manual. */
+   Dibuat oleh alat/perbarui-datapemetaan.js — jangan diubah manual. */
 window.AGAMA_DESA = [[11,72,2,2006,"COT ABEUK",1182,1172,7,3,0,0,0,0],[11,72,2,2004,"JABOI",871,871,0,0,0,0,0,0],[11,72,2,2005,"BALOHAN",3892,3892,0,0,0,0,0,0],[11,72,2,2008,"IE MEULEE",4944,4904,40,0,0,0,0,0],[11,72,3,2003,"PAYA SEUNARA",3344,3340,3,0,0,1,0,0],[11,72,3,2001,"IBOIH",1515,1504,5,6,0,0,0,0],[11,72,2,2010,"ANOE ITAM",885,885,0,0,0,0,0,0],[11,72,3,2005,"KEUNEKAI",1043,1043,0,0,0,0,0,0],[11,72,1,2005,"ANEUK LAOT",1365,1360,3,0,0,2,0,0],[11,72,1,2004,"KRUENG RAYA",2226,2226,0,0,0,0,0,0],[11,72,1,2006,"KUTA TIMU",2277,2195,27,3,0,52,0,0],[11,72,2,2009,"UJOENG KAREUNG",773,772,1,0,0,0,0,0],[11,72,3,2004,"PAYA",755,755,0,0,0,0,0,0],[11,72,3,2006,"BEURAWANG",413,413,0,0,0,0,0,0],[11,72,1,2007,"KUTA BARAT",3534,3329,45,22,0,138,0,0],[11,72,1,2008,"KUTA ATEUH",3984,3882,78,8,0,16,0,0],[11,72,3,2002,"BATEE SHOK",1832,1831,1,0,0,0,0,0],[11,72,2,2007,"COT BA U",7958,7876,69,7,0,6,0,0]];

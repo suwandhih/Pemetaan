@@ -1,6 +1,6 @@
 /* DATA AGAMA DESA — bagian 6474 (Dukcapil Kemendagri)
    Sumber: gis.dukcapil.kemendagri.go.id · ArcGIS FeatureServer, tanpa kunci
-   Ambil: 2026-10-17 · tanpa batas wilayah
+   Ambil: 2026-10-24 · tanpa batas wilayah
    Kolom a: [no_prop, no_kab, no_kec, no_kel, nama_kel, jumlah_penduduk, islam, kristen, katholik, hindu, budha, konghucu, kepercayaan]
-   Dibuat oleh alat/ambil-agama.js — jangan diubah manual. */
+   Dibuat oleh alat/perbarui-datapemetaan.js — jangan diubah manual. */
 window.AGAMA_DESA = [[64,74,2,1001,"TANJUNG LAUT",16895,16165,572,118,16,24,0,0],[64,74,3,1002,"GUNUNG TELIHAN",14654,9585,4118,935,16,0,0,0],[64,74,2,1006,"TANJUNG LAUT INDAH",15642,15467,132,39,2,2,0,0],[64,74,3,1001,"BELIMBING",11790,10252,1254,258,22,4,0,0],[64,74,3,1003,"KANAAN",5190,1232,3438,519,1,0,0,0],[64,74,1,1003,"LOK TUAN",24315,23130,933,230,6,16,0,0],[64,74,2,1002,"BERBAS TENGAH",14400,12906,1330,144,9,11,0,0],[64,74,1,1006,"API-API",18207,17115,697,326,44,25,0,0],[64,74,1,1002,"BONTANG BARU",12931,12196,505,117,97,16,0,0],[64,74,2,1005,"BONTANG LESTARI",7557,7425,97,34,0,1,0,0],[64,74,2,1003,"BERBAS PANTAI",9850,9806,30,2,5,7,0,0],[64,74,1,1001,"BONTANG KUALA",7775,7303,300,143,24,5,0,0],[64,74,2,1004,"SATIMPO",6823,6169,513,129,12,0,0,0],[64,74,1,1004,"GUNTUNG",10062,9142,678,242,0,0,0,0],[64,74,1,1005,"GUNUNG ELAI",15720,14414,1037,222,31,16,0,0]];

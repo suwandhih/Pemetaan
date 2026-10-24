@@ -1,6 +1,6 @@
 /* DATA AGAMA DESA — bagian 3572 (Dukcapil Kemendagri)
    Sumber: gis.dukcapil.kemendagri.go.id · ArcGIS FeatureServer, tanpa kunci
-   Ambil: 2026-10-17 · tanpa batas wilayah
+   Ambil: 2026-10-24 · tanpa batas wilayah
    Kolom a: [no_prop, no_kab, no_kec, no_kel, nama_kel, jumlah_penduduk, islam, kristen, katholik, hindu, budha, konghucu, kepercayaan]
-   Dibuat oleh alat/ambil-agama.js — jangan diubah manual. */
+   Dibuat oleh alat/perbarui-datapemetaan.js — jangan diubah manual. */
 window.AGAMA_DESA = [[35,72,2,1005,"KARANGSARI",5405,4867,297,212,3,21,5,0],[35,72,3,1005,"REMBANG",3282,2999,223,56,2,2,0,0],[35,72,1,1006,"BENDO",6521,6290,113,110,1,5,2,0],[35,72,3,1003,"KLAMPOK",5254,5174,56,24,0,0,0,0],[35,72,1,1001,"KEPANJENKIDUL",7954,6529,624,662,7,107,22,3],[35,72,1,1003,"SENTUL",8539,8071,231,198,9,25,5,0],[35,72,1,1007,"KEPANJENLOR",5756,4975,326,371,1,74,9,0],[35,72,2,1002,"BLITAR",4979,4706,159,105,2,3,2,2],[35,72,2,1004,"TURI",3525,3080,212,203,3,24,3,0],[35,72,2,1006,"SUKOREJO",14689,12965,939,637,2,117,27,2],[35,72,3,1002,"PLOSOKEREP",5356,5275,27,37,8,6,0,3],[35,72,3,1007,"BENDOGERIT",11003,9997,472,492,3,23,12,4],[35,72,1,1004,"KAUMAN",6739,6474,122,110,2,20,10,1],[35,72,3,1004,"SANANWETAN",15055,13608,810,598,17,10,6,6],[35,72,3,1001,"GEDOG",12206,11281,371,539,6,0,4,5],[35,72,3,1006,"KARANGTENGAH",8052,7537,296,191,18,10,0,0],[35,72,2,1007,"TANJUNGSARI",10211,9835,227,144,1,2,0,2],[35,72,1,1005,"TANGGUNG",6594,6504,36,49,1,4,0,0],[35,72,1,1002,"NGADIREJO",3897,3615,31,243,3,5,0,0],[35,72,2,1003,"TLUMPU",4291,3908,306,59,2,7,3,6],[35,72,2,1001,"PAKUNDEN",11896,11420,320,139,0,13,0,4]];

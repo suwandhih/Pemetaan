@@ -1,6 +1,6 @@
 /* DATA AGAMA DESA — bagian 1374 (Dukcapil Kemendagri)
    Sumber: gis.dukcapil.kemendagri.go.id · ArcGIS FeatureServer, tanpa kunci
-   Ambil: 2026-10-17 · tanpa batas wilayah
+   Ambil: 2026-10-24 · tanpa batas wilayah
    Kolom a: [no_prop, no_kab, no_kec, no_kel, nama_kel, jumlah_penduduk, islam, kristen, katholik, hindu, budha, konghucu, kepercayaan]
-   Dibuat oleh alat/ambil-agama.js — jangan diubah manual. */
+   Dibuat oleh alat/perbarui-datapemetaan.js — jangan diubah manual. */
 window.AGAMA_DESA = [[13,74,2,1002,"PASAR USANG",4005,3894,12,56,0,43,0,0],[13,74,1,1005,"GUGUK MALINTANG",7330,7252,63,15,0,0,0,0],[13,74,2,1008,"BALAI-BALAI",6567,6561,1,5,0,0,0,0],[13,74,2,1005,"SILAING ATAS",2524,2430,61,33,0,0,0,0],[13,74,1,1001,"GANTING",3522,3522,0,0,0,0,0,0],[13,74,1,1002,"SIGANDO",2143,2143,0,0,0,0,0,0],[13,74,1,1008,"TANAH PAK LAMBIK",2034,1970,28,36,0,0,0,0],[13,74,2,1007,"TANAH HITAM",3896,3884,4,8,0,0,0,0],[13,74,1,1004,"NGALAU",3509,3472,10,27,0,0,0,0],[13,74,2,1006,"PASAR BARU",1739,1730,5,2,0,1,1,0],[13,74,1,1006,"KOTO PANJANG",4990,4893,55,42,0,0,0,0],[13,74,1,1007,"KOTO KATIK",1376,1359,17,0,0,0,0,0],[13,74,2,1003,"KAMPUNG MANGGIS",8095,7992,62,41,0,0,0,0],[13,74,2,1004,"SILAING BAWAH",6613,6469,73,71,0,0,0,0],[13,74,1,1003,"EKOR LUBUK",2778,2778,0,0,0,0,0,0],[13,74,2,1001,"BUKIT SURUNGAN",2774,2774,0,0,0,0,0,0]];
