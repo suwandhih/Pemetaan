@@ -212,9 +212,6 @@
     cari.addEventListener('input', gambar); gambar();
   }
   function dapatKunci() { try { return localStorage.getItem(KUNCI) || ''; } catch (e) { return ''; } }
-  function pasangKunci() {
-    if (typeof Simpanan !== 'undefined') { Simpanan.simpanKunci(dapatKunci()); }
-  }
   function mintaKunci() {
     if (dapatKunci()) { return Promise.resolve(true); }
     var k = window.prompt('Masukkan kode database Pemetaan untuk membaca data tersimpan dan katalog media.\nKode disimpan hanya di peramban ini.');
@@ -234,7 +231,7 @@
   function muatMedia(manual) {
     return mintaKunci().then(function (ok) {
       if (!ok) { pesanMedia('Kode database diperlukan untuk membaca media.'); return null; }
-      pasangKunci(); pesanMedia('Membaca data tersimpan…'); document.getElementById('muat-media').disabled = true;
+      pesanMedia('Membaca data tersimpan…'); document.getElementById('muat-media').disabled = true;
       var janjiTersimpan = panggilWorker('ambilSemua').then(function (h) { tersimpan = bersihkanDaftar(h.anggota); }).catch(function (e) { tersimpan = []; pesanMedia(e.message, true); });
       var janjiKatalog = panggilWorker('tarikRumahweb').then(function (h) { katalog = h.anggota; gagalMedia = h.gagal || []; }).catch(function (e) { katalog = null; gagalMedia = []; pesanMedia('Katalog API tidak dapat dibaca: ' + e.message, true); });
       return Promise.all([janjiTersimpan, janjiKatalog]).then(function () {
@@ -408,7 +405,8 @@
     });
     document.getElementById('ganti-kunci').addEventListener('click', function () {
       if (!window.confirm('Ganti kode database pada peramban ini? Kode lama akan dihapus.')) { return; }
-      Simpanan.lupakanKunci(); katalog = null; tersimpan = []; gambarMedia(); muatMedia(true);
+      try { localStorage.removeItem(KUNCI); } catch (e) { /* penyimpanan peramban tidak tersedia */ }
+      katalog = null; tersimpan = []; gambarMedia(); muatMedia(true);
     });
   }
   function mulai() {

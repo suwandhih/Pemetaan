@@ -52,7 +52,8 @@ function git(args) {
   return r.stdout.trim();
 }
 function backup(keterangan) {
-  if (git(['status', '--porcelain'])) { throw new Error('Working tree belum bersih. Commit/simpan perubahan dulu sebelum pembaruan Dukcapil.'); }
+  const perubahan = git(['status', '--porcelain', '--untracked-files=all', '--', '.', ':!Docs/setting rumahweb.txt']);
+  if (perubahan) { throw new Error('Working tree belum bersih. Commit/simpan perubahan dulu sebelum pembaruan Dukcapil.'); }
   git(['commit', '--allow-empty', '-m', 'Backup sebelum pembaruan Data Pemetaan: ' + keterangan]);
   console.log('Backup Git dibuat. Titik pulih: ' + git(['rev-parse', 'HEAD']));
 }
