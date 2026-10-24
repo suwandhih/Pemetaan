@@ -597,6 +597,13 @@ button.agama-baris:hover {
   background: rgba(255, 255, 255, 0.18);
 }
 
+.media-serempak-tombol.nyala {
+  border-color: #58a6ff;
+  background: rgba(88, 166, 255, 0.18);
+  color: #9ecbff;
+  font-weight: 600;
+}
+
 /* ============================================================
    Orderan 26 — keterangan media di peta
    ------------------------------------------------------------

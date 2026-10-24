@@ -259,19 +259,20 @@
         'sisanya tetap terlihat.',
       langkah: [
         'Ketuk tombol [[\uD83D\uDCFA|tekan:#tombol-media]] di bilah atas untuk membuka daftar kelompok.',
-        'Ketuk satu baris untuk menghidupkan atau mematikannya. Baris yang menyala berarti penandanya tampil di peta.',
-        'Ketuk [[Semua hidup|media:hidup]] untuk menampilkan seluruh kelompok sekaligus.',
-        'Ketuk [[Semua mati|media:mati]] untuk menyembunyikan seluruh kelompok sekaligus.',
+        'Ketuk satu baris untuk memilih atau batal memilih kategorinya. Saat tombol utama On, kategori yang dipilih tampil di peta.',
+        'Ketuk [[On|tekan:#media-utama]] untuk mematikan sementara tampilan media; tombol berubah menjadi Off dan pilihan kategori tetap tersimpan.',
+        'Ketuk [[Off|tekan:#media-utama]] untuk menghidupkan kembali hanya kategori yang Anda pilih, bukan seluruh kategori.',
+        'Pilihan kategori tetap dapat diubah saat Off; hasilnya tampil setelah tombol utama diubah ke On.',
         'Ketuk di luar daftar, atau tekan tombol [[Esc|tekan:#tombol-media]], untuk menutupnya.'
       ],
       hasil: [
-        'Penanda di peta langsung menyesuaikan: hanya kelompok yang menyala yang tampil.',
-        'Pilihan Anda tersimpan di database, jadi tetap sama saat halaman dibuka lagi — baik di PC maupun di HP.'
+        'Penanda di peta langsung menyesuaikan pilihan Anda saat tombol utama On.',
+        'Pilihan kategori dan keadaan On/Off tersimpan di database, jadi tetap sama saat halaman dibuka lagi — baik di PC maupun di HP.'
       ],
       catatan: [
         'Daftar kelompok disusun dari data yang benar-benar ada. Lima kelompok media tokomedia.org selalu muncul lebih dulu, lalu seluruh kategori anggota menyusul di bawahnya — termasuk kategori yang belum dipakai anggota, supaya bisa diatur lebih dulu.',
-        'Tombol di bilah atas menjadi redup bila seluruh kelompok dimatikan.',
-        'Menu ini menggantikan tombol mata (\uD83D\uDC41) yang dulu hanya bisa menyembunyikan seluruh penanda sekaligus.'
+        'Tombol di bilah atas menjadi redup bila saklar utama berada pada Off.',
+        'Off hanya menyembunyikan tampilan, bukan menghapus pilihan atau data anggota.'
       ]
     },
     {
@@ -540,7 +541,10 @@
     var arg = pisah < 0 ? '' : aksi.slice(pisah + 1);
 
     if (nama === 'seret' || nama === 'cubit') { gerakPeta(nama); return; }
-    if (nama === 'tekan') { tekan(arg, tombol); return; }
+    if (nama === 'tekan') {
+      if (arg === '#media-utama') { bukaDaftar('tombol-media', 'pemilih-media', arg, tombol); return; }
+      tekan(arg, tombol); return;
+    }
     if (nama === 'sorot') { sorot(arg, tombol); return; }
     if (nama === 'tingkat') {
       tekan('.anggota-tingkat-tombol[data-kelompok="' + arg + '"]', tombol);
@@ -566,8 +570,8 @@
       return;
     }
     if (nama === 'media') {
-      bukaDaftar('tombol-media', 'pemilih-media',
-        '.media-serempak-tombol[data-serempak="' + arg + '"]', tombol);
+      bukaDaftar('tombol-media', 'pemilih-media', '#media-utama', tombol);
+      return;
     }
   }
 

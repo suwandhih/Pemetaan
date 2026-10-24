@@ -14,9 +14,10 @@
 
    CARA KERJA
      Setiap baris = satu kategori. Ketuk baris untuk menghidupkan atau
-     mematikan. Dua tombol di bawah untuk menghidupkan / mematikan
-     semuanya serempak. Keadaan disimpan di database (kunci
-     `media_nyala`), jadi sama di PC maupun HP dan tetap tersimpan
+     mematikan. Satu tombol utama On/Off menyembunyikan atau memulihkan
+     tampilan tanpa mengubah pilihan kategori. Pilihan kategori dan
+     keadaan utama disimpan di database (`media_nyala` dan
+     `media_utama`), jadi sama di PC maupun HP dan tetap tersimpan
      setelah halaman ditutup.
 
    HUBUNGAN DENGAN js/member.js
@@ -31,6 +32,7 @@
   'use strict';
 
   var KUNCI = 'media_nyala';
+  var KUNCI_UTAMA = 'media_utama';
 
   /* Lima kelompok media tokomedia.org — urutannya tetap, mengikuti
      urutan yang dipakai pemilik proyek. */
@@ -46,7 +48,8 @@
   var elTombol = document.getElementById('tombol-media');
   var elIkon = document.getElementById('media-ikon');
 
-  var nyala = {};        /* nama kategori -> true / false */
+  var nyala = {};        /* nama kategori -> pilihan pengguna */
+  var utamaNyala = true; /* saklar tampilan, terpisah dari pilihan */
   var terpasang = false;
   var siap = false;
   var kategoriTersedia = [];   /* seluruh kategori yang terdaftar */
@@ -99,20 +102,22 @@
 
   /* ---------- keadaan ---------- */
 
-  function hidup(nama) {
+  function dipilih(nama) {
     return nyala[nama] !== false;
   }
 
-  function jumlahHidup() {
-    return daftarKategori().filter(hidup).length;
+  function hidup(nama) {
+    return utamaNyala && dipilih(nama);
   }
 
-  /* Dipakai js/member.js. null = semua hidup, jadi tidak perlu disaring. */
+  /* [] = saklar utama mati, sehingga seluruh penanda disaring tanpa
+     mengubah pilihan kategori yang akan dipulihkan saat On. */
   function saring() {
+    if (!utamaNyala) { return []; }
     var semua = daftarKategori();
-    var mati = semua.filter(function (n) { return !hidup(n); });
+    var mati = semua.filter(function (n) { return !dipilih(n); });
     if (!mati.length) { return null; }
-    return semua.filter(hidup);
+    return semua.filter(dipilih);
   }
 
   /* Simpanan adalah `const` tingkat atas (js/simpanan.js), bukan properti
@@ -121,19 +126,26 @@
     return typeof Simpanan !== 'undefined' && !!Simpanan.simpanAtur;
   }
 
-  function simpan() {
-    if (!adaSimpanan()) { return; }
-    Simpanan.simpanAtur(KUNCI, JSON.stringify(nyala));
+  function simpanPilihan() {
+    if (adaSimpanan()) { Simpanan.simpanAtur(KUNCI, JSON.stringify(nyala)); }
+  }
+
+  function simpanUtama() {
+    if (adaSimpanan()) { Simpanan.simpanAtur(KUNCI_UTAMA, utamaNyala ? '1' : '0'); }
   }
 
   function muat() {
     if (!adaSimpanan()) { return Promise.resolve(); }
-    return Simpanan.ambilAtur(KUNCI).then(function (v) {
-      if (!v) { return; }
+    return Promise.all([
+      Simpanan.ambilAtur(KUNCI),
+      Simpanan.ambilAtur(KUNCI_UTAMA)
+    ]).then(function (nilai) {
+      utamaNyala = nilai[1] !== '0';
+      if (!nilai[0]) { return; }
       try {
-        var isi = JSON.parse(v);
+        var isi = JSON.parse(nilai[0]);
         if (isi && typeof isi === 'object') { nyala = isi; }
-      } catch (e) { /* nilai lama / rusak — diabaikan, semua dianggap hidup */ }
+      } catch (e) { /* nilai lama / rusak — diabaikan, semua dianggap dipilih */ }
     }).catch(function () { /* diabaikan */ });
   }
 
@@ -164,8 +176,8 @@
     b.appendChild(k);
 
     b.addEventListener('click', function () {
-      nyala[nama] = !hidup(nama);
-      simpan();
+      nyala[nama] = !dipilih(nama);
+      simpanPilihan();
       tandai();
       terapkan();
     });
@@ -193,40 +205,50 @@
     var serempak = document.createElement('div');
     serempak.className = 'media-serempak';
 
-    [['hidup', 'Semua hidup'], ['mati', 'Semua mati']].forEach(function (p) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'media-serempak-tombol';
-      b.dataset.serempak = p[0];
-      b.textContent = p[1];
-      b.addEventListener('click', function () { semua(p[0] === 'hidup'); });
-      serempak.appendChild(b);
-    });
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.id = 'media-utama';
+    b.className = 'media-serempak-tombol';
+    b.setAttribute('aria-pressed', 'true');
+    b.addEventListener('click', function () { semua(); });
+    serempak.appendChild(b);
 
     elPemilih.appendChild(serempak);
   }
 
   function tandai() {
     var semua = daftarKategori();
-    var hidupN = semua.filter(hidup).length;
+    var pilihanN = semua.filter(dipilih).length;
 
     var b = elPemilih ? elPemilih.querySelectorAll('.media-baris') : [];
     for (var i = 0; i < b.length; i++) {
       var nama = b[i].dataset.media;
-      var on = hidup(nama);
+      var on = dipilih(nama);
       b[i].classList.toggle('nyala', on);
       b[i].setAttribute('aria-selected', on ? 'true' : 'false');
       var k = b[i].querySelector('.media-keadaan');
-      if (k) { k.textContent = on ? 'Hidup' : 'Mati'; }
+      if (k) { k.textContent = on ? 'Dipilih' : 'Tidak dipilih'; }
+    }
+
+    var utama = document.getElementById('media-utama');
+    if (utama) {
+      utama.textContent = utamaNyala ? 'On' : 'Off';
+      utama.classList.toggle('nyala', utamaNyala);
+      utama.setAttribute('aria-pressed', utamaNyala ? 'true' : 'false');
+      utama.setAttribute('aria-label', utamaNyala
+        ? 'On — klik untuk mematikan tampilan media tanpa menghapus pilihan'
+        : 'Off — klik untuk menghidupkan hanya media yang dipilih');
+      utama.title = utamaNyala
+        ? 'On — klik untuk Off; pilihan kategori tetap disimpan'
+        : 'Off — klik untuk On dan tampilkan hanya kategori yang dipilih';
     }
 
     if (elTombol) {
-      elTombol.setAttribute('aria-pressed', hidupN ? 'true' : 'false');
-      elTombol.title = hidupN === semua.length
-        ? 'Media on/off — semua ' + semua.length + ' kelompok tampil di peta'
-        : 'Media on/off — ' + hidupN + ' dari ' + semua.length + ' kelompok tampil di peta';
+      elTombol.setAttribute('aria-pressed', utamaNyala ? 'true' : 'false');
+      elTombol.title = (utamaNyala ? 'Media On — ' : 'Media Off — ') +
+        pilihanN + ' dari ' + semua.length + ' kelompok dipilih';
     }
-    if (elIkon) { elIkon.style.opacity = hidupN ? '1' : '0.45'; }
+    if (elIkon) { elIkon.style.opacity = utamaNyala ? '1' : '0.45'; }
   }
 
   /* ---------- menerapkan ke peta ---------- */
@@ -242,9 +264,9 @@
     }
   }
 
-  function semua(hidupSemua) {
-    daftarKategori().forEach(function (n) { nyala[n] = !!hidupSemua; });
-    simpan();
+  function semua(nyalaUtama) {
+    utamaNyala = arguments.length ? !!nyalaUtama : !utamaNyala;
+    simpanUtama();
     tandai();
     terapkan();
   }
@@ -314,6 +336,7 @@
     MEDIA: MEDIA,
     siap: function () { return siap; },
     hidup: hidup,
+    utama: function () { return utamaNyala; },
     saring: saring,
     semua: semua,
     terapkan: terapkan,

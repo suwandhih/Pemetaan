@@ -218,7 +218,7 @@ sebagai skrip biasa supaya bisa jalan dari GitHub Pages tanpa build.
 | `PD_SUKU` | `suku.js` | `ganti(i)`, `matikan()`, `aktif()`, `tutupPanel()`, `SUKU` |
 | `PD_ANGGOTA` | `member.js` | `muat()`, `gambarPenanda()`, `bukaPanel()`, `bukaForm()`, `tutupPanel()`, `tutupForm()`, `terapkanTampil()`, `ambilAnggota()`, `sorotWilayah()`, `tunjukTitik()` |
 | `PD_IKON` | `ikon.js` | `DAFTAR`, `KATEGORI`, `untukKategori()`, `gambar()`, `pasang()`, `lengkap()` |
-| `PD_MEDIA` | `media.js` | `MEDIA`, `siap()`, `hidup(nama)`, `saring()`, `semua(nyala)`, `terapkan()`, `bukaTutup(buka)`, `segarkan()` |
+| `PD_MEDIA` | `media.js` | `MEDIA`, `siap()`, `hidup(nama)`, `utama()`, `saring()`, `semua(nyalaUtama?)`, `terapkan()`, `bukaTutup(buka)`, `segarkan()` |
 | `PD_LABEL` | `label.js` | `siap()`, `segarkan()`, `gambar()`, `data()`, `inventaris()` |
 | `PD_TOKOMEDIA` | `tokomedia.js` | `tarik()`, `siap()` |
 | `PD_CARI` | `cari.js` | `buka()`, `tutup()`, `setAnggotaSiap()` |
@@ -343,13 +343,20 @@ tingginya ±11 px + 4 px jarak, jadi keterangan perlu diangkat ke **+18 px**.
 | 21 | Peta agama 4 tingkat | `agama.js` | disajikan dalam **persentase** supaya tidak mengulang peta penduduk; Konghucu & Kepercayaan tetap dalam angka jumlah |
 | 22 | Tampilan PC lebar (responsive) | `gaya.css` | PC lebar penuh, HP seperti semula |
 | 23 | Data anggota dari tokomedia.org + tombol [Update] | `tokomedia.js`, `worker.js` | 699 anggota · 5 kategori · koordinat otomatis · icon kategori |
-| 24 | Menu "Media on/off" | `media.js` | pilih kelompok data yang tampil di peta; keadaan disimpan di database; bilah atas menjadi ikon saja |
+| 24 | Menu "Media on/off" | `media.js` | pilih kelompok data yang tampil di peta; pilihan disimpan di database; satu tombol utama On/Off menyembunyikan atau memulihkan hanya pilihan tersebut; bilah atas menjadi ikon saja |
 | 25 | Seluruh kategori bisa dihidupkan / dimatikan | `media.js` | daftar digabung dari kategori yang dipakai anggota + daftar kategori resmi |
 | 26 | Jangkar & label media per provinsi | `label.js` | satu jangkar + satu label per provinsi berdata media; label menyebut nama pendek kelompok yang sedang hidup; ketuk → garis merah provinsi |
 | 27 | Pemetaan memakai 2 server (Neon + Rumahweb) | `worker.js`, `simpanan.js`, `tokomedia.js` | Neon = data anggota (baca/tulis); Rumahweb = data media TokoMedia (**baca saja**) lewat `pemetaan-bridge.php`; 300 anggota · 35 provinsi berlabel |
 | — | Panduan pemakaian interaktif | `panduan.js` | tombol `?` mengenali posisi pemakai; kata kunci jadi tautan yang benar-benar menjalankan aksinya |
 
 ### Detail yang mudah terlewat
+
+**Media on/off — pilihan dan tampilan terpisah (orderan 30).** `media_nyala`
+menyimpan pilihan per kategori; `media_utama` menyimpan `1` untuk On atau `0`
+untuk Off. Off menghasilkan saringan kosong tanpa menimpa pilihan kategori.
+Pengguna tetap bisa mengubah pilihan saat Off; On memulihkan hanya kategori
+yang dipilih, bukan seluruh kategori. Label media mengikuti keadaan utama dan
+pilihan tersebut melalui `PD_MEDIA.hidup()`.
 
 **Peta tematik (16 & 21) — perilaku tombol.** Tombol Populasi memakai
 **klik-pilih / klik-mati**: bila peta Populasi sedang menyala, klik tombol =

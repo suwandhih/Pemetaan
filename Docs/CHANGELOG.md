@@ -29,6 +29,40 @@ Repo: https://github.com/suwandhih/Pemetaan
 2026-10-17 → 22 commit · 2026-10-18 → 4 commit · 2026-10-22 → 7 commit.
 ---
 
+## 2026-10-24
+
+### Orderan 30 — satu tombol Media On/Off dengan pilihan yang diingat
+
+**Perbaikan.** Tombol **Semua hidup** dan **Semua mati** diganti satu tombol
+utama **On/Off**. Off menyembunyikan seluruh penanda dan label media tanpa
+menghapus pilihan kategori. On memulihkan **hanya kategori yang dipilih
+pengguna**, bukan menghidupkan semua kategori.
+
+- Pilihan per kategori tetap disimpan dalam `media_nyala`; keadaan utama
+  disimpan terpisah dalam `media_utama` (`1` = On, `0` = Off) melalui Neon,
+  dengan cadangan IndexedDB/antrean dari modul penyimpanan yang sudah ada.
+- Kategori tetap dapat dipilih atau dibatalkan saat Off. Pilihan baru tidak
+  tampil sampai tombol utama diubah ke On, dan bertahan setelah halaman dimuat
+  ulang.
+- Baris kategori menunjukkan **Dipilih/Tidak dipilih**, bukan keadaan tampilan
+  sesaat. Tombol di bilah atas meredup selama Off.
+- Panduan Media on/off diperbarui; tautan On/Off membuka daftar media lebih
+  dahulu agar tombol tujuan tersedia saat panduan dijalankan.
+- Versi cache di `index.html` dinaikkan ke `20261024-01`.
+
+**Verifikasi lokal:** `node --check` untuk `js/media.js`, `js/member.js`,
+`js/label.js`, dan `js/panduan.js` lulus; `git diff --check` lulus; pemeriksaan
+editor tidak menemukan galat. Uji Playwright memakai delapan kategori dan
+Worker tiruan—tanpa mengubah data produksi—meluluskan **37 pemeriksaan**:
+memilih Film Isa, Video Kitab Suci, Kesehatan, dan Sosial; Off menyaring semua
+penanda dan label; mengganti Sosial dengan Film Ikatan Ilahi saat Off;
+mempertahankan pilihan setelah reload; On memulihkan hanya empat pilihan;
+klik nyata pada kategori dan tombol utama; ganti Satelit → Map → Satelit;
+panduan interaktif; dan **0 galat runtime aplikasi**. Ubin peta luar sengaja
+diblokir dalam pengujian lokal terisolasi.
+
+---
+
 ## 2026-10-23
 
 ### Orderan 29 — Dashboard laporan cakupan layanan
