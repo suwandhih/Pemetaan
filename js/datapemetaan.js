@@ -471,7 +471,7 @@
     pasang(); Promise.all([ambil('indeks.json'), ambil('bahasa-suku.json'), ambil('snapshot-media.json')]).then(function (d) {
       indeks = d[0]; bahasaSuku = d[1]; katalog = bersihkanDaftar(d[2].katalog); gagalMedia = d[2].gagal || []; waktuSnapshot = d[2].diambil; status('');
       document.getElementById('status-sumber').textContent = 'Dukcapil ' + indeks.sumber.wilayah + ' · rincian dimuat saat diklik';
-      daftarProvinsi(); gambarAgama(); gambarSumber(); perbaruiAnalisis(); gantiTab('wilayah');
+      daftarProvinsi(); gambarAgama(); gambarSumber(); perbaruiAnalisis(); gantiTab(new URLSearchParams(location.search).get('di') === 'manajemen' ? 'analisis' : 'wilayah');
     }).catch(function (e) { status('Laporan tidak dapat dimuat: ' + e.message, true); });
   }
   mulai();

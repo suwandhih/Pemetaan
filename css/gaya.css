@@ -751,6 +751,20 @@ button.agama-baris:hover {
 
 #panel-dashboard[hidden] { display: none; }
 
+/* Orderan 32: isi laporan manajemen diganti Data Pemetaan. */
+#dashboard-laporan { display: block; flex: 1; min-width: 0; min-height: 0; width: 100%; border: 0; background: #f4f3ed; }
+#panel-dashboard { background: #f4f3ed; }
+#dashboard-status { flex: none; padding: 7px 16px; margin: 0; color: #596960; background: #eae9dc; font-size: 11px; }
+@media (min-width: 900px) {
+  #panel-dashboard { width: min(1100px, 85vw); }
+  #bingkai:has(#panel-dashboard:not([hidden])) #peta,
+  #bingkai:has(#panel-dashboard:not([hidden])) #bilah-atas,
+  #bingkai:has(#panel-dashboard:not([hidden])) #bilah-bawah,
+  #bingkai:has(#panel-dashboard:not([hidden])) #cari,
+  #bingkai:has(#panel-dashboard:not([hidden])) #keterangan-media,
+  #bingkai:has(#panel-dashboard:not([hidden])) #atribusi { left: min(1100px, 85vw); right: 0; }
+}
+
 #dashboard-kepala {
   flex: none;
   display: flex;

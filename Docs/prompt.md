@@ -292,6 +292,13 @@ selalu disertai angka tekstual. Modul `hitung()` murni dapat diuji di Node;
 modul tidak mengambil API sendiri dan hanya menerima hasil read-only dari
 `js/datapemetaan.js`.
 
+**Laporan manajemen (2026-10-24):** tombol laporan pada `index.html` memuat
+`datapemetaan.html?di=manajemen` melalui `js/laporan-manajemen.js`. Report yang
+sama tampil dalam panel peta dengan tab awal Target & produk; tidak ada model
+perhitungan kedua. Dashboard lama disimpan pada
+`backup/laporan-manajemen-20261024/` dan dapat dipulihkan dari situ. Halaman
+`datapemetaan.html` mandiri tetap tersedia.
+
 **Snapshot live (2026-10-24):** `data/datapemetaan/snapshot-media.json` berisi
 304 rekaman katalog bahasa/produk yang dibaca read-only melalui koneksi
 Pemetaan → Worker → Rumahweb → API TokoMedia. Pembacaan selesai dalam 4,272

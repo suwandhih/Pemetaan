@@ -31,6 +31,28 @@ Repo: https://github.com/suwandhih/Pemetaan
 
 ## 2026-10-24
 
+### Orderan 32 — Laporan manajemen memakai Data Pemetaan
+
+Atas perintah pemilik 18:43 WIB, isi **Laporan manajemen** pada peta diganti
+dengan report `datapemetaan.html` yang sudah berisi snapshot media live.
+Dashboard lama dibackup sebelum perubahan pada
+`backup/laporan-manajemen-20261024/` (`index.html`, `js/dashboard.js`, dan
+`css/gaya.css`), serta titik pulih Git `f79a26f`.
+
+- Tombol laporan pada peta membuka report Target & produk di panel yang sama;
+  tab Wilayah, Bahasa & media, Suku & agama, serta Sumber tetap tersedia.
+- `js/laporan-manajemen.js` menggantikan pemuat dashboard pada `index.html`.
+  Report dimuat saat tombol dibuka dan memakai sumber/perhitungan yang sama,
+  tanpa mengubah katalog atau membangun ulang hierarki.
+- `datapemetaan.html` tetap tersedia sebagai halaman mandiri. Saat dibuka dari
+  panel manajemen, tajuk ganda disederhanakan dan tab awal adalah Target &
+  produk; tombol tutup mengembalikan peta.
+- Verifikasi browser lulus 15 pemeriksaan: tombol peta, angka snapshot, 38
+  provinsi, rincian bahasa, tab wilayah, buka/tutup, desktop, ponsel, dan
+  0 galat runtime. Status tetap **MENUNGGU KONFIRMASI**, bukan `SELESAI`.
+
+---
+
 ### Orderan 32 — Snapshot live langsung ke report inti
 
 Atas persetujuan pemilik 18:17 WIB, pendekatan langsung menggantikan proses yang

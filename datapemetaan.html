@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
-<link rel="stylesheet" href="css/datapemetaan.css?v=20261024-05">
+<link rel="stylesheet" href="css/datapemetaan.css?v=20261024-06">
 </head>
 <body>
 <a class="loncat" href="#isi">Langsung ke isi</a>
-<header class="kepala">
+<header class="kepala laporan-mandiri">
   <div class="kepala-isi">
     <a class="kembali" href="index.html" aria-label="Kembali ke peta Pemetaan">← Peta</a>
     <p class="eyebrow">PEMETAAN · CERMIN DATA</p>
@@ -74,8 +74,9 @@
     <div id="isi-detail" class="isi-detail"></div>
   </section>
 </div>
-<footer class="kaki"><span>Data Pemetaan · Tahap 2</span><a href="index.html">Kembali ke peta ↗</a></footer>
+<footer class="kaki laporan-mandiri"><span>Data Pemetaan · Tahap 2</span><a href="index.html">Kembali ke peta ↗</a></footer>
+<script>if (new URLSearchParams(location.search).get('di') === 'manajemen') { document.body.classList.add('di-manajemen'); }</script>
 <script src="js/analisis-media.js?v=20261024-05"></script>
-<script src="js/datapemetaan.js?v=20261024-05"></script>
+<script src="js/datapemetaan.js?v=20261024-06"></script>
 </body>
 </html>
