@@ -20,7 +20,8 @@ Repo: https://github.com/suwandhih/Pemetaan
 |---|---|
 | Orderan selesai | 27 (orderan 1–27) |
 | Menunggu konfirmasi | 28–33 |
-| Status kerja | **Orderan 33 selesai diverifikasi lokal; menunggu konfirmasi pemilik** |
+| Status kerja | **Orderan 33 online dan terverifikasi; menunggu konfirmasi pemilik** |
+| Publikasi Opsi A | `6b4f319a` · GitHub Pages berhasil · server pratinjau dihentikan |
 | Laporan aktif | Data Pemetaan pada `datapemetaan.html` dan tombol ▣ pada peta |
 | Snapshot media | 304 rekaman · 2026-10-24 18:19 WIB |
 | Target–produk | 212/341 ada isi · 129 belum · 6 lengkap · 731 produk inti kurang |
@@ -80,8 +81,11 @@ tanpa overflow halaman, dan 0 galat runtime. Empat pengujian Agama juga
 memastikan tujuh kategori dan nilai sumber pada setiap tingkat; desa Kenari
 diuji langsung dalam viewport ponsel 390 × 844, termasuk rincian sumber dan
 tutup kartu. Pemeriksaan sintaks `warna.js` dan `agama.js` serta pemeriksaan
-editor untuk berkas yang berubah lulus. Status **MENUNGGU KONFIRMASI**, bukan
-`SELESAI` sampai pemilik menyatakannya.
+editor untuk berkas yang berubah lulus. Setelah push `6b4f319a`, deployment
+GitHub Pages run `40095680388` berhasil pada commit yang sama. Pengujian klik
+Populasi (9 pemeriksaan) dan Agama (4 tingkat) diulang pada situs online dan
+lulus, termasuk desa Kenari pada ponsel. Server pratinjau kemudian dihentikan.
+Status **MENUNGGU KONFIRMASI**, bukan `SELESAI` sampai pemilik menyatakannya.
 
 ---
 
